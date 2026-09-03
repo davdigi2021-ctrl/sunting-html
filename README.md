@@ -16,18 +16,25 @@ Editor ini **tidak melakukan itu**. Halaman dirender apa adanya di dalam iframe,
 
 ## Fitur
 
+**Menyunting**
 - Klik elemen untuk memilih, klik dua kali untuk mengubah teks
-- Ubah **link** tujuan (href) dan opsi buka di tab baru
-- **Ubah ukuran** dengan menarik titik biru, atau isi angka lebar/tinggi/ukuran teks
-- Atur **jarak** (padding/margin), **warna** teks dan latar, serta perataan teks
+- Ubah **link** tujuan dan opsi buka di tab baru, dengan peringatan kalau alamatnya keliru
+- **Ubah ukuran** dengan menarik bulatan biru, atau isi angka lebar/tinggi
+- **Ganti font**, tebal huruf, jarak baris, dan perataan. Font Google dimuat otomatis
+- Atur jarak dalam/luar, warna tulisan dan latar
+- **Ganti ikon SVG** dari daftar siap pakai atau tempel kode SVG sendiri
+- **Ganti/tambah gambar** lewat pemilih file atau seret langsung ke kanvas
+- Geser posisi dengan menyeret, gandakan, dan hapus elemen
 - **Tambah elemen**: section, judul, paragraf, tombol, gambar, 2 kolom, garis, jarak
-- **Ganti/tambah gambar** — pilih file atau seret langsung dari komputer ke kanvas (gambar disimpan sebagai data URI, jadi ikut terbawa di file hasil)
-- **Geser posisi** elemen dengan seret, atau tombol naik/turun
-- Duplikat dan hapus elemen
-- **Undo/redo** (Ctrl+Z / Ctrl+Shift+Z)
-- Pratinjau lebar **desktop / tablet / HP**
-- Dukungan file **CSS dan JS terpisah** (kalau AI memberi 3 file, bukan 1)
-- Unduh hasil sebagai `.html` atau salin kodenya
+- Undo/redo (Ctrl+Z / Ctrl+Shift+Z)
+
+**Melihat**
+- Pratinjau **ukuran layar asli**: Desktop 1440px, Laptop 1280px, Tablet 820px, HP 390px, dengan zoom yang menyesuaikan
+- **Panel lapisan** berisi struktur halaman. Arahkan kursor ke satu baris untuk melihat letaknya disorot di kanvas
+- **Lihat kode** untuk seluruh halaman atau satu elemen saja
+
+**Memeriksa**
+- Pemeriksa masalah otomatis dengan penjelasan bahasa sehari-hari dan tombol perbaiki. Yang dicek: link yang tidak akan sampai tujuan, nomor WhatsApp salah format, link tab baru yang belum aman, gambar tanpa teks pengganti, gambar dengan alamat lokal, alamat http yang rawan diblokir, link menu yang menuju bagian tidak ada, id kembar, kurung CSS yang belum ditutup, aturan CSS salah tulis, serta bahasa/judul/viewport halaman
 
 ## Privasi
 
