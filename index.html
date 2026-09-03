@@ -201,32 +201,56 @@ button,input,select,textarea{font:inherit;color:inherit;}
 .empty svg{width:26px;height:26px;color:var(--ink-3);}
 
 /* ---------- Blok ---------- */
-.blocks{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.block{
-  border:1px solid var(--line);background:var(--surface-2);border-radius:var(--r);
-  padding:13px 8px;cursor:pointer;color:var(--ink);
-  display:flex;flex-direction:column;align-items:center;gap:7px;
-  font-size:13px;font-weight:500;transition:border-color var(--t),background var(--t),transform .1s;
+.block-cat{
+  font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--ink-3);margin:2px 0 -4px;
 }
-.block:hover{border-color:var(--accent);background:var(--accent-soft);}
-.block:active{transform:scale(.96);}
+.blocks{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.block{
+  border:1px solid var(--line);background:var(--surface);border-radius:var(--r);
+  padding:14px 8px 12px;cursor:grab;color:var(--ink);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  font-size:12px;font-weight:500;
+  transition:border-color var(--t),background var(--t),transform .12s ease,box-shadow var(--t);
+}
+.block-ico{
+  width:34px;height:34px;border-radius:var(--r-sm);background:var(--surface-3);
+  display:grid;place-items:center;color:var(--ink-2);
+  transition:background var(--t),color var(--t);
+}
+.block:hover{border-color:var(--accent);background:var(--surface);box-shadow:var(--sh-1);transform:translateY(-1px);}
+.block:hover .block-ico{background:var(--accent-soft);color:var(--accent);}
+.block:active{transform:scale(.97);cursor:grabbing;}
+.block.dragging{opacity:.4;}
 .block:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
-.block svg{width:21px;height:21px;color:var(--ink-3);stroke-linecap:round;stroke-linejoin:round;}
-.block:hover svg{color:var(--accent);}
+.block svg{width:18px;height:18px;stroke-linecap:round;stroke-linejoin:round;}
 
 /* ---------- Lapisan ---------- */
 .layers{display:flex;flex-direction:column;gap:1px;}
 .layer{
-  display:flex;align-items:center;gap:5px;width:100%;
+  display:flex;align-items:center;gap:3px;width:100%;
   border:0;background:transparent;cursor:pointer;color:var(--ink);
-  padding:5px 6px;border-radius:var(--r-xs);font-size:13px;text-align:left;
+  padding:4px 6px;border-radius:var(--r-xs);font-size:13px;text-align:left;
   transition:background var(--t);
 }
 .layer:hover{background:var(--surface-3);}
 .layer.on{background:var(--accent);color:var(--accent-ink);}
-.layer.on .layer-tag{color:rgba(255,255,255,.75);}
+.layer.on .layer-tag,.layer.on .layer-count{color:rgba(255,255,255,.75);}
+.layer.on .layer-eye,.layer.on .layer-grip{color:rgba(255,255,255,.75);}
+.layer-eye{
+  width:20px;height:20px;flex:0 0 auto;border:0;background:transparent;padding:0;
+  display:grid;place-items:center;color:var(--ink-3);border-radius:6px;cursor:pointer;position:relative;
+}
+.layer-eye:hover{background:var(--surface-2);color:var(--ink);}
+.layer.on .layer-eye:hover{background:rgba(255,255,255,.16);}
+.layer-eye svg{width:14px;height:14px;}
+.layer-eye.off{color:var(--ink-3);opacity:.55;}
+.layer-eye.off::after{
+  content:'';position:absolute;width:15px;height:1.5px;background:currentColor;
+  transform:rotate(45deg);border-radius:1px;
+}
 .layer-twist{
-  width:15px;height:15px;flex:0 0 auto;display:grid;place-items:center;
+  width:14px;height:14px;flex:0 0 auto;display:grid;place-items:center;
   color:var(--ink-3);transition:transform var(--t);cursor:pointer;
 }
 .layer-twist svg{width:9px;height:9px;}
@@ -234,6 +258,18 @@ button,input,select,textarea{font:inherit;color:inherit;}
 .layer-twist.leaf{visibility:hidden;}
 .layer-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .layer-tag{font-family:var(--mono);font-size:11px;color:var(--ink-3);flex:0 0 auto;}
+.layer-count{
+  font-family:var(--mono);font-size:10px;color:var(--ink-3);background:var(--surface-3);
+  padding:1px 6px;border-radius:var(--r-pill);flex:0 0 auto;
+}
+.layer.on .layer-count{background:rgba(255,255,255,.2);}
+.layer-grip{
+  width:20px;height:20px;flex:0 0 auto;border:0;background:transparent;padding:0;
+  display:grid;place-items:center;color:var(--ink-3);cursor:grab;border-radius:6px;
+}
+.layer-grip:hover{background:var(--surface-2);color:var(--ink);}
+.layer.on .layer-grip:hover{background:rgba(255,255,255,.16);}
+.layer-grip svg{width:13px;height:13px;}
 .layer-kids[hidden]{display:none;}
 
 /* ---------- Cek masalah ---------- */
@@ -409,10 +445,70 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
 .crumb-sep{color:var(--ink-3);font-size:11px;}
 
 .swatch{display:flex;align-items:center;gap:5px;}
-.swatch input[type="color"]{
-  width:100%;height:32px;padding:3px;border:1px solid var(--line);
-  border-radius:var(--r-sm);background:var(--surface);cursor:pointer;
+.swatch-trigger{
+  flex:1;min-width:0;height:32px;padding:0 8px;display:flex;align-items:center;gap:7px;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);
+  cursor:pointer;transition:border-color var(--t),background var(--t);
 }
+.swatch-trigger:hover{border-color:var(--line-2);background:var(--surface-2);}
+.swatch-trigger:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.swatch-chip{
+  width:17px;height:17px;border-radius:50%;flex:0 0 auto;
+  border:1px solid rgba(0,0,0,.14);box-shadow:inset 0 0 0 1px rgba(255,255,255,.55);
+}
+.swatch-val{
+  font-family:var(--mono);font-size:11px;color:var(--ink-2);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+
+/* ---------- Pemilih warna kustom ---------- */
+.cpop{
+  position:fixed;z-index:1150;width:210px;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--sh-3);padding:12px;display:flex;flex-direction:column;gap:10px;
+}
+.cpop[hidden]{display:none;}
+.cpop-sv{
+  position:relative;width:100%;height:120px;border-radius:var(--r-sm);cursor:crosshair;
+  background-image:
+    linear-gradient(to top, #000, rgba(0,0,0,0)),
+    linear-gradient(to right, #fff, rgba(255,255,255,0));
+  overflow:hidden;touch-action:none;
+}
+.cpop-sv-thumb{
+  position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;
+  border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.35),0 1px 4px rgba(0,0,0,.35);
+  pointer-events:none;left:0;top:0;
+}
+.cpop-hue{
+  position:relative;width:100%;height:13px;border-radius:var(--r-pill);cursor:pointer;
+  background:linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00);touch-action:none;
+}
+.cpop-hue-thumb{
+  position:absolute;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;
+  background:#fff;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.35),0 1px 4px rgba(0,0,0,.35);
+  pointer-events:none;left:0;
+}
+.cpop-row{display:flex;gap:7px;align-items:center;}
+.cpop-eye{
+  width:32px;height:32px;flex:0 0 auto;border:1px solid var(--line);background:var(--surface-2);
+  border-radius:var(--r-sm);color:var(--ink-2);cursor:pointer;display:grid;place-items:center;
+  transition:background var(--t),color var(--t);
+}
+.cpop-eye:hover{background:var(--surface-3);color:var(--ink);}
+.cpop-eye svg{width:15px;height:15px;}
+.cpop-eye[hidden]{display:none;}
+.cpop-hex{
+  flex:1;min-width:0;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:7px 9px;font-family:var(--mono);font-size:12px;color:var(--ink);text-transform:uppercase;
+}
+.cpop-hex:focus-visible{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent;}
+.cpop-swatches{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;}
+.cpop-sw{
+  aspect-ratio:1;border-radius:50%;border:1px solid var(--line-2);cursor:pointer;padding:0;
+  transition:transform .12s ease;
+}
+.cpop-sw:hover{transform:scale(1.18);}
 .clr{
   width:30px;height:32px;flex:0 0 auto;border:1px solid var(--line);
   background:var(--surface);color:var(--ink-3);border-radius:var(--r-sm);
@@ -502,6 +598,8 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
     <g id="i-button"><rect x="2.5" y="7.5" width="19" height="9" rx="4.5"/><path d="M8.5 12h7"/></g>
     <g id="i-image"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><circle cx="8.8" cy="9.8" r="1.6"/><path d="m4.5 17.5 4.8-4.8a1.6 1.6 0 0 1 2.2 0l5.3 5.3M14.5 14l1.7-1.7a1.6 1.6 0 0 1 2.2 0l2.1 2.1"/></g>
     <g id="i-cols"><rect x="3.5" y="4.5" width="7" height="15" rx="2.4"/><rect x="13.5" y="4.5" width="7" height="15" rx="2.4"/></g>
+    <g id="i-cols3"><rect x="2.5" y="4.5" width="5.7" height="15" rx="2"/><rect x="9.2" y="4.5" width="5.7" height="15" rx="2"/><rect x="15.8" y="4.5" width="5.7" height="15" rx="2"/></g>
+    <g id="i-video"><rect x="2.5" y="5.5" width="14" height="13" rx="2.6"/><path d="M16.5 10.3 21 7.8v8.4l-4.5-2.5"/></g>
     <g id="i-line"><path d="M4 12h16"/></g>
     <g id="i-space"><path d="M12 4.5v15M8.5 8 12 4.5 15.5 8M8.5 16 12 19.5 15.5 16"/></g>
     <g id="i-trash"><path d="M4 6.5h16M9.5 6.5V5a1.5 1.5 0 0 1 1.5-1.5h2A1.5 1.5 0 0 1 14.5 5v1.5"/><path d="M6.5 6.5 7.4 19a2 2 0 0 0 2 1.9h5.2a2 2 0 0 0 2-1.9l.9-12.5"/></g>
@@ -516,6 +614,9 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
     <g id="i-target"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.6"/><path d="M12 1.8v2.6M12 19.6v2.6M1.8 12h2.6M19.6 12h2.6"/></g>
     <g id="i-refresh"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6"/><path d="M20.5 3v5.2h-5.2"/></g>
     <g id="i-star"><path d="m12 3.5 2.6 5.3 5.9.9-4.2 4.1 1 5.8-5.3-2.8-5.3 2.8 1-5.8-4.2-4.1 5.9-.9Z"/></g>
+    <g id="i-eye"><path d="M2.2 12S6.5 5.3 12 5.3 21.8 12 21.8 12 17.5 18.7 12 18.7 2.2 12 2.2 12Z"/><circle cx="12" cy="12" r="3"/></g>
+    <g id="i-drop"><path d="M19.6 4.4a2.15 2.15 0 0 1 0 3l-1 1-3-3 1-1a2.15 2.15 0 0 1 3 0Z"/><path d="m15.6 5.4-9.9 9.9a2 2 0 0 0-.5.9L4 20l3.8-1.2a2 2 0 0 0 .9-.5l9.9-9.9Z"/><path d="m12.6 8.4 3 3"/></g>
+    <g id="i-grip"><circle cx="9" cy="6" r="1.15"/><circle cx="15" cy="6" r="1.15"/><circle cx="9" cy="12" r="1.15"/><circle cx="15" cy="12" r="1.15"/><circle cx="9" cy="18" r="1.15"/><circle cx="15" cy="18" r="1.15"/></g>
   </defs>
 </svg>
 
@@ -710,13 +811,19 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
               <div class="row">
                 <label>Tulisan
                   <span class="swatch">
-                    <input type="color" id="pColor" value="#000000">
+                    <button class="swatch-trigger" id="pColorBtn" type="button" aria-label="Pilih warna tulisan">
+                      <span class="swatch-chip" id="pColorChip"></span>
+                      <span class="swatch-val" id="pColorVal">#000000</span>
+                    </button>
                     <button class="clr" type="button" data-clear="color" title="Kembalikan ke asal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><use href="#i-x"/></svg></button>
                   </span>
                 </label>
                 <label>Latar
                   <span class="swatch">
-                    <input type="color" id="pBg" value="#ffffff">
+                    <button class="swatch-trigger" id="pBgBtn" type="button" aria-label="Pilih warna latar">
+                      <span class="swatch-chip" id="pBgChip"></span>
+                      <span class="swatch-val" id="pBgVal">#ffffff</span>
+                    </button>
                     <button class="clr" type="button" data-clear="backgroundColor" title="Kembalikan ke asal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><use href="#i-x"/></svg></button>
                   </span>
                 </label>
@@ -738,17 +845,23 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
 
     <div class="tab-panel" id="tabBlocks" hidden>
           <p class="sec-title">Tambah elemen</p>
+          <p class="block-cat">Dasar</p>
           <div class="blocks">
-            <button class="block" data-block="section" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-section"/></svg>Section</button>
-            <button class="block" data-block="heading" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-heading"/></svg>Judul</button>
-            <button class="block" data-block="text" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-text"/></svg>Paragraf</button>
-            <button class="block" data-block="button" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-button"/></svg>Tombol</button>
-            <button class="block" data-block="image" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-image"/></svg>Gambar</button>
-            <button class="block" data-block="columns" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-cols"/></svg>2 Kolom</button>
-            <button class="block" data-block="divider" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-line"/></svg>Garis</button>
-            <button class="block" data-block="spacer" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-space"/></svg>Jarak</button>
+            <button class="block" data-block="section" type="button"><span class="block-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-section"/></svg></span>Section</button>
+            <button class="block" data-block="heading" type="button"><span class="block-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-heading"/></svg></span>Judul</button>
+            <button class="block" data-block="text" type="button"><span class="block-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-text"/></svg></span>Paragraf</button>
+            <button class="block" data-block="button" type="button"><span class="block-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-button"/></svg></span>Tombol</button>
+            <button class="block" data-block="image" type="button"><span class="block-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-image"/></svg></span>Gambar</button>
+            <button class="block" data-block="video" type="button"><span class="block-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-video"/></svg></span>Video</button>
           </div>
-          <p class="note">Elemen baru muncul tepat di bawah elemen yang sedang kamu pilih. Kalau belum memilih apa pun, ia ditaruh di paling bawah halaman.</p>
+          <p class="block-cat">Tata letak</p>
+          <div class="blocks">
+            <button class="block" data-block="columns" type="button"><span class="block-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-cols"/></svg></span>2 Kolom</button>
+            <button class="block" data-block="columns3" type="button"><span class="block-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-cols3"/></svg></span>3 Kolom</button>
+            <button class="block" data-block="divider" type="button"><span class="block-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-line"/></svg></span>Garis</button>
+            <button class="block" data-block="spacer" type="button"><span class="block-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-space"/></svg></span>Jarak</button>
+          </div>
+          <p class="note">Seret kartu ke kanvas untuk menaruhnya di posisi tertentu, atau klik saja untuk menambahkannya tepat di bawah elemen yang sedang dipilih.</p>
         </div>
 
     <div class="tab-panel" id="tabLayers" hidden>
@@ -832,6 +945,16 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
 
 <input type="file" id="fileInput" accept="image/*" hidden>
 <div class="toast" id="toast" hidden></div>
+
+<div class="cpop" id="colorPop" hidden>
+  <div class="cpop-sv" id="cpSv"><div class="cpop-sv-thumb" id="cpSvThumb"></div></div>
+  <div class="cpop-hue" id="cpHue"><div class="cpop-hue-thumb" id="cpHueThumb"></div></div>
+  <div class="cpop-row">
+    <button class="cpop-eye" id="cpEye" type="button" title="Ambil warna dari layar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-drop"/></svg></button>
+    <input class="cpop-hex" id="cpHex" type="text" maxlength="7" spellcheck="false" autocomplete="off">
+  </div>
+  <div class="cpop-swatches" id="cpSwatches"></div>
+</div>
 <script>
 (function(){
 'use strict';
@@ -845,7 +968,9 @@ var E = {};
  'ovl','boxHover','boxPeek','boxDrop','boxSel','selTag','insLine','qbar','shield',
  'propsEmpty','propsBody','crumbs','cText','pText','cLink','pHref','linkErr','linkFix','pBlank',
  'cImg','imgPick','pAlt','cIcon','iconPick','pFont','pSize','pWeight','pLh','pAlign',
- 'pW','pH','pPad','pMar','pColor','pBg','fileInput','toast',
+ 'pW','pH','pPad','pMar','fileInput','toast',
+ 'pColorBtn','pColorChip','pColorVal','pBgBtn','pBgChip','pBgVal',
+ 'colorPop','cpSv','cpSvThumb','cpHue','cpHueThumb','cpEye','cpHex','cpSwatches',
  'codeModal','codeOut','codeTitle','codeCopy','iconModal','iconGrid','iconSvg','iconApply'
 ].forEach(function(id){ E[id] = $(id); });
 
@@ -1267,8 +1392,8 @@ function fillProps(){
   E.pH.value = sel.style.height || ''; E.pH.placeholder = Math.round(r.height)+'px';
   E.pPad.value = sel.style.padding || ''; E.pPad.placeholder = css(sel,'padding');
   E.pMar.value = sel.style.margin || ''; E.pMar.placeholder = css(sel,'margin');
-  E.pColor.value = hex(css(sel,'color')) || '#000000';
-  E.pBg.value = hex(css(sel,'backgroundColor')) || '#ffffff';
+  setSwatch(E.pColorChip, E.pColorVal, hex(css(sel,'color')) || '#000000');
+  setSwatch(E.pBgChip, E.pBgVal, hex(css(sel,'backgroundColor')) || '#ffffff');
 }
 
 E.pText.addEventListener('focus', snap);
@@ -1388,12 +1513,155 @@ function loadFont(fam){
 });
 E.pWeight.addEventListener('change', function(){ snap(); setStyle('fontWeight', E.pWeight.value); });
 E.pAlign.addEventListener('change', function(){ snap(); setStyle('textAlign', E.pAlign.value); });
-E.pColor.addEventListener('input', function(){ setStyle('color', E.pColor.value); });
-E.pColor.addEventListener('change', snap);
-E.pBg.addEventListener('input', function(){ setStyle('backgroundColor', E.pBg.value); });
-E.pBg.addEventListener('change', snap);
+function setSwatch(chip, val, hexColor){
+  chip.style.background = hexColor;
+  val.textContent = hexColor.toUpperCase();
+}
 document.querySelectorAll('[data-clear]').forEach(function(b){
   b.addEventListener('click', function(){ if (!sel) return; snap(); setStyle(b.dataset.clear, ''); fillProps(); });
+});
+
+/* ---------------- pemilih warna kustom ---------------- */
+var SWATCH_PRESETS = ['#000000','#ffffff','#5f6470','#e5484d','#f5a524','#ffd60a','#30a46c','#3d63dd','#8e4ec6','#e93d82'];
+function clamp01(v){ return v<0?0:v>1?1:v; }
+function hexToHsv(hexColor){
+  var hx = (hexColor||'#000000').replace('#','');
+  if (hx.length===3) hx = hx.split('').map(function(c){ return c+c; }).join('');
+  if (hx.length!==6) hx = '000000';
+  var r=parseInt(hx.slice(0,2),16)/255, g=parseInt(hx.slice(2,4),16)/255, b=parseInt(hx.slice(4,6),16)/255;
+  var max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min, h=0;
+  if (d!==0){
+    if (max===r) h = ((g-b)/d) % 6;
+    else if (max===g) h = (b-r)/d + 2;
+    else h = (r-g)/d + 4;
+    h *= 60; if (h<0) h += 360;
+  }
+  return { h:h, s:max===0?0:d/max, v:max };
+}
+function hsvToHex(h,s,v){
+  var i = Math.floor(h/60) % 6, f = h/60 - Math.floor(h/60);
+  var p=v*(1-s), q=v*(1-f*s), t=v*(1-(1-f)*s), r,g,b;
+  switch(i){
+    case 0: r=v;g=t;b=p;break;
+    case 1: r=q;g=v;b=p;break;
+    case 2: r=p;g=v;b=t;break;
+    case 3: r=p;g=q;b=v;break;
+    case 4: r=t;g=p;b=v;break;
+    default: r=v;g=p;b=q;
+  }
+  function hx(n){ var s2 = Math.round(clamp01(n)*255).toString(16); return s2.length<2 ? '0'+s2 : s2; }
+  return '#' + hx(r) + hx(g) + hx(b);
+}
+var cp = { h:0, s:0, v:0, onChange:null, anchor:null };
+function paintPop(){
+  E.cpSv.style.backgroundColor = hsvToHex(cp.h,1,1);
+  E.cpSvThumb.style.left = (cp.s*100) + '%';
+  E.cpSvThumb.style.top = ((1-cp.v)*100) + '%';
+  E.cpHueThumb.style.left = (cp.h/360*100) + '%';
+  var hexNow = hsvToHex(cp.h,cp.s,cp.v);
+  if (document.activeElement !== E.cpHex) E.cpHex.value = hexNow.toUpperCase();
+}
+function pickCommit(){
+  var hexNow = hsvToHex(cp.h,cp.s,cp.v);
+  if (cp.onChange) cp.onChange(hexNow);
+}
+if (!window.EyeDropper) E.cpEye.hidden = true;
+E.cpSwatches.innerHTML = '';
+SWATCH_PRESETS.forEach(function(hexColor){
+  var b = document.createElement('button');
+  b.type = 'button'; b.className = 'cpop-sw'; b.style.background = hexColor; b.title = hexColor;
+  b.addEventListener('click', function(){
+    var hsv = hexToHsv(hexColor); cp.h=hsv.h; cp.s=hsv.s; cp.v=hsv.v;
+    paintPop(); pickCommit();
+  });
+  E.cpSwatches.appendChild(b);
+});
+function openColorPop(anchor, hexColor, onChange){
+  snap();
+  var hsv = hexToHsv(hexColor);
+  cp.h = hsv.h; cp.s = hsv.s; cp.v = hsv.v; cp.onChange = onChange; cp.anchor = anchor;
+  paintPop();
+  // Posisikan di luar layar dulu supaya bisa diukur tanpa "berkedip" di tempat yang salah,
+  // lalu klem ke dalam viewport. getBoundingClientRect() memaksa reflow sinkron, jadi
+  // ukurannya sudah pasti di sini -- tidak perlu menunggu requestAnimationFrame (yang bisa
+  // telat atau tidak jalan sama sekali kalau tab sedang tidak terlihat).
+  E.colorPop.style.left = '-9999px'; E.colorPop.style.top = '0px';
+  E.colorPop.hidden = false;
+  var r = anchor.getBoundingClientRect();
+  var pr = E.colorPop.getBoundingClientRect();
+  var left = r.left, top = r.bottom + 8;
+  if (left + pr.width > window.innerWidth - 8) left = window.innerWidth - pr.width - 8;
+  if (top + pr.height > window.innerHeight - 8) top = r.top - pr.height - 8;
+  if (left < 8) left = 8;
+  if (top < 8) top = 8;
+  E.colorPop.style.left = left + 'px'; E.colorPop.style.top = top + 'px';
+}
+function closeColorPop(){
+  if (E.colorPop.hidden) return false;
+  E.colorPop.hidden = true; cp.onChange = null; cp.anchor = null;
+  return true;
+}
+function wireSwatch(btn, chip, val, prop){
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    if (!sel) return;
+    var current = val.textContent || '#000000';
+    if (!E.colorPop.hidden && cp.anchor === btn){ closeColorPop(); return; }
+    openColorPop(btn, current, function(hexColor){
+      setSwatch(chip, val, hexColor);
+      setStyle(prop, hexColor);
+    });
+  });
+}
+wireSwatch(E.pColorBtn, E.pColorChip, E.pColorVal, 'color');
+wireSwatch(E.pBgBtn, E.pBgChip, E.pBgVal, 'backgroundColor');
+
+function svFromEvent(e){
+  var r = E.cpSv.getBoundingClientRect();
+  cp.s = clamp01((e.clientX - r.left) / r.width);
+  cp.v = clamp01(1 - (e.clientY - r.top) / r.height);
+}
+E.cpSv.addEventListener('pointerdown', function(e){
+  svFromEvent(e); paintPop(); pickCommit();
+  E.cpSv.setPointerCapture(e.pointerId);
+  function move(ev){ svFromEvent(ev); paintPop(); pickCommit(); }
+  function up(){ E.cpSv.removeEventListener('pointermove', move); E.cpSv.removeEventListener('pointerup', up); }
+  E.cpSv.addEventListener('pointermove', move);
+  E.cpSv.addEventListener('pointerup', up);
+});
+function hueFromEvent(e){
+  var r = E.cpHue.getBoundingClientRect();
+  cp.h = clamp01((e.clientX - r.left) / r.width) * 360;
+}
+E.cpHue.addEventListener('pointerdown', function(e){
+  hueFromEvent(e); paintPop(); pickCommit();
+  E.cpHue.setPointerCapture(e.pointerId);
+  function move(ev){ hueFromEvent(ev); paintPop(); pickCommit(); }
+  function up(){ E.cpHue.removeEventListener('pointermove', move); E.cpHue.removeEventListener('pointerup', up); }
+  E.cpHue.addEventListener('pointermove', move);
+  E.cpHue.addEventListener('pointerup', up);
+});
+E.cpHex.addEventListener('input', function(){
+  var v = E.cpHex.value.trim();
+  if (!/^#?[0-9a-f]{3}$|^#?[0-9a-f]{6}$/i.test(v)) return;
+  if (v[0] !== '#') v = '#' + v;
+  var hsv = hexToHsv(v);
+  cp.h = hsv.h; cp.s = hsv.s; cp.v = hsv.v;
+  paintPop(); pickCommit();
+});
+E.cpEye.addEventListener('click', function(){
+  if (!window.EyeDropper) return;
+  new window.EyeDropper().open().then(function(res){
+    var hsv = hexToHsv(res.sRGBHex);
+    cp.h = hsv.h; cp.s = hsv.s; cp.v = hsv.v;
+    paintPop(); pickCommit();
+  }).catch(function(){});
+});
+document.addEventListener('mousedown', function(e){
+  if (E.colorPop.hidden) return;
+  if (E.colorPop.contains(e.target) || e.target === E.pColorBtn || E.pColorBtn.contains(e.target) ||
+      e.target === E.pBgBtn || E.pBgBtn.contains(e.target)) return;
+  closeColorPop();
 });
 
 /* ---------------- geser & ubah ukuran ---------------- */
@@ -1401,8 +1669,10 @@ function onDown(e){
   if (e.button!==0 || editing(e.target)) return;
   var t = e.target;
   if (skip(t)) return;
-  if (t !== sel && !(sel && sel.contains(t))) return;
-  pend = { x:e.clientX, y:e.clientY, el: sel || t };
+  // Elemen apa pun bisa langsung diseret. Kalau target ada di dalam elemen yang
+  // sedang dipilih, seret elemen terpilih itu (bukan anak yang tersentuh kursor).
+  var el = (sel && (t===sel || sel.contains(t))) ? sel : t;
+  pend = { x:e.clientX, y:e.clientY, el: el };
   fd.addEventListener('mousemove', pendMove, true);
   fd.addEventListener('mouseup', pendUp, true);
 }
@@ -1486,12 +1756,32 @@ function isFile(e){
     Array.prototype.indexOf.call(e.dataTransfer.types,'Files') !== -1);
 }
 function onFileOver(e){
+  if (paletteKind){
+    e.preventDefault(); e.dataTransfer.dropEffect = 'copy';
+    var pp = fd.elementFromPoint(e.clientX, e.clientY);
+    if (!pp || skip(pp) || pp.tagName==='BODY'){ E.insLine.hidden = true; paletteDrop = null; return; }
+    var pr = pp.getBoundingClientRect();
+    var pBefore = (e.clientY - pr.top) < pr.height/2;
+    paletteDrop = { el:pp, before:pBefore };
+    E.insLine.hidden = false;
+    E.insLine.style.left = (pr.left*scale) + 'px';
+    E.insLine.style.width = (pr.width*scale) + 'px';
+    E.insLine.style.top = ((pBefore ? pr.top : pr.bottom)*scale - 1) + 'px';
+    return;
+  }
   if (!isFile(e)) return;
   e.preventDefault(); e.dataTransfer.dropEffect = 'copy';
   var t = fd.elementFromPoint(e.clientX, e.clientY);
   setDrop(skip(t) ? null : t);
 }
 function onFileDrop(e){
+  if (paletteKind){
+    e.preventDefault();
+    var kind = paletteKind, drop = paletteDrop;
+    paletteKind = null; paletteDrop = null; E.insLine.hidden = true;
+    insertBlock(kind, drop);
+    return;
+  }
   if (!isFile(e)) return;
   e.preventDefault();
   var fs = Array.prototype.filter.call(e.dataTransfer.files, function(f){ return f.type.indexOf('image/')===0; });
@@ -1506,8 +1796,8 @@ function onFileDrop(e){
   };
   rd.readAsDataURL(f);
 }
-window.addEventListener('dragover', function(e){ if (isFile(e)) e.preventDefault(); });
-window.addEventListener('drop', function(e){ if (isFile(e)) e.preventDefault(); });
+window.addEventListener('dragover', function(e){ if (isFile(e) || paletteKind) e.preventDefault(); });
+window.addEventListener('drop', function(e){ if (isFile(e) || paletteKind) e.preventDefault(); });
 
 /* ---------------- papan ketik ---------------- */
 function onKey(e){
@@ -1520,7 +1810,7 @@ function onKey(e){
   }
   if (mod && String(e.key).toLowerCase()==='y'){ if (!typing){ e.preventDefault(); redo(); } return; }
   if (typing) return;
-  if (e.key==='Escape'){ closeModals(); deselect(); return; }
+  if (e.key==='Escape'){ if (closeColorPop()) return; closeModals(); deselect(); return; }
   if ((e.key==='Delete'||e.key==='Backspace') && sel){ e.preventDefault(); actDel(); }
 }
 document.addEventListener('keydown', onKey);
@@ -1557,12 +1847,28 @@ function walk(parent, host, depth, count){
     var el = kids[i];
     if (skip(el)) continue;
     if (count.n++ > 500) return;
-    var hasKids = false;
-    for (var j=0;j<el.children.length;j++){ if (!skip(el.children[j])) { hasKids = true; break; } }
+    var childCount = 0;
+    for (var j=0;j<el.children.length;j++){ if (!skip(el.children[j])) childCount++; }
+    var hasKids = childCount > 0;
 
-    var row = document.createElement('button');
-    row.type = 'button'; row.className = 'layer';
-    row.style.paddingLeft = (6 + depth*11) + 'px';
+    var row = document.createElement('div');
+    row.className = 'layer'; row.tabIndex = 0; row.setAttribute('role','button');
+    row.style.paddingLeft = (4 + depth*11) + 'px';
+
+    var eyeBtn = document.createElement('button');
+    eyeBtn.type = 'button'; eyeBtn.className = 'layer-eye'; eyeBtn.title = 'Sembunyikan / tampilkan';
+    eyeBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-eye"/></svg>';
+    if (el.style.display === 'none') eyeBtn.classList.add('off');
+    eyeBtn.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      snap(); markEdited(el);
+      var wasHidden = el.style.display === 'none';
+      if (wasHidden) el.style.removeProperty('display'); else el.style.display = 'none';
+      if (!el.getAttribute('style')) el.removeAttribute('style');
+      eyeBtn.classList.toggle('off', !wasHidden);
+      redraw();
+      toast(wasHidden ? 'Elemen ditampilkan.' : 'Elemen disembunyikan.');
+    });
 
     var tw = document.createElement('span');
     tw.className = 'layer-twist' + (hasKids ? '' : ' leaf');
@@ -1576,7 +1882,26 @@ function walk(parent, host, depth, count){
     tg.className = 'layer-tag';
     tg.textContent = el.tagName.toLowerCase();
 
-    row.appendChild(tw); row.appendChild(nm); row.appendChild(tg);
+    row.appendChild(eyeBtn); row.appendChild(tw); row.appendChild(nm); row.appendChild(tg);
+
+    if (hasKids){
+      var cnt = document.createElement('span');
+      cnt.className = 'layer-count'; cnt.textContent = String(childCount);
+      row.appendChild(cnt);
+    }
+
+    var grip = document.createElement('button');
+    grip.type = 'button'; grip.className = 'layer-grip'; grip.title = 'Seret untuk memindahkan';
+    grip.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><use href="#i-grip"/></svg>';
+    grip.addEventListener('click', function(ev){ ev.stopPropagation(); });
+    grip.addEventListener('mousedown', function(target){
+      return function(ev){
+        ev.preventDefault(); ev.stopPropagation();
+        select(target); startDrag(target);
+      };
+    }(el));
+    row.appendChild(grip);
+
     host.appendChild(row);
 
     var kidBox = null;
@@ -1603,6 +1928,9 @@ function walk(parent, host, depth, count){
         select(target); setPeek(target, true);
         setTimeout(function(){ setPeek(null); }, 900);
       });
+      rowEl.addEventListener('keydown', function(ev){
+        if (ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); select(target); }
+      });
     })(el, row);
   }
 }
@@ -1624,26 +1952,51 @@ var BLOCK = {
   text:'<p style="margin:12px 0;font-size:16px;line-height:1.7;">Paragraf baru. Klik dua kali untuk mengganti tulisannya.</p>',
   button:'<a href="#" style="display:inline-block;padding:14px 28px;background:#0071e3;color:#fff;border-radius:999px;text-decoration:none;font-weight:600;">Tombol Baru</a>',
   image:'',
+  video:'<div style="position:relative;padding-top:56.25%;background:#111;border-radius:10px;overflow:hidden;margin:16px 0;"><iframe src="about:blank" title="Video" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;border:0;" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>',
   columns:'<div style="display:flex;gap:24px;flex-wrap:wrap;margin:18px 0;"><div style="flex:1;min-width:220px;"><h3 style="margin:0 0 8px;">Kolom 1</h3><p style="margin:0;line-height:1.7;">Isi kolom pertama.</p></div><div style="flex:1;min-width:220px;"><h3 style="margin:0 0 8px;">Kolom 2</h3><p style="margin:0;line-height:1.7;">Isi kolom kedua.</p></div></div>',
+  columns3:'<div style="display:flex;gap:20px;flex-wrap:wrap;margin:18px 0;"><div style="flex:1;min-width:160px;"><h3 style="margin:0 0 8px;">Kolom 1</h3><p style="margin:0;line-height:1.7;">Isi kolom pertama.</p></div><div style="flex:1;min-width:160px;"><h3 style="margin:0 0 8px;">Kolom 2</h3><p style="margin:0;line-height:1.7;">Isi kolom kedua.</p></div><div style="flex:1;min-width:160px;"><h3 style="margin:0 0 8px;">Kolom 3</h3><p style="margin:0;line-height:1.7;">Isi kolom ketiga.</p></div></div>',
   divider:'<hr style="border:0;border-top:1px solid #e0e0e0;margin:28px 0;">',
   spacer:'<div style="height:56px;"></div>'
 };
 var PLACEHOLDER = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'640'%20height%3D'360'%3E%3Crect%20width%3D'640'%20height%3D'360'%20fill%3D'%23eeeeef'%2F%3E%3Ctext%20x%3D'320'%20y%3D'190'%20text-anchor%3D'middle'%20font-family%3D'sans-serif'%20font-size%3D'24'%20fill%3D'%23999'%3EGambar%3C%2Ftext%3E%3C%2Fsvg%3E";
 BLOCK.image = '<img src="' + PLACEHOLDER + '" alt="Gambar" style="max-width:100%;display:block;">';
 
+/* dropInfo: {el, before} untuk menaruh tepat di sana (dari drag), atau null untuk
+   menaruh di bawah elemen yang sedang dipilih (dari klik). */
+function insertBlock(kind, dropInfo){
+  if (!fd){ toast('Buka halaman dulu di kanvas.', true); return; }
+  var box = fd.createElement('div');
+  box.innerHTML = BLOCK[kind] || '';
+  var node = box.firstElementChild;
+  if (!node) return;
+  snap();
+  if (dropInfo && dropInfo.el && dropInfo.el.parentNode){
+    if (dropInfo.before) dropInfo.el.parentNode.insertBefore(node, dropInfo.el);
+    else dropInfo.el.parentNode.insertBefore(node, dropInfo.el.nextSibling);
+  } else if (sel && sel.parentNode && sel.tagName!=='BODY'){
+    sel.parentNode.insertBefore(node, sel.nextSibling);
+  } else {
+    fd.body.appendChild(node);
+  }
+  select(node); setPeek(node, true);
+  setTimeout(function(){ setPeek(null); }, 900);
+  buildLayers(); toast('Elemen ditambahkan.');
+}
+
+var paletteKind = null, paletteDrop = null;
 document.querySelectorAll('[data-block]').forEach(function(b){
-  b.addEventListener('click', function(){
-    if (!fd){ toast('Buka halaman dulu di kanvas.', true); return; }
-    snap();
-    var box = fd.createElement('div');
-    box.innerHTML = BLOCK[b.dataset.block] || '';
-    var node = box.firstElementChild;
-    if (!node) return;
-    if (sel && sel.parentNode && sel.tagName!=='BODY') sel.parentNode.insertBefore(node, sel.nextSibling);
-    else fd.body.appendChild(node);
-    select(node); setPeek(node, true);
-    setTimeout(function(){ setPeek(null); }, 900);
-    buildLayers(); toast('Elemen ditambahkan.');
+  b.addEventListener('click', function(){ insertBlock(b.dataset.block, null); });
+  b.setAttribute('draggable', 'true');
+  b.addEventListener('dragstart', function(e){
+    if (!fd){ e.preventDefault(); toast('Buka halaman dulu di kanvas.', true); return; }
+    paletteKind = b.dataset.block;
+    b.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'copy';
+    try { e.dataTransfer.setData('text/plain', 'block'); } catch(err){}
+  });
+  b.addEventListener('dragend', function(){
+    b.classList.remove('dragging');
+    paletteKind = null; paletteDrop = null; E.insLine.hidden = true;
   });
 });
 
