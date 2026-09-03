@@ -187,6 +187,13 @@
     color:var(--ink-muted);font-weight:600;
   }
   .prop-label{font-size:12px;font-weight:600;color:var(--ink-muted);}
+  .prop-hint[hidden]{display:none;}
+  .prop-hint{
+    display:flex;flex-direction:column;align-items:flex-start;gap:5px;
+    font-size:11px;line-height:1.5;color:var(--danger);
+    background:var(--danger-soft);padding:8px 9px;border-radius:7px;
+  }
+  .prop-hint .link-btn{font-size:11px;color:var(--danger);}
   .prop-input{
     width:100%;background:var(--surface);border:1px solid var(--border);border-radius:7px;
     padding:7px 9px;font-size:12px;color:var(--ink);font-family:var(--font-mono);
@@ -378,6 +385,10 @@
         <div class="prop-head">Link</div>
         <label class="prop-label" for="pHref">Alamat tujuan</label>
         <input id="pHref" class="prop-input" type="text" placeholder="https://wa.me/62812...">
+        <div id="linkHint" class="prop-hint" hidden>
+          <span id="linkHintText"></span>
+          <button type="button" id="linkHintFix" class="link-btn">Perbaiki otomatis</button>
+        </div>
         <label class="prop-check"><input type="checkbox" id="pBlank"> Buka di tab baru</label>
       </div>
 
@@ -489,12 +500,14 @@
     propsEmpty:$('propsEmpty'), propsBody:$('propsBody'), crumbs:$('crumbs'),
     grpText:$('grpText'), pText:$('pText'),
     grpLink:$('grpLink'), pHref:$('pHref'), pBlank:$('pBlank'),
+    linkHint:$('linkHint'), linkHintText:$('linkHintText'), linkHintFix:$('linkHintFix'),
     grpImg:$('grpImg'), pAlt:$('pAlt'), pReplaceImg:$('pReplaceImg'),
     pW:$('pW'), pH:$('pH'), pFs:$('pFs'), pAlign:$('pAlign'),
     pPad:$('pPad'), pMar:$('pMar'), pColor:$('pColor'), pBg:$('pBg')
   };
 
   var fd = null;              // dokumen di dalam iframe
+  var pristineDoc = null;     // hasil parse tanpa menjalankan script — acuan class asli
   var loaded = false;
   var sel = null;             // elemen terpilih
   var hoverEl = null;
@@ -533,6 +546,22 @@
     });
   }
   function isEditable(el){ return el && el.getAttribute && el.getAttribute('contenteditable') === 'true'; }
+
+  // Catat class asli tiap elemen (dari hasil parse, sebelum script halaman sempat mengubahnya).
+  // Disimpan sebagai properti JS, bukan atribut — jadi tidak pernah ikut terserialisasi.
+  function stampPristine(){
+    if (!pristineDoc || !fd || !fd.documentElement) return;
+    var live = fd.documentElement.querySelectorAll('*');
+    var pri = pristineDoc.documentElement.querySelectorAll('*');
+    if (live.length !== pri.length) return;   // struktur beda — lewati, jangan menebak
+    var i;
+    for (i = 0; i < live.length; i++){
+      if (live[i].tagName !== pri[i].tagName) return;
+    }
+    for (i = 0; i < live.length; i++){
+      live[i].__pristineClass = pri[i].getAttribute('class');
+    }
+  }
   function isSkippable(el){
     if (!el || el.nodeType !== 1) return true;
     var t = el.tagName;
@@ -614,6 +643,10 @@
     var doc = isFull ? raw :
       '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body>' + raw + '</body></html>';
     doc = injectExtra(doc, (extraCss || '').trim(), (extraJs || '').trim());
+    // Parse tanpa menjalankan script: ini acuan class asli, supaya class yang nanti
+    // ditambahkan script halaman saat pratinjau (in-view, is-visible, dsb) tidak ikut terekspor.
+    try { pristineDoc = new DOMParser().parseFromString(doc, 'text/html'); }
+    catch (err) { pristineDoc = null; }
     els.frame.srcdoc = doc;
     els.pasteView.hidden = true;
     els.canvasView.hidden = false;
@@ -639,6 +672,7 @@
     if (!els.frame.srcdoc) return;
     fd = els.frame.contentDocument;
     if (!fd) return;
+    stampPristine();
     bindFrame();
     loaded = true;
     els.downloadBtn.disabled = false;
@@ -881,9 +915,17 @@
     var cs = fd.defaultView.getComputedStyle(sel);
 
     // teks (hanya kalau isinya murni teks)
+    // Tampilkan versi rapi, tapi ingat spasi/baris asli di sekelilingnya supaya
+    // indentasi kode sumber tidak ikut berubah saat teks disunting.
     var pureText = sel.children.length === 0;
     els.grpText.hidden = !pureText;
-    if (pureText) els.pText.value = sel.textContent;
+    if (pureText){
+      var raw = sel.textContent;
+      var trimmed = raw.trim();
+      els.pText.value = trimmed;
+      els.pText.dataset.lead = trimmed ? raw.slice(0, raw.indexOf(trimmed)) : '';
+      els.pText.dataset.trail = trimmed ? raw.slice(raw.indexOf(trimmed) + trimmed.length) : '';
+    }
 
     // link
     var link = sel.tagName === 'A' ? sel : sel.closest('a');
@@ -891,6 +933,9 @@
     if (link){
       els.pHref.value = link.getAttribute('href') || '';
       els.pBlank.checked = link.getAttribute('target') === '_blank';
+      checkLink();
+    } else {
+      els.linkHint.hidden = true;
     }
 
     // gambar
@@ -937,18 +982,70 @@
   // teks
   els.pText.addEventListener('input', function(){
     if (!sel || sel.children.length) return;
-    sel.textContent = els.pText.value;
+    var lead = els.pText.dataset.lead || '';
+    var trail = els.pText.dataset.trail || '';
+    sel.textContent = lead + els.pText.value + trail;
     refreshOverlay();
   });
   els.pText.addEventListener('focus', snapshot);
 
   // link
+  function currentLink(){
+    return sel && (sel.tagName === 'A' ? sel : sel.closest('a'));
+  }
+  // "wa.me/0812" tanpa skema itu URL relatif — saat file dibuka jadi file:///.../wa.me/0812
+  function normalizeUrl(v){
+    v = (v || '').trim();
+    if (!v) return '';
+    if (/^(https?:|mailto:|tel:|sms:|data:|#|\/|\.\/|\.\.\/|\?)/i.test(v)) return v;
+    if (/^[a-z0-9-]+(\.[a-z0-9-]+)+([\/?#]|$)/i.test(v)) return 'https://' + v;
+    return v;
+  }
+  function checkLink(){
+    var link = currentLink();
+    var href = link ? (link.getAttribute('href') || '') : '';
+    var msg = '', fixed = null;
+    if (href && normalizeUrl(href) !== href){
+      msg = 'Link ini relatif, jadi saat file dibuka akan berubah jadi file:///… Tambahkan https:// di depan.';
+      fixed = normalizeUrl(href);
+    } else if (/wa\.me\/0\d/i.test(href)){
+      msg = 'Nomor WhatsApp harus format internasional. Ganti angka 0 di depan menjadi 62.';
+      fixed = href.replace(/(wa\.me\/)0/i, '$162');
+    }
+    els.linkHint.hidden = !msg;
+    els.linkHintText.textContent = msg;
+    els.linkHintFix.textContent = fixed ? ('Perbaiki jadi ' + fixed) : '';
+    els.linkHintFix.hidden = !fixed;
+    els.linkHintFix.dataset.fix = fixed || '';
+  }
+  els.linkHintFix.addEventListener('click', function(){
+    var link = currentLink(), v = els.linkHintFix.dataset.fix;
+    if (!link || !v) return;
+    snapshot();
+    link.setAttribute('href', v);
+    els.pHref.value = v;
+    checkLink();
+    flash('Link diperbaiki.');
+  });
   els.pHref.addEventListener('focus', snapshot);
   els.pHref.addEventListener('input', function(){
-    var link = sel && (sel.tagName === 'A' ? sel : sel.closest('a'));
+    var link = currentLink();
     if (!link) return;
     var v = els.pHref.value.trim();
     if (v) link.setAttribute('href', v); else link.removeAttribute('href');
+    checkLink();
+  });
+  // saat selesai mengetik, lengkapi skema-nya otomatis
+  els.pHref.addEventListener('change', function(){
+    var link = currentLink();
+    if (!link) return;
+    var v = normalizeUrl(els.pHref.value);
+    if (v && v !== els.pHref.value.trim()){
+      els.pHref.value = v;
+      link.setAttribute('href', v);
+      flash('https:// ditambahkan otomatis.');
+    }
+    checkLink();
   });
   els.pBlank.addEventListener('change', function(){
     var link = sel && (sel.tagName === 'A' ? sel : sel.closest('a'));
@@ -1230,8 +1327,28 @@
   function buildExportHtml(){
     commitAnyEdit();
     var clone = fd.documentElement.cloneNode(true);
+    var i;
+
+    // Kembalikan class ke kondisi asli untuk elemen yang tidak kita ubah, sehingga
+    // class buatan script halaman saat pratinjau (in-view, is-visible, is-open, ...)
+    // tidak ikut tersimpan di file hasil.
+    var live = fd.documentElement.querySelectorAll('*');
+    var cl = clone.querySelectorAll('*');
+    if (live.length === cl.length){
+      for (i = 0; i < live.length; i++){
+        var orig = live[i].__pristineClass;
+        if (orig === undefined) continue;           // elemen baru dari editor — biarkan
+        var now = cl[i].getAttribute('class');
+        if (orig === null){
+          if (now !== null) cl[i].removeAttribute('class');
+        } else if (now !== orig){
+          cl[i].setAttribute('class', orig);
+        }
+      }
+    }
+
     var leftovers = clone.querySelectorAll('[contenteditable]');
-    for (var i=0;i<leftovers.length;i++) leftovers[i].removeAttribute('contenteditable');
+    for (i=0;i<leftovers.length;i++) leftovers[i].removeAttribute('contenteditable');
     return '<!DOCTYPE html>\n' + clone.outerHTML + '\n';
   }
   function validateHtml(html){
