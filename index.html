@@ -547,8 +547,17 @@
   }
   function isEditable(el){ return el && el.getAttribute && el.getAttribute('contenteditable') === 'true'; }
 
-  // Catat class asli tiap elemen (dari hasil parse, sebelum script halaman sempat mengubahnya).
-  // Disimpan sebagai properti JS, bukan atribut — jadi tidak pernah ikut terserialisasi.
+  // Catat atribut asli tiap elemen (dari hasil parse, sebelum script halaman sempat
+  // mengubahnya). Disimpan sebagai properti JS, bukan atribut — tidak pernah ikut
+  // terserialisasi. Dipakai saat ekspor untuk mengembalikan elemen yang TIDAK kamu
+  // sentuh ke kondisi persis seperti di kode sumber.
+  function attrMap(el){
+    var m = {};
+    for (var i = 0; i < el.attributes.length; i++){
+      m[el.attributes[i].name] = el.attributes[i].value;
+    }
+    return m;
+  }
   function stampPristine(){
     if (!pristineDoc || !fd || !fd.documentElement) return;
     var live = fd.documentElement.querySelectorAll('*');
@@ -559,8 +568,13 @@
       if (live[i].tagName !== pri[i].tagName) return;
     }
     for (i = 0; i < live.length; i++){
-      live[i].__pristineClass = pri[i].getAttribute('class');
+      live[i].__pristineAttrs = attrMap(pri[i]);
     }
+  }
+  // Tandai elemen yang benar-benar kamu ubah lewat editor, supaya perubahannya
+  // tidak ikut dikembalikan saat ekspor.
+  function markEdited(el){
+    if (el) el.__edited = true;
   }
   function isSkippable(el){
     if (!el || el.nodeType !== 1) return true;
@@ -823,6 +837,7 @@
   function startTextEdit(){
     if (!sel) return;
     snapshot();
+    markEdited(sel);
     sel.setAttribute('contenteditable','true');
     sel.focus();
     try{
@@ -974,6 +989,7 @@
   }
   function setStyle(prop, val){
     if (!sel) return;
+    markEdited(sel);
     if (val === '') sel.style.removeProperty(prop.replace(/[A-Z]/g, function(c){ return '-' + c.toLowerCase(); }));
     else sel.style[prop] = val;
     refreshOverlay();
@@ -984,6 +1000,7 @@
     if (!sel || sel.children.length) return;
     var lead = els.pText.dataset.lead || '';
     var trail = els.pText.dataset.trail || '';
+    markEdited(sel);
     sel.textContent = lead + els.pText.value + trail;
     refreshOverlay();
   });
@@ -1022,6 +1039,7 @@
     var link = currentLink(), v = els.linkHintFix.dataset.fix;
     if (!link || !v) return;
     snapshot();
+    markEdited(link);
     link.setAttribute('href', v);
     els.pHref.value = v;
     checkLink();
@@ -1032,6 +1050,7 @@
     var link = currentLink();
     if (!link) return;
     var v = els.pHref.value.trim();
+    markEdited(link);
     if (v) link.setAttribute('href', v); else link.removeAttribute('href');
     checkLink();
   });
@@ -1042,6 +1061,7 @@
     var v = normalizeUrl(els.pHref.value);
     if (v && v !== els.pHref.value.trim()){
       els.pHref.value = v;
+      markEdited(link);
       link.setAttribute('href', v);
       flash('https:// ditambahkan otomatis.');
     }
@@ -1051,6 +1071,7 @@
     var link = sel && (sel.tagName === 'A' ? sel : sel.closest('a'));
     if (!link) return;
     snapshot();
+    markEdited(link);
     if (els.pBlank.checked){
       link.setAttribute('target','_blank');
       link.setAttribute('rel','noopener');
@@ -1063,7 +1084,7 @@
   // gambar
   els.pAlt.addEventListener('focus', snapshot);
   els.pAlt.addEventListener('input', function(){
-    if (sel && sel.tagName === 'IMG') sel.setAttribute('alt', els.pAlt.value);
+    if (sel && sel.tagName === 'IMG'){ markEdited(sel); sel.setAttribute('alt', els.pAlt.value); }
   });
   els.pReplaceImg.addEventListener('click', function(){
     if (!sel) return;
@@ -1222,6 +1243,7 @@
   function onResizeMove(e){
     if (!resizeState || !sel) return;
     var d = resizeState;
+    markEdited(sel);
     if (d.dir === 'e' || d.dir === 'se'){
       sel.style.width = Math.max(16, Math.round(d.w + (e.clientX - d.x))) + 'px';
     }
@@ -1256,6 +1278,7 @@
 
   function applyImage(target, dataUrl, mode){
     if (mode === 'replace' && target.tagName === 'IMG'){
+      markEdited(target);
       target.setAttribute('src', dataUrl);
       return target;
     }
@@ -1329,20 +1352,24 @@
     var clone = fd.documentElement.cloneNode(true);
     var i;
 
-    // Kembalikan class ke kondisi asli untuk elemen yang tidak kita ubah, sehingga
-    // class buatan script halaman saat pratinjau (in-view, is-visible, is-open, ...)
-    // tidak ikut tersimpan di file hasil.
+    // Elemen yang tidak kamu sentuh dikembalikan persis ke atribut aslinya. Ini yang
+    // membuang jejak script halaman saat pratinjau (class in-view/is-visible/is-open,
+    // aria-expanded yang ter-toggle, dan sejenisnya).
     var live = fd.documentElement.querySelectorAll('*');
     var cl = clone.querySelectorAll('*');
     if (live.length === cl.length){
       for (i = 0; i < live.length; i++){
-        var orig = live[i].__pristineClass;
-        if (orig === undefined) continue;           // elemen baru dari editor — biarkan
-        var now = cl[i].getAttribute('class');
-        if (orig === null){
-          if (now !== null) cl[i].removeAttribute('class');
-        } else if (now !== orig){
-          cl[i].setAttribute('class', orig);
+        var orig = live[i].__pristineAttrs;
+        if (!orig || live[i].__edited) continue;    // elemen baru / yang kamu ubah — biarkan
+        var el = cl[i], k;
+        for (k = el.attributes.length - 1; k >= 0; k--){
+          var nm = el.attributes[k].name;
+          if (!Object.prototype.hasOwnProperty.call(orig, nm)) el.removeAttribute(nm);
+        }
+        for (k in orig){
+          if (Object.prototype.hasOwnProperty.call(orig, k) && el.getAttribute(k) !== orig[k]){
+            el.setAttribute(k, orig[k]);
+          }
         }
       }
     }
