@@ -12,56 +12,66 @@
    tenang supaya halaman yang sedang disunting jadi bintangnya.
    ============================================================ */
 :root{
-  --bg:#f5f5f7;
+  /* Netral sedikit dingin, bukan abu datar. Aksen biru pekat yang dipakai hemat. */
+  --bg:#f7f7f9;
   --surface:#ffffff;
-  --surface-2:#fafafa;
-  --surface-3:#ececed;
-  --line:rgba(0,0,0,.09);
-  --line-2:rgba(0,0,0,.16);
-  --ink:#1d1d1f;
-  --ink-2:#6e6e73;
-  --ink-3:#98989d;
-  --accent:#0071e3;
-  --accent-hov:#0077ed;
+  --surface-2:#fbfbfc;
+  --surface-3:#eeeef1;
+  --line:rgba(16,17,20,.08);
+  --line-2:rgba(16,17,20,.16);
+  --ink:#101114;
+  --ink-2:#5f6470;
+  --ink-3:#9096a1;
+  --accent:#3d63dd;
+  --accent-hov:#3358d4;
   --accent-ink:#ffffff;
-  --accent-soft:#e9f2fe;
-  --ok:#28a745;
-  --ok-soft:#e8f7ec;
-  --warn:#b26b00;
-  --warn-soft:#fff4e0;
-  --bad:#d70015;
-  --bad-soft:#ffeceb;
+  --accent-soft:#eaeefc;
+  --ok:#18794e;
+  --ok-soft:#e6f6ed;
+  --warn:#a35829;
+  --warn-soft:#fdf1e4;
+  --bad:#ce2c31;
+  --bad-soft:#feecec;
 
-  --r-xs:6px; --r-sm:9px; --r:12px; --r-lg:18px; --r-pill:999px;
-  --sh-1:0 1px 2px rgba(0,0,0,.05);
-  --sh-2:0 4px 16px rgba(0,0,0,.07);
-  --sh-3:0 16px 48px rgba(0,0,0,.16);
+  /* Lapisan mengambang: sengaja tidak ikut berbalik saat mode gelap. */
+  --float:rgba(23,24,28,.94);
+  --float-ink:#ffffff;
+  --float-line:rgba(255,255,255,.12);
+
+  --r-xs:7px; --r-sm:10px; --r:13px; --r-lg:20px; --r-pill:999px;
+  --sh-1:0 1px 2px rgba(16,17,20,.05);
+  --sh-2:0 2px 6px rgba(16,17,20,.05),0 12px 28px rgba(16,17,20,.07);
+  --sh-3:0 8px 20px rgba(16,17,20,.12),0 24px 60px rgba(16,17,20,.18);
 
   --font:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,"Helvetica Neue",Arial,sans-serif;
   --mono:ui-monospace,SFMono-Regular,"SF Mono","Cascadia Code","Segoe UI Mono",Consolas,monospace;
 
-  --t:.22s cubic-bezier(.4,0,.2,1);
+  --t:.2s cubic-bezier(.32,.72,0,1);
   --topbar:56px;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#000000; --surface:#1c1c1e; --surface-2:#242426; --surface-3:#2c2c2e;
-    --line:rgba(255,255,255,.11); --line-2:rgba(255,255,255,.2);
-    --ink:#f5f5f7; --ink-2:#a1a1a6; --ink-3:#8e8e93;
-    --accent:#0a84ff; --accent-hov:#3d9bff; --accent-ink:#ffffff; --accent-soft:#12233a;
-    --ok:#30d158; --ok-soft:#122b18; --warn:#ffd60a; --warn-soft:#2e2611;
-    --bad:#ff453a; --bad-soft:#331714;
-    --sh-1:0 1px 2px rgba(0,0,0,.4); --sh-2:0 4px 16px rgba(0,0,0,.5); --sh-3:0 16px 48px rgba(0,0,0,.7);
+    --bg:#0c0d10; --surface:#151619; --surface-2:#1a1c20; --surface-3:#24262b;
+    --line:rgba(255,255,255,.08); --line-2:rgba(255,255,255,.15);
+    --ink:#edeef0; --ink-2:#a0a4ad; --ink-3:#6f747d;
+    --accent:#6e8afb; --accent-hov:#8aa1fc; --accent-ink:#0b1020; --accent-soft:#1b2340;
+    --ok:#3dd68c; --ok-soft:#12261c; --warn:#ffb757; --warn-soft:#2a1e10;
+    --bad:#ff6369; --bad-soft:#2c1516;
+    --sh-1:0 1px 2px rgba(0,0,0,.5);
+    --sh-2:0 2px 6px rgba(0,0,0,.4),0 12px 28px rgba(0,0,0,.45);
+    --sh-3:0 8px 20px rgba(0,0,0,.55),0 24px 60px rgba(0,0,0,.6);
   }
 }
 :root[data-theme="dark"]{
-  --bg:#000000; --surface:#1c1c1e; --surface-2:#242426; --surface-3:#2c2c2e;
-  --line:rgba(255,255,255,.11); --line-2:rgba(255,255,255,.2);
-  --ink:#f5f5f7; --ink-2:#a1a1a6; --ink-3:#8e8e93;
-  --accent:#0a84ff; --accent-hov:#3d9bff; --accent-ink:#ffffff; --accent-soft:#12233a;
-  --ok:#30d158; --ok-soft:#122b18; --warn:#ffd60a; --warn-soft:#2e2611;
-  --bad:#ff453a; --bad-soft:#331714;
-  --sh-1:0 1px 2px rgba(0,0,0,.4); --sh-2:0 4px 16px rgba(0,0,0,.5); --sh-3:0 16px 48px rgba(0,0,0,.7);
+  --bg:#0c0d10; --surface:#151619; --surface-2:#1a1c20; --surface-3:#24262b;
+  --line:rgba(255,255,255,.08); --line-2:rgba(255,255,255,.15);
+  --ink:#edeef0; --ink-2:#a0a4ad; --ink-3:#6f747d;
+  --accent:#6e8afb; --accent-hov:#8aa1fc; --accent-ink:#0b1020; --accent-soft:#1b2340;
+  --ok:#3dd68c; --ok-soft:#12261c; --warn:#ffb757; --warn-soft:#2a1e10;
+  --bad:#ff6369; --bad-soft:#2c1516;
+  --sh-1:0 1px 2px rgba(0,0,0,.5);
+  --sh-2:0 2px 6px rgba(0,0,0,.4),0 12px 28px rgba(0,0,0,.45);
+  --sh-3:0 8px 20px rgba(0,0,0,.55),0 24px 60px rgba(0,0,0,.6);
 }
 
 *,*::before,*::after{box-sizing:border-box;}
@@ -91,7 +101,7 @@ button,input,select,textarea{font:inherit;color:inherit;}
 .brand{display:flex;align-items:center;gap:9px;min-width:0;}
 .brand-mark{
   width:26px;height:26px;border-radius:7px;flex:0 0 auto;
-  background:linear-gradient(160deg,var(--accent),#5ac8fa);
+  background:linear-gradient(145deg,#6e8afb,var(--accent));
   display:grid;place-items:center;color:#fff;
   box-shadow:var(--sh-1);
 }
@@ -119,8 +129,8 @@ button,input,select,textarea{font:inherit;color:inherit;}
 }
 .btn:active:not(:disabled){transform:scale(.97);}
 .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
-.btn svg{width:15px;height:15px;}
-.btn-primary{background:var(--accent);color:var(--accent-ink);}
+.btn svg{width:15px;height:15px;stroke-linecap:round;stroke-linejoin:round;}
+.btn-primary{background:var(--accent);color:var(--accent-ink);box-shadow:0 1px 2px rgba(16,17,20,.16);}
 .btn-primary:hover:not(:disabled){background:var(--accent-hov);}
 .btn-plain{background:var(--surface-3);color:var(--ink);}
 .btn-plain:hover:not(:disabled){background:var(--line);}
@@ -138,13 +148,15 @@ button,input,select,textarea{font:inherit;color:inherit;}
 .ibtn:hover:not(:disabled){background:var(--surface-3);color:var(--ink);}
 .ibtn:disabled{opacity:.3;cursor:not-allowed;}
 .ibtn:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
-.ibtn svg{width:16px;height:16px;}
+.ibtn svg{width:16px;height:16px;stroke-linecap:round;stroke-linejoin:round;}
 
 .toast{
   position:fixed;left:50%;top:calc(var(--topbar) + 14px);
-  z-index:1200;background:var(--ink);color:var(--bg);
-  padding:9px 16px;border-radius:var(--r-pill);font-size:13px;font-weight:500;
+  z-index:1200;background:var(--float);color:var(--float-ink);
+  border:1px solid var(--float-line);
+  padding:9px 17px;border-radius:var(--r-pill);font-size:13px;font-weight:500;
   box-shadow:var(--sh-3);pointer-events:none;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   opacity:0;transform:translateX(-50%) translateY(-6px);
   transition:opacity var(--t),transform var(--t);
 }
@@ -156,19 +168,19 @@ button,input,select,textarea{font:inherit;color:inherit;}
 .pane{background:var(--surface);display:flex;flex-direction:column;min-height:0;}
 .pane-l{border-right:1px solid var(--line);}
 .pane-r{border-left:1px solid var(--line);}
-.pane-tabs{display:flex;padding:8px 10px 0;gap:2px;border-bottom:1px solid var(--line);flex:0 0 auto;}
+.pane-tabs{display:flex;padding:8px;gap:4px;border-bottom:1px solid var(--line);flex:0 0 auto;}
 .tab-wrap{position:relative;flex:1;display:flex;}
 .tab{
   flex:1;border:0;background:transparent;color:var(--ink-2);cursor:pointer;
-  padding:7px 4px 9px;font-size:13px;font-weight:500;
-  border-bottom:2px solid transparent;transition:color var(--t),border-color var(--t);
-  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:8px 4px;font-size:11px;font-weight:500;letter-spacing:.01em;
+  border-radius:var(--r-sm);transition:color var(--t),background var(--t);
+  display:flex;flex-direction:column;align-items:center;gap:5px;
 }
-.tab svg{width:17px;height:17px;}
-.tab:hover{color:var(--ink);}
-.tab.on{color:var(--accent);border-bottom-color:var(--accent);}
+.tab svg{width:19px;height:19px;stroke-linecap:round;stroke-linejoin:round;}
+.tab:hover{color:var(--ink);background:var(--surface-3);}
+.tab.on{color:var(--accent);background:var(--accent-soft);}
 .badge{
-  position:absolute;right:8px;top:2px;
+  position:absolute;right:6px;top:3px;
   min-width:16px;height:16px;padding:0 4px;border-radius:8px;
   background:var(--bad);color:#fff;font-size:11px;font-weight:700;
   display:grid;place-items:center;pointer-events:none;
@@ -199,7 +211,7 @@ button,input,select,textarea{font:inherit;color:inherit;}
 .block:hover{border-color:var(--accent);background:var(--accent-soft);}
 .block:active{transform:scale(.96);}
 .block:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
-.block svg{width:20px;height:20px;color:var(--ink-2);}
+.block svg{width:21px;height:21px;color:var(--ink-3);stroke-linecap:round;stroke-linejoin:round;}
 .block:hover svg{color:var(--accent);}
 
 /* ---------- Lapisan ---------- */
@@ -340,18 +352,20 @@ button,input,select,textarea{font:inherit;color:inherit;}
   border-radius:50%;background:var(--accent);
 }
 .qbar{
-  position:absolute;display:flex;gap:1px;padding:3px;pointer-events:auto;
-  background:var(--ink);border-radius:var(--r-sm);box-shadow:var(--sh-3);
+  position:absolute;display:flex;gap:2px;padding:4px;pointer-events:auto;
+  background:var(--float);border:1px solid var(--float-line);
+  border-radius:var(--r-sm);box-shadow:var(--sh-3);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
 }
 .qbar[hidden]{display:none;}
 .qb{
-  border:0;background:transparent;color:#fff;cursor:pointer;
-  padding:5px 8px;border-radius:6px;font-size:13px;font-weight:500;
-  display:inline-flex;align-items:center;gap:4px;white-space:nowrap;
+  border:0;background:transparent;color:var(--float-ink);cursor:pointer;
+  padding:6px 9px;border-radius:7px;font-size:13px;font-weight:500;
+  display:inline-flex;align-items:center;gap:5px;white-space:nowrap;
   transition:background var(--t);
 }
-.qb svg{width:13px;height:13px;}
-.qb:hover{background:rgba(255,255,255,.18);}
+.qb svg{width:14px;height:14px;stroke-linecap:round;stroke-linejoin:round;}
+.qb:hover{background:rgba(255,255,255,.14);}
 .qb-bad:hover{background:var(--bad);}
 .shield{position:fixed;inset:0;z-index:900;cursor:grabbing;}
 .shield[hidden]{display:none;}
@@ -396,11 +410,11 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
 
 .swatch{display:flex;align-items:center;gap:5px;}
 .swatch input[type="color"]{
-  width:100%;height:29px;padding:2px;border:1px solid var(--line);
+  width:100%;height:32px;padding:3px;border:1px solid var(--line);
   border-radius:var(--r-sm);background:var(--surface);cursor:pointer;
 }
 .clr{
-  width:26px;height:29px;flex:0 0 auto;border:1px solid var(--line);
+  width:30px;height:32px;flex:0 0 auto;border:1px solid var(--line);
   background:var(--surface);color:var(--ink-3);border-radius:var(--r-sm);
   cursor:pointer;display:grid;place-items:center;transition:color var(--t),background var(--t);
 }
@@ -413,7 +427,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
   cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;
   transition:background var(--t),border-color var(--t);
 }
-.act svg{width:13px;height:13px;}
+.act svg{width:14px;height:14px;stroke-linecap:round;stroke-linejoin:round;}
 .act:hover{background:var(--surface-3);}
 .act-bad{color:var(--bad);}
 .act-bad:hover{background:var(--bad-soft);border-color:var(--bad);}
@@ -474,47 +488,34 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
 <!--ARTIFACT_BODY_START-->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <g id="i-pen"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></g>
-    <g id="i-undo"><path d="M3 7v6h6"/><path d="M3.5 13a9 9 0 1 0 2.3-9.3L3 7"/></g>
-    <g id="i-redo"><path d="M21 7v6h-6"/><path d="M20.5 13a9 9 0 1 1-2.3-9.3L21 7"/></g>
-    <g id="i-code"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></g>
-    <g id="i-down"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></g>
-    <g id="i-copy"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></g>
-    <g id="i-blocks"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></g>
-    <g id="i-layers"><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5M3 17l9 5 9-5"/></g>
-    <g id="i-shield"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></g>
-    <g id="i-chev"><path d="m6 9 6 6 6-6"/></g>
-    <g id="i-section"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></g>
-    <g id="i-heading"><path d="M6 4v16M18 4v16M6 12h12"/></g>
-    <g id="i-text"><path d="M4 6h16M4 12h16M4 18h11"/></g>
-    <g id="i-button"><rect x="2" y="8" width="20" height="8" rx="4"/></g>
-    <g id="i-image"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></g>
-    <g id="i-cols"><rect x="3" y="4" width="7" height="16" rx="1.5"/><rect x="14" y="4" width="7" height="16" rx="1.5"/></g>
-    <g id="i-line"><path d="M3 12h18"/></g>
-    <g id="i-space"><path d="M12 3v18M8 7l4-4 4 4M8 17l4 4 4-4"/></g>
-    <g id="i-trash"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1L5 6"/></g>
-    <g id="i-dup"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></g>
-    <g id="i-up"><path d="M12 19V5M5 12l7-7 7 7"/></g>
-    <g id="i-dn"><path d="M12 5v14M19 12l-7 7-7-7"/></g>
+    <g id="i-pen"><path d="M13.8 6.2 17.8 10.2"/><path d="M4 20.2 4.9 16.3 16.1 5.1a2 2 0 0 1 2.8 2.8L7.7 19.3 4 20.2Z"/></g>
+    <g id="i-undo"><path d="M9.5 14.5 4.5 9.5 9.5 4.5"/><path d="M4.5 9.5h9.3a5.7 5.7 0 0 1 0 11.4H9.5"/></g>
+    <g id="i-redo"><path d="M14.5 14.5 19.5 9.5 14.5 4.5"/><path d="M19.5 9.5h-9.3a5.7 5.7 0 0 0 0 11.4h4.3"/></g>
+    <g id="i-code"><path d="M8.5 6.5 3 12l5.5 5.5M15.5 6.5 21 12l-5.5 5.5"/></g>
+    <g id="i-down"><path d="M12 3.5v11.8M7.5 11l4.5 4.5 4.5-4.5M4.5 20.5h15"/></g>
+    <g id="i-blocks"><rect x="3.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2.2"/></g>
+    <g id="i-layers"><path d="m12 3 8.5 4.3L12 11.6 3.5 7.3 12 3Z"/><path d="m3.5 12 8.5 4.3 8.5-4.3M3.5 16.7 12 21l8.5-4.3"/></g>
+    <g id="i-shield"><path d="M12 3.2 19 6v5.4c0 4.2-2.9 7.7-7 8.6-4.1-.9-7-4.4-7-8.6V6l7-2.8Z"/><path d="m9.2 11.8 2 2 3.6-3.8"/></g>
+    <g id="i-section"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><path d="M3.5 9.5h17"/></g>
+    <g id="i-heading"><path d="M6.5 5v14M17.5 5v14M6.5 12h11"/></g>
+    <g id="i-text"><path d="M4.5 6.5h15M4.5 12h15M4.5 17.5h9"/></g>
+    <g id="i-button"><rect x="2.5" y="7.5" width="19" height="9" rx="4.5"/><path d="M8.5 12h7"/></g>
+    <g id="i-image"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><circle cx="8.8" cy="9.8" r="1.6"/><path d="m4.5 17.5 4.8-4.8a1.6 1.6 0 0 1 2.2 0l5.3 5.3M14.5 14l1.7-1.7a1.6 1.6 0 0 1 2.2 0l2.1 2.1"/></g>
+    <g id="i-cols"><rect x="3.5" y="4.5" width="7" height="15" rx="2.4"/><rect x="13.5" y="4.5" width="7" height="15" rx="2.4"/></g>
+    <g id="i-line"><path d="M4 12h16"/></g>
+    <g id="i-space"><path d="M12 4.5v15M8.5 8 12 4.5 15.5 8M8.5 16 12 19.5 15.5 16"/></g>
+    <g id="i-trash"><path d="M4 6.5h16M9.5 6.5V5a1.5 1.5 0 0 1 1.5-1.5h2A1.5 1.5 0 0 1 14.5 5v1.5"/><path d="M6.5 6.5 7.4 19a2 2 0 0 0 2 1.9h5.2a2 2 0 0 0 2-1.9l.9-12.5"/></g>
+    <g id="i-dup"><rect x="8.5" y="8.5" width="12" height="12" rx="3"/><path d="M15.5 5.5v-.5a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h.5"/></g>
+    <g id="i-up"><path d="M12 19.5V5M5.5 11.5 12 5l6.5 6.5"/></g>
+    <g id="i-dn"><path d="M12 4.5V19M18.5 12.5 12 19l-6.5-6.5"/></g>
     <g id="i-x"><path d="M18 6 6 18M6 6l12 12"/></g>
-    <g id="i-eye"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></g>
-    <g id="i-zin"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></g>
-    <g id="i-zout"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11h6"/></g>
-    <g id="i-wand"><path d="m15 4 1.5 3L20 8.5 16.5 10 15 13l-1.5-3L10 8.5 13.5 7Z"/><path d="M4 20 13 11M6 4v4M4 6h4"/></g>
-    <g id="i-alert"><path d="M12 9v5M12 17.5v.5"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></g>
-    <g id="i-check"><path d="M20 6 9 17l-5-5"/></g>
-    <g id="i-target"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></g>
-    <g id="i-refresh"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></g>
-    <g id="i-wa"><path d="M20.5 3.5A10.4 10.4 0 0 0 3.6 16.2L2.5 21.5l5.4-1.1a10.4 10.4 0 0 0 12.6-16.9Z"/><path d="M8.6 8.2c.4-.9.7-.7 1.1-.7h.5c.2 0 .4.1.6.5l.7 1.7c.1.2 0 .4-.1.5l-.5.6c-.1.2-.2.3 0 .5.6 1 1.5 1.8 2.6 2.3.2.1.4.1.5-.1l.6-.7c.2-.2.3-.2.5-.1l1.6.8c.2.1.4.2.4.4 0 .3-.2 1.1-.5 1.4-.4.4-1.1.6-1.8.5a8.5 8.5 0 0 1-6.3-6c-.1-.6 0-1.2.1-1.6Z"/></g>
-    <g id="i-phone"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.8 2.1Z"/></g>
-    <g id="i-mail"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></g>
-    <g id="i-pin"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></g>
-    <g id="i-clock"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></g>
-    <g id="i-star"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1L3.2 9.5l6.1-.9Z"/></g>
-    <g id="i-cart"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.6 12.4a2 2 0 0 0 2 1.6h8a2 2 0 0 0 2-1.6L21 7H6"/></g>
-    <g id="i-arrow"><path d="M5 12h14M13 6l6 6-6 6"/></g>
-    <g id="i-ig"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></g>
-    <g id="i-info"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/></g>
+    <g id="i-zin"><circle cx="10.8" cy="10.8" r="7"/><path d="M20.5 20.5 15.8 15.8M10.8 7.8v6M7.8 10.8h6"/></g>
+    <g id="i-zout"><circle cx="10.8" cy="10.8" r="7"/><path d="M20.5 20.5 15.8 15.8M7.8 10.8h6"/></g>
+    <g id="i-wand"><path d="m14.5 3.5 1.3 2.9 2.9 1.3-2.9 1.3-1.3 2.9-1.3-2.9L10.3 7.7l2.9-1.3Z"/><path d="M4 20 12.2 11.8M5 4v3.4M3.3 5.7h3.4"/></g>
+    <g id="i-check"><path d="m5 12.5 4.5 4.5L19 7.5"/></g>
+    <g id="i-target"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.6"/><path d="M12 1.8v2.6M12 19.6v2.6M1.8 12h2.6M19.6 12h2.6"/></g>
+    <g id="i-refresh"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6"/><path d="M20.5 3v5.2h-5.2"/></g>
+    <g id="i-star"><path d="m12 3.5 2.6 5.3 5.9.9-4.2 4.1 1 5.8-5.3-2.8-5.3 2.8 1-5.8-4.2-4.1 5.9-.9Z"/></g>
   </defs>
 </svg>
 
@@ -602,11 +603,11 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
   <!-- ============ Panel samping ============ -->
   <aside class="pane pane-r">
     <nav class="pane-tabs" role="tablist">
-      <div class="tab-wrap"><button class="tab on" data-tab="props" type="button" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><use href="#i-target"/></svg> Properti</button></div>
-      <div class="tab-wrap"><button class="tab" data-tab="blocks" type="button" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><use href="#i-blocks"/></svg> Tambah</button></div>
-      <div class="tab-wrap"><button class="tab" data-tab="layers" type="button" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><use href="#i-layers"/></svg> Lapisan</button></div>
+      <div class="tab-wrap"><button class="tab on" data-tab="props" type="button" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-target"/></svg> Properti</button></div>
+      <div class="tab-wrap"><button class="tab" data-tab="blocks" type="button" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-blocks"/></svg> Tambah</button></div>
+      <div class="tab-wrap"><button class="tab" data-tab="layers" type="button" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><use href="#i-layers"/></svg> Lapisan</button></div>
       <div class="tab-wrap">
-        <button class="tab" data-tab="scan" type="button" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-shield"/></svg> Periksa</button>
+        <button class="tab" data-tab="scan" type="button" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-shield"/></svg> Periksa</button>
         <span class="badge" id="scanBadge" hidden>0</span>
       </div>
     </nav>
@@ -638,14 +639,14 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
 
             <div class="card" id="cImg" hidden>
               <div class="card-h"><span class="card-t">Gambar</span></div>
-              <button class="btn btn-plain btn-sm btn-full" id="imgPick" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><use href="#i-image"/></svg>Pilih gambar dari komputer</button>
+              <button class="btn btn-plain btn-sm btn-full" id="imgPick" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-image"/></svg>Pilih gambar dari komputer</button>
               <label class="lbl" for="pAlt">Teks pengganti (kalau gambar gagal tampil)</label>
               <input id="pAlt" class="inp" type="text" placeholder="misalnya: foto rumah tampak depan">
             </div>
 
             <div class="card" id="cIcon" hidden>
               <div class="card-h"><span class="card-t">Ikon</span></div>
-              <button class="btn btn-plain btn-sm btn-full" id="iconPick" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><use href="#i-star"/></svg>Ganti ikon</button>
+              <button class="btn btn-plain btn-sm btn-full" id="iconPick" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-star"/></svg>Ganti ikon</button>
               <p class="note">Bisa pilih dari daftar siap pakai, atau tempel kode SVG sendiri.</p>
             </div>
 
@@ -727,8 +728,8 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
               <div class="grid2">
                 <button class="act" data-act="up" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-up"/></svg>Naik</button>
                 <button class="act" data-act="down" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-dn"/></svg>Turun</button>
-                <button class="act" data-act="dup" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><use href="#i-dup"/></svg>Gandakan</button>
-                <button class="act act-bad" data-act="del" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><use href="#i-trash"/></svg>Hapus</button>
+                <button class="act" data-act="dup" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-dup"/></svg>Gandakan</button>
+                <button class="act act-bad" data-act="del" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-trash"/></svg>Hapus</button>
               </div>
               <button class="act" data-act="code" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-code"/></svg>Lihat kode elemen ini</button>
             </div>
@@ -764,8 +765,8 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
             <p class="sec-title">Hasil pemeriksaan</p>
             <span class="pill" id="scanPill">Belum diperiksa</span>
           </div>
-          <button class="btn btn-plain btn-full btn-sm" id="scanBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-shield"/></svg>Periksa halaman</button>
-          <button class="btn btn-primary btn-full btn-sm" id="fixAllBtn" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-wand"/></svg>Perbaiki semua yang bisa</button>
+          <button class="btn btn-plain btn-full btn-sm" id="scanBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-shield"/></svg>Periksa halaman</button>
+          <button class="btn btn-primary btn-full btn-sm" id="fixAllBtn" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-wand"/></svg>Perbaiki semua yang bisa</button>
           <div class="issues" id="issueList"></div>
         </div>
   </aside>
@@ -785,10 +786,10 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
   <div class="ins" id="insLine" hidden></div>
   <div class="qbar" id="qbar" hidden>
     <button class="qb" data-act="text" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-pen"/></svg>Ubah teks</button>
-    <button class="qb" data-act="dup" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><use href="#i-dup"/></svg></button>
+    <button class="qb" data-act="dup" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-dup"/></svg></button>
     <button class="qb" data-act="up" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-up"/></svg></button>
     <button class="qb" data-act="down" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-dn"/></svg></button>
-    <button class="qb qb-bad" data-act="del" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><use href="#i-trash"/></svg></button>
+    <button class="qb qb-bad" data-act="del" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-trash"/></svg></button>
   </div>
 </div>
 <div class="shield" id="shield" hidden></div>
@@ -1929,15 +1930,15 @@ document.querySelectorAll('[data-close]').forEach(function(b){ b.addEventListene
 /* ---------------- ganti ikon ---------------- */
 var ICONS = {
   'WhatsApp':'<path d="M20.5 3.5A10.4 10.4 0 0 0 3.6 16.2L2.5 21.5l5.4-1.1a10.4 10.4 0 0 0 12.6-16.9Z"/><path d="M8.6 8.2c.4-.9.7-.7 1.1-.7h.5c.2 0 .4.1.6.5l.7 1.7c.1.2 0 .4-.1.5l-.5.6c-.1.2-.2.3 0 .5.6 1 1.5 1.8 2.6 2.3.2.1.4.1.5-.1l.6-.7c.2-.2.3-.2.5-.1l1.6.8c.2.1.4.2.4.4 0 .3-.2 1.1-.5 1.4-.4.4-1.1.6-1.8.5a8.5 8.5 0 0 1-6.3-6c-.1-.6 0-1.2.1-1.6Z"/>',
-  'Telepon':'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.8 2.1Z"/>',
-  'Email':'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/>',
-  'Lokasi':'<path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/>',
-  'Jam':'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
-  'Bintang':'<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1L3.2 9.5l6.1-.9Z"/>',
-  'Centang':'<path d="M20 6 9 17l-5-5"/>',
-  'Panah':'<path d="M5 12h14M13 6l6 6-6 6"/>',
-  'Keranjang':'<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.6 12.4a2 2 0 0 0 2 1.6h8a2 2 0 0 0 2-1.6L21 7H6"/>',
-  'Instagram':'<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/>'
+  'Telepon':'<path d="M21.5 16.9v2.6a2 2 0 0 1-2.2 2 19.4 19.4 0 0 1-8.5-3 19.1 19.1 0 0 1-5.9-5.9 19.4 19.4 0 0 1-3-8.6 2 2 0 0 1 2-2.2h2.6a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.4 9.6a15.5 15.5 0 0 0 6 6l1.2-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.8 2Z"/>',
+  'Email':'<rect x="2.5" y="4.5" width="19" height="15" rx="3"/><path d="m3 7.5 8.1 5.2a1.8 1.8 0 0 0 1.9 0L21 7.5"/>',
+  'Lokasi':'<path d="M12 21c4-4.4 6.5-7.7 6.5-10.6a6.5 6.5 0 0 0-13 0C5.5 13.3 8 16.6 12 21Z"/><circle cx="12" cy="10.2" r="2.4"/>',
+  'Jam':'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.2V12l3.2 2"/>',
+  'Bintang':'<path d="m12 3.5 2.6 5.3 5.9.9-4.2 4.1 1 5.8-5.3-2.8-5.3 2.8 1-5.8-4.2-4.1 5.9-.9Z"/>',
+  'Centang':'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  'Panah':'<path d="M4.5 12h15M13.5 6l6 6-6 6"/>',
+  'Keranjang':'<circle cx="9.5" cy="20" r="1.4"/><circle cx="17.5" cy="20" r="1.4"/><path d="M2.5 3.5h2.6l2.5 11.5a1.8 1.8 0 0 0 1.8 1.4h7.7a1.8 1.8 0 0 0 1.8-1.4l1.6-7.4H6"/>',
+  'Instagram':'<rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="3.8"/><circle cx="17" cy="7" r="1"/>'
 };
 var iconTarget = null;
 E.iconPick.addEventListener('click', function(){
@@ -1950,7 +1951,7 @@ E.iconPick.addEventListener('click', function(){
 Object.keys(ICONS).forEach(function(name){
   var b = document.createElement('button');
   b.type='button'; b.className='icon-pick'; b.title = name;
-  b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + ICONS[name] + '</svg>';
+  b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + ICONS[name] + '</svg>';
   b.addEventListener('click', function(){ applyIcon(ICONS[name], true); });
   E.iconGrid.appendChild(b);
 });
@@ -1964,7 +1965,7 @@ function applyIcon(src, isPath){
   snap();
   var box = fd.createElement('div');
   if (isPath){
-    box.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + src + '</svg>';
+    box.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + src + '</svg>';
   } else {
     box.innerHTML = src;
   }
