@@ -370,6 +370,7 @@ button,input,select,textarea{font:inherit;color:inherit;}
 /* ---------- Hamparan di atas kanvas (tidak menyentuh DOM halaman) ---------- */
 .ovl{position:fixed;pointer-events:none;z-index:500;overflow:hidden;}
 .ovl[hidden]{display:none;}
+.ovl-cv{position:absolute;left:0;top:0;pointer-events:none;}
 .box{position:absolute;pointer-events:none;border-radius:2px;}
 .box[hidden]{display:none;}
 .box-hover{border:1px solid var(--accent);background:rgba(0,113,227,.07);}
@@ -903,6 +904,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
 
 <!-- Hamparan kanvas -->
 <div class="ovl" id="ovl" hidden>
+  <canvas class="ovl-cv" id="outlineCv" hidden></canvas>
   <div class="box box-hover" id="boxHover" hidden></div>
   <div class="box box-peek" id="boxPeek" hidden></div>
   <div class="box box-drop" id="boxDrop" hidden></div>
@@ -992,7 +994,7 @@ var E = {};
  'pW','pH','pPad','pMar','fileInput','toast',
  'pColorBtn','pColorChip','pColorVal','pBgBtn','pBgChip','pBgVal',
  'colorPop','cpSv','cpSvThumb','cpHue','cpHueThumb','cpEye','cpHex','cpSwatches',
- 'outlineBtn','qbMove','iconUrl','iconUrlApply','themeBtn',
+ 'outlineBtn','outlineCv','qbMove','iconUrl','iconUrlApply','themeBtn',
  'codeModal','codeOut','codeTitle','codeCopy','iconModal','iconGrid','iconSvg','iconApply'
 ].forEach(function(id){ E[id] = $(id); });
 
@@ -1161,7 +1163,7 @@ E.frame.addEventListener('load', function(){
   ready = true;
   E.dlBtn.disabled = E.copyBtn.disabled = E.codeBtn.disabled = false;
   E.ovl.hidden = false;
-  layout(); applyOutline(); buildLayers(); deselect();
+  layout(); outlineBuild(); buildLayers(); deselect();
   runScan(true);
   hint('Klik elemen untuk memilih. Klik dua kali untuk mengubah teksnya.');
 });
@@ -1189,52 +1191,85 @@ E.devSeg.addEventListener('click', function(e){
   Array.prototype.forEach.call(E.devSeg.querySelectorAll('.seg-btn'), function(x){ x.classList.toggle('on', x===b); });
   devW = DEV[b.dataset.dev] || 1440;
   zoomMode = 'fit';
-  layout();
+  layout(); outlineRebuild();
   toast('Pratinjau ' + b.textContent + ', lebar asli ' + devW + 'px');
 });
 E.zoomIn.addEventListener('click', function(){ zoomMode = Math.min(2, scale + .1); layout(); });
 E.zoomOut.addEventListener('click', function(){ zoomMode = Math.max(.2, scale - .1); layout(); });
 E.zoomFit.addEventListener('click', function(){ zoomMode = 'fit'; layout(); });
 
-/* Rangka semua komponen, seperti "view components" di GrapesJS. Disuntikkan sebagai
-   satu <style> ber-id, dan dibuang lagi saat ekspor sehingga tidak ikut tersimpan. */
-var outlineOn = false;
+/* Rangka semua komponen, seperti "view components" di GrapesJS.
+
+   Digambar sebagai kotak di kanvas 2D pada lapisan hamparan, di LUAR iframe.
+   Dengan begitu garisnya selalu berbentuk kotak lurus tanpa mengikuti lengkung
+   tombol atau gambar, bentuk asli halaman tidak disentuh sama sekali, dan tidak
+   ada apa pun yang perlu dibersihkan saat ekspor. Satu elemen kanvas jauh lebih
+   ringan daripada ratusan div penanda. */
+var outlineOn = false, outlineRects = [], outlineTimer = null;
 E.outlineBtn.addEventListener('click', function(){
   if (!fd){ toast('Buka halaman dulu di kanvas.', true); return; }
   outlineOn = !outlineOn;
-  applyOutline();
+  E.outlineBtn.classList.toggle('on', outlineOn);
+  E.outlineCv.hidden = !outlineOn;
+  if (outlineOn) outlineBuild(); else outlineRects = [];
   toast(outlineOn ? 'Rangka komponen ditampilkan.' : 'Rangka komponen disembunyikan.');
 });
-function applyOutline(){
-  if (!fd || !fd.head) return;
-  var st = fd.getElementById('__sunting_outline__');
-  if (!outlineOn){
-    if (st) st.remove();
-    E.outlineBtn.classList.toggle('on', false);
-    return;
+function outlineFade(col, a){
+  var m = String(col).match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+  if (!m) return 'rgba(61,99,221,' + a + ')';
+  return 'rgba(' + m[1] + ',' + m[2] + ',' + m[3] + ',' + a + ')';
+}
+/* Letak kotak disimpan dalam koordinat dokumen halaman, bukan koordinat layar,
+   supaya menggulir dan zoom cukup menggambar ulang tanpa mengukur ulang. */
+function outlineBuild(){
+  outlineRects = [];
+  if (!outlineOn || !fd || !fd.body) return;
+  var win = fd.defaultView;
+  var sx = win.scrollX || 0, sy = win.scrollY || 0;
+  var list = fd.body.querySelectorAll('*');
+  var max = Math.min(list.length, 1500);
+  for (var i = 0; i < max; i++){
+    var el = list[i];
+    if (skip(el)) continue;
+    var r = el.getBoundingClientRect();
+    if (r.width < 2 || r.height < 2) continue;
+    outlineRects.push({
+      x: r.left + sx, y: r.top + sy, w: r.width, h: r.height,
+      c: outlineFade(win.getComputedStyle(el).color, 0.5)
+    });
   }
-  if (!st){
-    st = fd.createElement('style');
-    st.id = '__sunting_outline__';
-    fd.head.appendChild(st);
+  outlineDraw();
+}
+function outlineRebuild(){
+  if (!outlineOn) return;
+  clearTimeout(outlineTimer);
+  outlineTimer = setTimeout(outlineBuild, 120);
+}
+function outlineDraw(){
+  if (!outlineOn || !fd) return;
+  var cv = E.outlineCv, win = fd.defaultView;
+  var fr = E.frame.getBoundingClientRect();
+  var dpr = window.devicePixelRatio || 1;
+  var w = Math.max(1, Math.round(fr.width)), h = Math.max(1, Math.round(fr.height));
+  if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)){
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
   }
-  // Kanvas diperkecil dengan transform: scale(), jadi garis 1px ikut menyusut sampai
-  // nyaris hilang saat zoom di bawah 100%. Tebalnya dikompensasi agar tetap terlihat
-  // setebal satu piksel di layar, berapa pun zoomnya.
-  // Chrome membulatkan outline-width ke piksel bulat, jadi 1,28px jatuh kembali ke
-  // 1px dan ikut menghilang. Karena itu dibulatkan ke atas.
-  var w = Math.min(4, Math.max(1, Math.ceil(1 / Math.max(scale, 0.25))));
-  var q = 'body *:not(script):not(style):not(br)';
-  // Garis outline selalu mengikuti border-radius elemen, sehingga di tombol pil dan
-  // gambar melengkung ia ikut membulat. Selama mode rangka menyala radiusnya
-  // dinolkan agar semua rangka tampil sebagai kotak; begitu dimatikan, tampilan
-  // halaman kembali seperti semula.
-  st.textContent =
-    q + '{outline:' + w + 'px dashed rgba(61,99,221,.9) !important;outline-offset:-' + w + 'px !important;' +
-    'border-radius:0 !important;}' +
-    '@supports (outline-color:color-mix(in srgb,currentColor 50%,transparent)){' +
-    q + '{outline-color:color-mix(in srgb,currentColor 78%,transparent) !important;}}';
-  E.outlineBtn.classList.toggle('on', true);
+  cv.style.width = w + 'px'; cv.style.height = h + 'px';
+  var ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 2]);
+  var sx = win.scrollX || 0, sy = win.scrollY || 0;
+  for (var i = 0; i < outlineRects.length; i++){
+    var o = outlineRects[i];
+    var x = (o.x - sx) * scale, y = (o.y - sy) * scale;
+    var ww = o.w * scale, hh = o.h * scale;
+    if (x > w || y > h || x + ww < 0 || y + hh < 0) continue;   // di luar layar
+    ctx.strokeStyle = o.c;
+    ctx.strokeRect(Math.round(x) + 0.5, Math.round(y) + 0.5,
+                   Math.max(1, Math.round(ww) - 1), Math.max(1, Math.round(hh) - 1));
+  }
 }
 
 function layout(){
@@ -1248,8 +1283,7 @@ function layout(){
   E.sizer.style.width = Math.round(devW * scale) + 'px';
   E.sizer.style.height = Math.round(h * scale) + 'px';
   E.zoomLabel.textContent = Math.round(scale * 100) + '%';
-  if (outlineOn) applyOutline();
-  syncOvl(); redraw();
+  syncOvl(); redraw(); outlineDraw();
 }
 window.addEventListener('resize', function(){ if (ready) layout(); });
 
@@ -1285,10 +1319,32 @@ function redraw(){
   } else if (sel){ deselect(); }
   if (hoverEl && fd.contains(hoverEl)) put(E.boxHover, hoverEl);
   if (dropEl && fd.contains(dropEl)) put(E.boxDrop, dropEl);
+  outlineDraw();
 }
+
+/* Penanda visual hidup di luar iframe, jadi posisinya harus ikut saat halaman
+   digulir. Event 'scroll' dari dalam iframe tidak selalu sampai ke sini (di
+   sebagian mesin dan saat halaman memakai scroll-behavior sendiri, event-nya
+   tidak pernah terpicu), jadi jangan pernah mengandalkan itu sendirian.
+   Pengawas ini jalan di jendela induk: satu perbandingan angka per frame, dan
+   baru menggambar ulang kalau posisi gulir benar-benar berubah DAN memang ada
+   yang perlu diselaraskan. Kalau tidak ada, ongkosnya nyaris nol. */
+var lastSX = -1, lastSY = -1;
+function watchScroll(){
+  requestAnimationFrame(watchScroll);
+  if (!fd || !(outlineOn || sel || hoverEl || dropEl)) return;
+  var win = fd.defaultView;
+  if (!win) return;
+  var sx = win.scrollX || 0, sy = win.scrollY || 0;
+  if (sx === lastSX && sy === lastSY) return;
+  lastSX = sx; lastSY = sy;
+  redraw();
+}
+requestAnimationFrame(watchScroll);
 
 /* ---------------- kejadian di dalam iframe ---------------- */
 function bind(){
+  lastSX = -1; lastSY = -1;
   fd.addEventListener('mousemove', onMove, true);
   fd.addEventListener('mouseleave', function(){ setHover(null); }, true);
   fd.addEventListener('click', onClick, true);
@@ -1986,6 +2042,7 @@ function buildLayers(){
 
   walk(fd.body, rootBox, 1, count);
   markLayer(sel);
+  outlineRebuild();
 }
 E.layersRefresh.addEventListener('click', function(){ buildLayers(); toast('Daftar lapisan dimuat ulang.'); });
 
@@ -2622,8 +2679,6 @@ function cleanClone(clone, liveRoot){
       }
     }
   }
-  var ol = clone.querySelector && clone.querySelector('#__sunting_outline__');
-  if (ol) ol.remove();
   var ce = clone.querySelectorAll('[contenteditable]');
   for (var j=0;j<ce.length;j++) ce[j].removeAttribute('contenteditable');
   if (clone.hasAttribute && clone.hasAttribute('contenteditable')) clone.removeAttribute('contenteditable');
