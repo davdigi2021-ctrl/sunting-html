@@ -382,6 +382,9 @@ button,input,select,textarea{font:inherit;color:inherit;}
   font-family:var(--mono);font-size:11px;font-weight:600;padding:2px 6px;
   border-radius:5px 5px 0 0;white-space:nowrap;
 }
+/* Kalau elemennya menempel di tepi atas kanvas, label dipindah ke dalam
+   supaya tidak terpotong oleh .ovl yang overflow-nya disembunyikan. */
+.tag.in{top:0;border-radius:0 0 5px 0;}
 .hdl{
   position:absolute;width:10px;height:10px;background:#fff;
   border:1.5px solid var(--accent);border-radius:50%;pointer-events:auto;
@@ -905,7 +908,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
 <!-- Hamparan kanvas -->
 <div class="ovl" id="ovl" hidden>
   <canvas class="ovl-cv" id="outlineCv" hidden></canvas>
-  <div class="box box-hover" id="boxHover" hidden></div>
+  <div class="box box-hover" id="boxHover" hidden><span class="tag" id="hoverTag">div</span></div>
   <div class="box box-peek" id="boxPeek" hidden></div>
   <div class="box box-drop" id="boxDrop" hidden></div>
   <div class="box box-sel" id="boxSel" hidden>
@@ -988,7 +991,7 @@ var E = {};
  'tabProps','tabBlocks','tabLayers','tabScan','layersTree','layersRefresh','scanBtn','fixAllBtn','issueList','scanPill','scanBadge',
  'startView','srcInput','cssInput','jsInput','extraToggle','extraFields','startErr','demoBtn','openBtn',
  'backBtn','hintText','canvas','sizer','device','frame',
- 'ovl','boxHover','boxPeek','boxDrop','boxSel','selTag','insLine','qbar','shield',
+ 'ovl','boxHover','boxPeek','boxDrop','boxSel','selTag','hoverTag','insLine','qbar','shield',
  'propsEmpty','propsBody','crumbs','cText','pText','cLink','pHref','linkErr','linkFix','pBlank',
  'cImg','imgPick','pAlt','cIcon','iconPick','pFont','pSize','pWeight','pLh','pAlign',
  'pW','pH','pPad','pMar','fileInput','toast',
@@ -1214,11 +1217,11 @@ E.outlineBtn.addEventListener('click', function(){
   if (outlineOn) outlineBuild(); else outlineRects = [];
   toast(outlineOn ? 'Rangka komponen ditampilkan.' : 'Rangka komponen disembunyikan.');
 });
-function outlineFade(col, a){
-  var m = String(col).match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
-  if (!m) return 'rgba(61,99,221,' + a + ')';
-  return 'rgba(' + m[1] + ',' + m[2] + ',' + m[3] + ',' + a + ')';
-}
+/* Satu warna untuk semua garis, sama seperti kotak hover dan seperti GrapesJS.
+   Dulu warnanya diambil dari warna teks tiap elemen, dan di halaman yang
+   warnanya kuat hasilnya jadi belang-belang mengikuti isi halaman, bukan
+   terbaca sebagai garis bantu editor. */
+var OUTLINE_COL = 'rgba(0,113,227,.55)';
 /* Letak kotak disimpan dalam koordinat dokumen halaman, bukan koordinat layar,
    supaya menggulir dan zoom cukup menggambar ulang tanpa mengukur ulang. */
 function outlineBuild(){
@@ -1233,10 +1236,7 @@ function outlineBuild(){
     if (skip(el)) continue;
     var r = el.getBoundingClientRect();
     if (r.width < 2 || r.height < 2) continue;
-    outlineRects.push({
-      x: r.left + sx, y: r.top + sy, w: r.width, h: r.height,
-      c: outlineFade(win.getComputedStyle(el).color, 0.5)
-    });
+    outlineRects.push({ x: r.left + sx, y: r.top + sy, w: r.width, h: r.height });
   }
   outlineDraw();
 }
@@ -1260,16 +1260,18 @@ function outlineDraw(){
   ctx.clearRect(0, 0, w, h);
   ctx.lineWidth = 1;
   ctx.setLineDash([3, 2]);
+  ctx.strokeStyle = OUTLINE_COL;   // satu warna untuk semua, diset sekali saja
+  ctx.beginPath();
   var sx = win.scrollX || 0, sy = win.scrollY || 0;
   for (var i = 0; i < outlineRects.length; i++){
     var o = outlineRects[i];
     var x = (o.x - sx) * scale, y = (o.y - sy) * scale;
     var ww = o.w * scale, hh = o.h * scale;
     if (x > w || y > h || x + ww < 0 || y + hh < 0) continue;   // di luar layar
-    ctx.strokeStyle = o.c;
-    ctx.strokeRect(Math.round(x) + 0.5, Math.round(y) + 0.5,
-                   Math.max(1, Math.round(ww) - 1), Math.max(1, Math.round(hh) - 1));
+    ctx.rect(Math.round(x) + 0.5, Math.round(y) + 0.5,
+             Math.max(1, Math.round(ww) - 1), Math.max(1, Math.round(hh) - 1));
   }
+  ctx.stroke();   // semua kotak digambar dalam satu jalur
 }
 
 function layout(){
@@ -1301,6 +1303,8 @@ function put(box, el){
   box.style.left = (r.left * scale) + 'px';
   box.style.width = (r.width * scale) + 'px';
   box.style.height = (r.height * scale) + 'px';
+  var tag = box.firstElementChild;
+  if (tag && tag.classList.contains('tag')) fitTag(box, tag);
 }
 function pt(e){
   var r = E.frame.getBoundingClientRect();
@@ -1404,7 +1408,12 @@ function deselect(){
 function setHover(el){
   hoverEl = el;
   if (!el){ E.boxHover.hidden = true; return; }
+  E.hoverTag.textContent = label(el);
   E.boxHover.hidden = false; put(E.boxHover, el);
+}
+/* Label ikut membalik ke dalam kalau kotaknya mepet tepi atas kanvas. */
+function fitTag(box, tag){
+  tag.classList.toggle('in', parseFloat(box.style.top) < 20);
 }
 function setDrop(el){
   dropEl = el;
