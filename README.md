@@ -29,7 +29,9 @@ Editor ini **tidak melakukan itu**. Halaman dirender apa adanya di dalam iframe,
 - Undo/redo (Ctrl+Z / Ctrl+Shift+Z)
 
 **Melihat**
-- Pratinjau **ukuran layar asli**: Desktop 1440px, Laptop 1280px, Tablet 820px, HP 390px, dengan zoom yang menyesuaikan
+- Pratinjau **ukuran layar asli** lewat tiga tombol ikon: Desktop 1440px, Tablet 820px, HP 390px — atau isi sendiri lebarnya (240–3000px) di kotak sebelahnya. Zoom menyesuaikan otomatis
+- Kanvas rata tepi saat lebar penuh, dan berbingkai saat pratinjau lebih sempit
+- **Rangka semua komponen** (seperti *view components* di GrapesJS), dengan label nama komponen saat kursor menyentuh elemen
 - **Panel lapisan** berisi struktur halaman. Arahkan kursor ke satu baris untuk melihat letaknya disorot di kanvas
 - **Lihat kode** untuk seluruh halaman atau satu elemen saja
 

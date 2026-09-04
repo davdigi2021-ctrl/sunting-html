@@ -120,6 +120,25 @@ button,input,select,textarea{font:inherit;color:inherit;}
 .seg-btn:hover{color:var(--ink);}
 .seg-btn.on{background:var(--surface);color:var(--ink);box-shadow:var(--sh-1);}
 .seg-btn:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.seg-btn svg{width:17px;height:17px;display:block;}
+.seg-btn:has(svg){padding:5px 9px;}
+
+/* Kotak lebar sendiri: tiga tombol perangkat menutup kebutuhan umum,
+   angka ini untuk ukuran apa pun di luar itu. */
+.wbox{
+  display:inline-flex;align-items:center;gap:2px;background:var(--surface-3);
+  border-radius:var(--r-sm);padding:0 7px 0 4px;height:30px;
+}
+.wbox[hidden]{display:none;}
+.wbox-in{
+  width:46px;border:0;background:transparent;color:var(--ink);
+  font-family:var(--mono);font-size:12px;text-align:right;padding:4px 2px;
+  -moz-appearance:textfield;appearance:textfield;
+}
+.wbox-in::-webkit-outer-spin-button,.wbox-in::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.wbox-in:focus{outline:none;}
+.wbox:focus-within{box-shadow:0 0 0 2px var(--accent) inset;}
+.wbox-unit{font-family:var(--mono);font-size:11px;color:var(--ink-3);}
 
 .btn{
   border:1px solid transparent;border-radius:var(--r-sm);
@@ -359,12 +378,14 @@ button,input,select,textarea{font:inherit;color:inherit;}
 
 .canvas{flex:1;min-height:0;overflow:auto;padding:20px;display:flex;justify-content:center;}
 .canvas[hidden]{display:none;}
+.canvas.full{padding:0;}
 .sizer{flex:0 0 auto;}
 .device{
   transform-origin:top left;background:#fff;
   border-radius:var(--r);overflow:hidden;
   box-shadow:var(--sh-2),0 0 0 1px var(--line);
 }
+.canvas.full .device{border-radius:0;box-shadow:none;}
 .frame{width:100%;height:100%;border:0;display:block;background:#fff;}
 
 /* ---------- Hamparan di atas kanvas (tidak menyentuh DOM halaman) ---------- */
@@ -627,6 +648,9 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
     <g id="i-zout"><circle cx="10.8" cy="10.8" r="7"/><path d="M20.5 20.5 15.8 15.8M7.8 10.8h6"/></g>
     <g id="i-wand"><path d="m14.5 3.5 1.3 2.9 2.9 1.3-2.9 1.3-1.3 2.9-1.3-2.9L10.3 7.7l2.9-1.3Z"/><path d="M4 20 12.2 11.8M5 4v3.4M3.3 5.7h3.4"/></g>
     <g id="i-check"><path d="m5 12.5 4.5 4.5L19 7.5"/></g>
+    <g id="i-desktop"><rect x="2.5" y="4" width="19" height="12.5" rx="2"/><path d="M9 20.5h6M12 16.5v4"/></g>
+    <g id="i-tablet"><rect x="5" y="2.5" width="14" height="19" rx="2.4"/><path d="M10.6 18.6h2.8"/></g>
+    <g id="i-mobile"><rect x="7" y="2.5" width="10" height="19" rx="2.4"/><path d="M10.8 18.7h2.4"/></g>
     <g id="i-sun"><circle cx="12" cy="12" r="4.1"/><path d="M12 2.6v2.3M12 19.1v2.3M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M2.6 12h2.3M19.1 12h2.3M5.2 18.8l1.6-1.6M17.2 6.8l1.6-1.6"/></g>
     <g id="i-moon"><path d="M20.4 14.3A8.7 8.7 0 0 1 9.7 3.6a8.7 8.7 0 1 0 10.7 10.7Z"/></g>
     <g id="i-sliders"><path d="M4 7.2h8.4M17.6 7.2H20M4 12h3.4M12.6 12H20M4 16.8h8.4M17.6 16.8H20"/><circle cx="15" cy="7.2" r="2.4"/><circle cx="10" cy="12" r="2.4"/><circle cx="15" cy="16.8" r="2.4"/></g>
@@ -647,10 +671,14 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
   </div>
 
   <div class="seg" id="devSeg" hidden role="group" aria-label="Ukuran layar pratinjau">
-    <button class="seg-btn on" data-dev="desktop" type="button" title="Desktop 1440px">Desktop</button>
-    <button class="seg-btn" data-dev="laptop" type="button" title="Laptop 1280px">Laptop</button>
-    <button class="seg-btn" data-dev="tablet" type="button" title="Tablet 820px">Tablet</button>
-    <button class="seg-btn" data-dev="mobile" type="button" title="HP 390px">HP</button>
+    <button class="seg-btn on" data-dev="desktop" type="button" title="Desktop — 1440px" aria-label="Desktop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-desktop"/></svg></button>
+    <button class="seg-btn" data-dev="tablet" type="button" title="Tablet — 820px" aria-label="Tablet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-tablet"/></svg></button>
+    <button class="seg-btn" data-dev="mobile" type="button" title="HP — 390px" aria-label="HP"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-mobile"/></svg></button>
+  </div>
+
+  <div class="wbox" id="widthBox" hidden title="Atur sendiri lebar pratinjau, dalam piksel">
+    <input class="wbox-in" id="devWidth" type="number" min="240" max="3000" step="10" value="1440" aria-label="Lebar pratinjau dalam piksel">
+    <span class="wbox-unit">px</span>
   </div>
 
   <div class="topbar-group" id="zoomGroup" hidden>
@@ -991,7 +1019,7 @@ var E = {};
  'tabProps','tabBlocks','tabLayers','tabScan','layersTree','layersRefresh','scanBtn','fixAllBtn','issueList','scanPill','scanBadge',
  'startView','srcInput','cssInput','jsInput','extraToggle','extraFields','startErr','demoBtn','openBtn',
  'backBtn','hintText','canvas','sizer','device','frame',
- 'ovl','boxHover','boxPeek','boxDrop','boxSel','selTag','hoverTag','insLine','qbar','shield',
+ 'ovl','boxHover','boxPeek','boxDrop','boxSel','selTag','hoverTag','insLine','qbar','shield','widthBox','devWidth',
  'propsEmpty','propsBody','crumbs','cText','pText','cLink','pHref','linkErr','linkFix','pBlank',
  'cImg','imgPick','pAlt','cIcon','iconPick','pFont','pSize','pWeight','pLh','pAlign',
  'pW','pH','pPad','pMar','fileInput','toast',
@@ -1009,7 +1037,7 @@ var sel = null, hoverEl = null, dropEl = null;
 var undoS = [], redoS = [];
 var dlCap = null;
 var scale = 1, devW = 1440, zoomMode = 'fit';
-var DEV = { desktop:1440, laptop:1280, tablet:820, mobile:390 };
+var DEV = { desktop:1440, tablet:820, mobile:390 };
 var drag = null, resize = null, pend = null;
 var toastT = null;
 var issues = [];
@@ -1128,7 +1156,7 @@ E.backBtn.addEventListener('click', function(){
   E.frame.removeAttribute('srcdoc');
   E.canvas.hidden = true; E.backBtn.hidden = true; E.ovl.hidden = true;
   E.hintText.textContent = '';
-  E.devSeg.hidden = true; E.zoomGroup.hidden = true;
+  E.devSeg.hidden = true; E.widthBox.hidden = true; E.zoomGroup.hidden = true;
   E.startView.hidden = false;
   E.dlBtn.disabled = E.copyBtn.disabled = E.codeBtn.disabled = true;
   E.layersTree.innerHTML = ''; E.issueList.innerHTML = '';
@@ -1154,7 +1182,7 @@ function open(raw, css, js){
   E.frame.srcdoc = doc;
   E.startView.hidden = true;
   E.canvas.hidden = false; E.backBtn.hidden = false;
-  E.devSeg.hidden = false; E.zoomGroup.hidden = false;
+  E.devSeg.hidden = false; E.widthBox.hidden = false; E.zoomGroup.hidden = false;
 }
 
 E.frame.addEventListener('load', function(){
@@ -1189,14 +1217,31 @@ function stamp(){
 }
 
 /* ---------------- ukuran layar & zoom ---------------- */
+/* Tiga tombol menutup hampir semua kebutuhan; kotak angka di sebelahnya untuk
+   lebar apa pun di luar itu. Kalau lebarnya diisi sendiri dan tidak sama persis
+   dengan salah satu dari ketiganya, tidak ada tombol yang menyala. */
 E.devSeg.addEventListener('click', function(e){
   var b = e.target.closest('.seg-btn'); if (!b) return;
-  Array.prototype.forEach.call(E.devSeg.querySelectorAll('.seg-btn'), function(x){ x.classList.toggle('on', x===b); });
-  devW = DEV[b.dataset.dev] || 1440;
+  setDevW(DEV[b.dataset.dev] || 1440);
+  toast('Pratinjau ' + (b.getAttribute('aria-label') || '') + ', lebar ' + devW + 'px');
+});
+function markDev(){
+  Array.prototype.forEach.call(E.devSeg.querySelectorAll('.seg-btn'), function(x){
+    x.classList.toggle('on', DEV[x.dataset.dev] === devW);
+  });
+}
+function setDevW(w){
+  devW = Math.max(240, Math.min(3000, Math.round(w) || 1440));
+  E.devWidth.value = devW;
+  markDev();
   zoomMode = 'fit';
   layout(); outlineRebuild();
-  toast('Pratinjau ' + b.textContent + ', lebar asli ' + devW + 'px');
+}
+E.devWidth.addEventListener('change', function(){
+  setDevW(parseInt(E.devWidth.value, 10));
+  toast('Lebar pratinjau ' + devW + 'px');
 });
+E.devWidth.addEventListener('keydown', function(e){ if (e.key === 'Enter') E.devWidth.blur(); });
 E.zoomIn.addEventListener('click', function(){ zoomMode = Math.min(2, scale + .1); layout(); });
 E.zoomOut.addEventListener('click', function(){ zoomMode = Math.max(.2, scale - .1); layout(); });
 E.zoomFit.addEventListener('click', function(){ zoomMode = 'fit'; layout(); });
@@ -1275,8 +1320,15 @@ function outlineDraw(){
 }
 
 function layout(){
-  var avail = E.canvas.clientWidth - 40;
-  var availH = E.canvas.clientHeight - 40;
+  /* Saat halaman memenuhi lebar kanvas, bingkainya dibuat rata tepi tanpa jarak
+     dan tanpa bayangan — seperti GrapesJS. Begitu lebarnya lebih kecil dari
+     kanvas (tablet, HP, atau lebar isian sendiri), barulah diberi jarak dan
+     bayangan supaya jelas di mana batas halamannya. */
+  var full = E.canvas.clientWidth <= devW + 24;
+  E.canvas.classList.toggle('full', full);
+  var pad = full ? 0 : 40;
+  var avail = E.canvas.clientWidth - pad;
+  var availH = E.canvas.clientHeight - pad;
   scale = zoomMode === 'fit' ? Math.min(1, avail / devW) : zoomMode;
   var h = Math.max(560, Math.round(availH / scale));
   E.device.style.width = devW + 'px';
