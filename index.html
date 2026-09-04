@@ -149,6 +149,17 @@ button,input,select,textarea{font:inherit;color:inherit;}
 .ibtn:disabled{opacity:.3;cursor:not-allowed;}
 .ibtn:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
 .ibtn.on{background:var(--accent-soft);color:var(--accent);}
+/* Ikon menunjukkan tema tujuan. Aturannya mengikuti cascade yang sama dengan token
+   warna, sehingga ikon tidak mungkin tertinggal dari tema yang sedang aktif. */
+.ico-sun{display:none;}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .ico-sun{display:block;}
+  :root:not([data-theme="light"]) .ico-moon{display:none;}
+}
+:root[data-theme="dark"] .ico-sun{display:block;}
+:root[data-theme="dark"] .ico-moon{display:none;}
+:root[data-theme="light"] .ico-sun{display:none;}
+:root[data-theme="light"] .ico-moon{display:block;}
 .ibtn svg{width:16px;height:16px;stroke-linecap:round;stroke-linejoin:round;}
 
 .toast{
@@ -612,6 +623,8 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
     <g id="i-zout"><circle cx="10.8" cy="10.8" r="7"/><path d="M20.5 20.5 15.8 15.8M7.8 10.8h6"/></g>
     <g id="i-wand"><path d="m14.5 3.5 1.3 2.9 2.9 1.3-2.9 1.3-1.3 2.9-1.3-2.9L10.3 7.7l2.9-1.3Z"/><path d="M4 20 12.2 11.8M5 4v3.4M3.3 5.7h3.4"/></g>
     <g id="i-check"><path d="m5 12.5 4.5 4.5L19 7.5"/></g>
+    <g id="i-sun"><circle cx="12" cy="12" r="4.1"/><path d="M12 2.6v2.3M12 19.1v2.3M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M2.6 12h2.3M19.1 12h2.3M5.2 18.8l1.6-1.6M17.2 6.8l1.6-1.6"/></g>
+    <g id="i-moon"><path d="M20.4 14.3A8.7 8.7 0 0 1 9.7 3.6a8.7 8.7 0 1 0 10.7 10.7Z"/></g>
     <g id="i-sliders"><path d="M4 7.2h8.4M17.6 7.2H20M4 12h3.4M12.6 12H20M4 16.8h8.4M17.6 16.8H20"/><circle cx="15" cy="7.2" r="2.4"/><circle cx="10" cy="12" r="2.4"/><circle cx="15" cy="16.8" r="2.4"/></g>
     <g id="i-target"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.6"/><path d="M12 1.8v2.6M12 19.6v2.6M1.8 12h2.6M19.6 12h2.6"/></g>
     <g id="i-refresh"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6"/><path d="M20.5 3v5.2h-5.2"/></g>
@@ -650,6 +663,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
   <p class="hint" id="hintText"></p>
 
   <div class="topbar-group">
+    <button class="ibtn" id="themeBtn" type="button" title="Ganti tema terang / gelap" aria-label="Ganti tema terang atau gelap"><svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sun"/></svg><svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-moon"/></svg></button>
     <button class="ibtn" id="undoBtn" type="button" title="Batalkan (Ctrl+Z)" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-undo"/></svg></button>
     <button class="ibtn" id="redoBtn" type="button" title="Ulangi (Ctrl+Shift+Z)" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-redo"/></svg></button>
     <button class="btn btn-quiet btn-sm" id="codeBtn" type="button" disabled title="Lihat kode HTML"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-code"/></svg>Kode</button>
@@ -978,7 +992,7 @@ var E = {};
  'pW','pH','pPad','pMar','fileInput','toast',
  'pColorBtn','pColorChip','pColorVal','pBgBtn','pBgChip','pBgVal',
  'colorPop','cpSv','cpSvThumb','cpHue','cpHueThumb','cpEye','cpHex','cpSwatches',
- 'outlineBtn','qbMove','iconUrl','iconUrlApply',
+ 'outlineBtn','qbMove','iconUrl','iconUrlApply','themeBtn',
  'codeModal','codeOut','codeTitle','codeCopy','iconModal','iconGrid','iconSvg','iconApply'
 ].forEach(function(id){ E[id] = $(id); });
 
@@ -997,6 +1011,36 @@ var issues = [];
 
 if (window.claude && typeof window.claude.use === 'function'){
   window.claude.use('downloads').then(function(c){ dlCap = c; }, function(){});
+}
+
+/* ---------------- tema terang / gelap ---------------- */
+var THEME_KEY = 'sunting-html-tema';
+function savedTheme(){
+  try { var t = localStorage.getItem(THEME_KEY); return (t==='light'||t==='dark') ? t : null; }
+  catch(err){ return null; }
+}
+function systemDark(){
+  return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+}
+function applyTheme(){
+  var t = savedTheme();
+  if (t) document.documentElement.setAttribute('data-theme', t);
+  else document.documentElement.removeAttribute('data-theme');
+}
+E.themeBtn.addEventListener('click', function(){
+  var t = savedTheme();
+  var dark = t ? t === 'dark' : systemDark();
+  var next = dark ? 'light' : 'dark';
+  try { localStorage.setItem(THEME_KEY, next); } catch(err){}
+  applyTheme();
+  toast(next === 'dark' ? 'Tema gelap.' : 'Tema terang.');
+});
+if (window.matchMedia){
+  try {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){
+      if (!savedTheme()) applyTheme();   // hanya ikut sistem kalau belum memilih sendiri
+    });
+  } catch(err){}
 }
 
 /* ---------------- bantu umum ---------------- */
@@ -2668,6 +2712,7 @@ function demoSrc(){
 '</div>','</body>','</html>'].join('\n');
 }
 
+applyTheme();
 histBtns();
 })();
 </script>
