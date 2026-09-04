@@ -47,7 +47,7 @@
   --mono:ui-monospace,SFMono-Regular,"SF Mono","Cascadia Code","Segoe UI Mono",Consolas,monospace;
 
   --t:.2s cubic-bezier(.32,.72,0,1);
-  --topbar:56px;
+  --topbar:50px;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
@@ -93,7 +93,7 @@ button,input,select,textarea{font:inherit;color:inherit;}
 /* ---------- Topbar ---------- */
 .topbar{
   flex:0 0 auto;height:var(--topbar);
-  display:flex;align-items:center;gap:14px;padding:0 14px;
+  display:flex;align-items:center;gap:10px;padding:0 12px;
   background:var(--surface);
   border-bottom:1px solid var(--line);
   position:relative;z-index:60;
@@ -148,6 +148,7 @@ button,input,select,textarea{font:inherit;color:inherit;}
 .ibtn:hover:not(:disabled){background:var(--surface-3);color:var(--ink);}
 .ibtn:disabled{opacity:.3;cursor:not-allowed;}
 .ibtn:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.ibtn.on{background:var(--accent-soft);color:var(--accent);}
 .ibtn svg{width:16px;height:16px;stroke-linecap:round;stroke-linejoin:round;}
 
 .toast{
@@ -164,7 +165,7 @@ button,input,select,textarea{font:inherit;color:inherit;}
 .toast.bad{background:var(--bad);color:#fff;}
 
 /* ---------- Kerangka aplikasi ---------- */
-.app{flex:1;display:grid;grid-template-columns:1fr 320px;min-height:0;}
+.app{flex:1;display:grid;grid-template-columns:1fr 272px;min-height:0;}
 .pane{background:var(--surface);display:flex;flex-direction:column;min-height:0;}
 .pane-l{border-right:1px solid var(--line);}
 .pane-r{border-left:1px solid var(--line);}
@@ -187,7 +188,7 @@ button,input,select,textarea{font:inherit;color:inherit;}
 }
 .badge[hidden]{display:none;}
 .tab-panel[hidden]{display:none;}
-.tab-panel{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:14px;min-height:0;}
+.tab-panel{flex:1;overflow-y:auto;padding:11px;display:flex;flex-direction:column;gap:11px;min-height:0;}
 
 .sec-title{
   font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
@@ -205,16 +206,16 @@ button,input,select,textarea{font:inherit;color:inherit;}
   font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
   color:var(--ink-3);margin:2px 0 -4px;
 }
-.blocks{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.blocks{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
 .block{
   border:1px solid var(--line);background:var(--surface);border-radius:var(--r);
-  padding:14px 8px 12px;cursor:grab;color:var(--ink);
+  padding:11px 6px 10px;cursor:grab;color:var(--ink);
   display:flex;flex-direction:column;align-items:center;gap:8px;
   font-size:12px;font-weight:500;
   transition:border-color var(--t),background var(--t),transform .12s ease,box-shadow var(--t);
 }
 .block-ico{
-  width:34px;height:34px;border-radius:var(--r-sm);background:var(--surface-3);
+  width:30px;height:30px;border-radius:var(--r-sm);background:var(--surface-3);
   display:grid;place-items:center;color:var(--ink-2);
   transition:background var(--t),color var(--t);
 }
@@ -257,7 +258,7 @@ button,input,select,textarea{font:inherit;color:inherit;}
 .layer-twist.closed{transform:rotate(-90deg);}
 .layer-twist.leaf{visibility:hidden;}
 .layer-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.layer-tag{font-family:var(--mono);font-size:11px;color:var(--ink-3);flex:0 0 auto;}
+.layer-tag{font-family:var(--mono);font-size:11px;color:var(--ink-3);flex:0 0 auto;display:none;}
 .layer-count{
   font-family:var(--mono);font-size:10px;color:var(--ink-3);background:var(--surface-3);
   padding:1px 6px;border-radius:var(--r-pill);flex:0 0 auto;
@@ -269,7 +270,8 @@ button,input,select,textarea{font:inherit;color:inherit;}
 }
 .layer-grip:hover{background:var(--surface-2);color:var(--ink);}
 .layer.on .layer-grip:hover{background:rgba(255,255,255,.16);}
-.layer-grip svg{width:13px;height:13px;}
+.layer-grip svg{width:14px;height:14px;}
+.layer-root{font-weight:600;}
 .layer-kids[hidden]{display:none;}
 
 /* ---------- Cek masalah ---------- */
@@ -335,13 +337,8 @@ button,input,select,textarea{font:inherit;color:inherit;}
 }
 .err[hidden]{display:none;}
 
-.canvas-bar{
-  flex:0 0 auto;display:flex;align-items:center;gap:10px;
-  padding:8px 12px;border-bottom:1px solid var(--line);background:var(--surface);
-}
-.canvas-bar[hidden]{display:none;}
 .hint{
-  font-size:13px;color:var(--ink-2);margin:0;
+  flex:1;min-width:0;font-size:12px;color:var(--ink-3);margin:0;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 .zoom-label{
@@ -410,7 +407,7 @@ button,input,select,textarea{font:inherit;color:inherit;}
 /* ---------- Panel properti ---------- */
 .card{
   border:1px solid var(--line);border-radius:var(--r);background:var(--surface-2);
-  padding:11px;display:flex;flex-direction:column;gap:9px;
+  padding:10px;display:flex;flex-direction:column;gap:8px;
 }
 .card[hidden]{display:none;}
 .card-h{display:flex;align-items:center;justify-content:space-between;gap:8px;}
@@ -517,6 +514,8 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
 .clr:hover{background:var(--surface-3);color:var(--ink);}
 .clr svg{width:12px;height:12px;}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.stack{display:flex;flex-direction:column;gap:8px;}
+.stack>label{display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:500;color:var(--ink-2);}
 .act{
   border:1px solid var(--line);background:var(--surface);color:var(--ink);
   border-radius:var(--r-sm);padding:7px 6px;font-size:13px;font-weight:500;
@@ -563,10 +562,12 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
 }
 .icon-pick:hover{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);}
 .icon-pick svg{width:20px;height:20px;}
+.url-row{display:flex;gap:7px;align-items:center;}
+.url-row .inp{flex:1;min-width:0;}
 
 /* ---------- Responsif ---------- */
 @media (max-width:1180px){
-  .app{grid-template-columns:1fr 288px;}
+  .app{grid-template-columns:1fr 252px;}
 }
 @media (max-width:820px){
   .brand-name{display:none;}
@@ -587,23 +588,23 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
     <g id="i-pen"><path d="M13.8 6.2 17.8 10.2"/><path d="M4 20.2 4.9 16.3 16.1 5.1a2 2 0 0 1 2.8 2.8L7.7 19.3 4 20.2Z"/></g>
     <g id="i-undo"><path d="M9.5 14.5 4.5 9.5 9.5 4.5"/><path d="M4.5 9.5h9.3a5.7 5.7 0 0 1 0 11.4H9.5"/></g>
     <g id="i-redo"><path d="M14.5 14.5 19.5 9.5 14.5 4.5"/><path d="M19.5 9.5h-9.3a5.7 5.7 0 0 0 0 11.4h4.3"/></g>
-    <g id="i-code"><path d="M8.5 6.5 3 12l5.5 5.5M15.5 6.5 21 12l-5.5 5.5"/></g>
+    <g id="i-code"><path d="M8.6 6.6 3.2 12l5.4 5.4M15.4 6.6 20.8 12l-5.4 5.4M13.4 4.6l-2.8 14.8"/></g>
     <g id="i-down"><path d="M12 3.5v11.8M7.5 11l4.5 4.5 4.5-4.5M4.5 20.5h15"/></g>
-    <g id="i-blocks"><rect x="3.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2.2"/></g>
+    <g id="i-blocks"><rect x="3.5" y="3.5" width="7.2" height="7.2" rx="2"/><rect x="13.3" y="3.5" width="7.2" height="7.2" rx="2"/><rect x="3.5" y="13.3" width="7.2" height="7.2" rx="2"/><rect x="13.3" y="13.3" width="7.2" height="7.2" rx="2"/></g>
     <g id="i-layers"><path d="m12 3 8.5 4.3L12 11.6 3.5 7.3 12 3Z"/><path d="m3.5 12 8.5 4.3 8.5-4.3M3.5 16.7 12 21l8.5-4.3"/></g>
     <g id="i-shield"><path d="M12 3.2 19 6v5.4c0 4.2-2.9 7.7-7 8.6-4.1-.9-7-4.4-7-8.6V6l7-2.8Z"/><path d="m9.2 11.8 2 2 3.6-3.8"/></g>
-    <g id="i-section"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><path d="M3.5 9.5h17"/></g>
-    <g id="i-heading"><path d="M6.5 5v14M17.5 5v14M6.5 12h11"/></g>
-    <g id="i-text"><path d="M4.5 6.5h15M4.5 12h15M4.5 17.5h9"/></g>
-    <g id="i-button"><rect x="2.5" y="7.5" width="19" height="9" rx="4.5"/><path d="M8.5 12h7"/></g>
-    <g id="i-image"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><circle cx="8.8" cy="9.8" r="1.6"/><path d="m4.5 17.5 4.8-4.8a1.6 1.6 0 0 1 2.2 0l5.3 5.3M14.5 14l1.7-1.7a1.6 1.6 0 0 1 2.2 0l2.1 2.1"/></g>
+    <g id="i-section"><rect x="3.5" y="4.5" width="17" height="15" rx="2.6"/><path d="M3.5 9.2h17"/><path d="M7 13h10M7 16h6"/></g>
+    <g id="i-heading"><path d="M6.2 5.5v13M17.8 5.5v13M6.2 12h11.6"/></g>
+    <g id="i-text"><path d="M4.5 6.5h15M4.5 12h15M4.5 17.5h8.5"/></g>
+    <g id="i-button"><rect x="2.5" y="7" width="19" height="10" rx="5"/><path d="M7.8 12h4.4"/><path d="m15.6 11.2 2.6 2.6-1.1.4-.4 1.1-2.6-2.6Z" fill="currentColor" stroke="none"/></g>
+    <g id="i-image"><rect x="3.5" y="4.5" width="17" height="15" rx="2.6"/><circle cx="9" cy="9.6" r="1.7"/><path d="m4.6 17.8 4.3-4.3a1.7 1.7 0 0 1 2.4 0l3.2 3.2M13.8 15.4l1.9-1.9a1.7 1.7 0 0 1 2.4 0l1.8 1.8"/></g>
     <g id="i-cols"><rect x="3.5" y="4.5" width="7" height="15" rx="2.4"/><rect x="13.5" y="4.5" width="7" height="15" rx="2.4"/></g>
     <g id="i-cols3"><rect x="2.5" y="4.5" width="5.7" height="15" rx="2"/><rect x="9.2" y="4.5" width="5.7" height="15" rx="2"/><rect x="15.8" y="4.5" width="5.7" height="15" rx="2"/></g>
-    <g id="i-video"><rect x="2.5" y="5.5" width="14" height="13" rx="2.6"/><path d="M16.5 10.3 21 7.8v8.4l-4.5-2.5"/></g>
-    <g id="i-line"><path d="M4 12h16"/></g>
-    <g id="i-space"><path d="M12 4.5v15M8.5 8 12 4.5 15.5 8M8.5 16 12 19.5 15.5 16"/></g>
-    <g id="i-trash"><path d="M4 6.5h16M9.5 6.5V5a1.5 1.5 0 0 1 1.5-1.5h2A1.5 1.5 0 0 1 14.5 5v1.5"/><path d="M6.5 6.5 7.4 19a2 2 0 0 0 2 1.9h5.2a2 2 0 0 0 2-1.9l.9-12.5"/></g>
-    <g id="i-dup"><rect x="8.5" y="8.5" width="12" height="12" rx="3"/><path d="M15.5 5.5v-.5a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h.5"/></g>
+    <g id="i-video"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="m10.2 9.4 4.6 2.6-4.6 2.6Z" fill="currentColor" stroke="none"/></g>
+    <g id="i-line"><path d="M3.5 12h17"/><circle cx="3.5" cy="12" r=".9" fill="currentColor" stroke="none"/><circle cx="20.5" cy="12" r=".9" fill="currentColor" stroke="none"/></g>
+    <g id="i-space"><path d="M4.5 4.5h15M4.5 19.5h15"/><path d="M12 8v8M9.4 10.4 12 7.8l2.6 2.6M9.4 13.6 12 16.2l2.6-2.6"/></g>
+    <g id="i-trash"><path d="M4 6.4h16M9.6 6.4V5.1a1.6 1.6 0 0 1 1.6-1.6h1.6a1.6 1.6 0 0 1 1.6 1.6v1.3"/><path d="M6.6 6.4 7.5 19a2 2 0 0 0 2 1.9h5a2 2 0 0 0 2-1.9l.9-12.6"/><path d="M10.4 10.2v6.6M13.6 10.2v6.6"/></g>
+    <g id="i-dup"><rect x="8.8" y="8.8" width="11.7" height="11.7" rx="2.6"/><path d="M15.2 5.6V5a2 2 0 0 0-2-2H5.5a2 2 0 0 0-2 2v7.7a2 2 0 0 0 2 2h.6"/></g>
     <g id="i-up"><path d="M12 19.5V5M5.5 11.5 12 5l6.5 6.5"/></g>
     <g id="i-dn"><path d="M12 4.5V19M18.5 12.5 12 19l-6.5-6.5"/></g>
     <g id="i-x"><path d="M18 6 6 18M6 6l12 12"/></g>
@@ -613,16 +614,17 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
     <g id="i-check"><path d="m5 12.5 4.5 4.5L19 7.5"/></g>
     <g id="i-target"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.6"/><path d="M12 1.8v2.6M12 19.6v2.6M1.8 12h2.6M19.6 12h2.6"/></g>
     <g id="i-refresh"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6"/><path d="M20.5 3v5.2h-5.2"/></g>
+    <g id="i-move"><path d="M12 3.2v17.6M3.2 12h17.6"/><path d="m9.2 6 2.8-2.8L14.8 6M9.2 18l2.8 2.8L14.8 18M6 9.2 3.2 12 6 14.8M18 9.2l2.8 2.8L18 14.8"/></g>
+    <g id="i-frame"><rect x="3.5" y="3.5" width="17" height="17" rx="2.2" stroke-dasharray="3.4 2.6"/><rect x="8.6" y="8.6" width="6.8" height="6.8" rx="1.4"/></g>
     <g id="i-star"><path d="m12 3.5 2.6 5.3 5.9.9-4.2 4.1 1 5.8-5.3-2.8-5.3 2.8 1-5.8-4.2-4.1 5.9-.9Z"/></g>
     <g id="i-eye"><path d="M2.2 12S6.5 5.3 12 5.3 21.8 12 21.8 12 17.5 18.7 12 18.7 2.2 12 2.2 12Z"/><circle cx="12" cy="12" r="3"/></g>
     <g id="i-drop"><path d="M19.6 4.4a2.15 2.15 0 0 1 0 3l-1 1-3-3 1-1a2.15 2.15 0 0 1 3 0Z"/><path d="m15.6 5.4-9.9 9.9a2 2 0 0 0-.5.9L4 20l3.8-1.2a2 2 0 0 0 .9-.5l9.9-9.9Z"/><path d="m12.6 8.4 3 3"/></g>
-    <g id="i-grip"><circle cx="9" cy="6" r="1.15"/><circle cx="15" cy="6" r="1.15"/><circle cx="9" cy="12" r="1.15"/><circle cx="15" cy="12" r="1.15"/><circle cx="9" cy="18" r="1.15"/><circle cx="15" cy="18" r="1.15"/></g>
   </defs>
 </svg>
 
 <header class="topbar">
   <div class="brand">
-    <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-pen"/></svg></span>
+    <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-pen"/></svg></span>
     <span class="brand-name">Sunting HTML</span>
   </div>
 
@@ -634,20 +636,24 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
   </div>
 
   <div class="topbar-group" id="zoomGroup" hidden>
-    <button class="ibtn" id="zoomOut" type="button" title="Perkecil tampilan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-zout"/></svg></button>
+    <button class="ibtn" id="zoomOut" type="button" title="Perkecil tampilan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-zout"/></svg></button>
     <span class="zoom-label" id="zoomLabel">100%</span>
-    <button class="ibtn" id="zoomIn" type="button" title="Perbesar tampilan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-zin"/></svg></button>
-    <button class="ibtn" id="zoomFit" type="button" title="Pas-kan ke layar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-target"/></svg></button>
+    <button class="ibtn" id="zoomIn" type="button" title="Perbesar tampilan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-zin"/></svg></button>
+    <button class="ibtn" id="zoomFit" type="button" title="Pas-kan ke layar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-target"/></svg></button>
+    <button class="ibtn" id="outlineBtn" type="button" title="Tampilkan rangka semua komponen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-frame"/></svg></button>
   </div>
 
-  <span class="topbar-spacer"></span>
+    <button class="btn btn-quiet btn-sm" id="backBtn" type="button" hidden>Ganti kode</button>
+  </div>
+
+  <p class="hint" id="hintText"></p>
 
   <div class="topbar-group">
-    <button class="ibtn" id="undoBtn" type="button" title="Batalkan (Ctrl+Z)" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-undo"/></svg></button>
-    <button class="ibtn" id="redoBtn" type="button" title="Ulangi (Ctrl+Shift+Z)" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-redo"/></svg></button>
-    <button class="btn btn-quiet btn-sm" id="codeBtn" type="button" disabled title="Lihat kode HTML"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-code"/></svg>Kode</button>
+    <button class="ibtn" id="undoBtn" type="button" title="Batalkan (Ctrl+Z)" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-undo"/></svg></button>
+    <button class="ibtn" id="redoBtn" type="button" title="Ulangi (Ctrl+Shift+Z)" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-redo"/></svg></button>
+    <button class="btn btn-quiet btn-sm" id="codeBtn" type="button" disabled title="Lihat kode HTML"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-code"/></svg>Kode</button>
     <button class="btn btn-plain btn-sm" id="copyBtn" type="button" disabled>Salin</button>
-    <button class="btn btn-primary btn-sm" id="dlBtn" type="button" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-down"/></svg>Unduh</button>
+    <button class="btn btn-primary btn-sm" id="dlBtn" type="button" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-down"/></svg>Unduh</button>
   </div>
 </header>
 
@@ -687,11 +693,6 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
       </div>
     </section>
 
-    <div class="canvas-bar" id="canvasBar" hidden>
-      <button class="btn btn-quiet btn-sm" id="backBtn" type="button">Ganti kode</button>
-      <p class="hint" id="hintText">Klik elemen untuk memilih. Klik dua kali untuk mengubah teksnya.</p>
-    </div>
-
     <div class="canvas" id="canvas" hidden>
       <div class="sizer" id="sizer">
         <div class="device" id="device">
@@ -714,7 +715,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
     </nav>
     <div class="tab-panel" id="tabProps">
           <div class="empty" id="propsEmpty">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><use href="#i-target"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-target"/></svg>
             <span>Belum ada yang dipilih.<br>Klik elemen mana pun di kanvas untuk mengatur teks, link, ukuran, font, dan warnanya.</span>
           </div>
 
@@ -808,14 +809,14 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
 
             <div class="card">
               <div class="card-h"><span class="card-t">Warna</span></div>
-              <div class="row">
+              <div class="stack">
                 <label>Tulisan
                   <span class="swatch">
                     <button class="swatch-trigger" id="pColorBtn" type="button" aria-label="Pilih warna tulisan">
                       <span class="swatch-chip" id="pColorChip"></span>
                       <span class="swatch-val" id="pColorVal">#000000</span>
                     </button>
-                    <button class="clr" type="button" data-clear="color" title="Kembalikan ke asal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><use href="#i-x"/></svg></button>
+                    <button class="clr" type="button" data-clear="color" title="Kembalikan ke asal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-x"/></svg></button>
                   </span>
                 </label>
                 <label>Latar
@@ -824,7 +825,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
                       <span class="swatch-chip" id="pBgChip"></span>
                       <span class="swatch-val" id="pBgVal">#ffffff</span>
                     </button>
-                    <button class="clr" type="button" data-clear="backgroundColor" title="Kembalikan ke asal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><use href="#i-x"/></svg></button>
+                    <button class="clr" type="button" data-clear="backgroundColor" title="Kembalikan ke asal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-x"/></svg></button>
                   </span>
                 </label>
               </div>
@@ -833,12 +834,12 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
             <div class="card">
               <div class="card-h"><span class="card-t">Tindakan</span></div>
               <div class="grid2">
-                <button class="act" data-act="up" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-up"/></svg>Naik</button>
-                <button class="act" data-act="down" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-dn"/></svg>Turun</button>
+                <button class="act" data-act="up" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-up"/></svg>Naik</button>
+                <button class="act" data-act="down" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-dn"/></svg>Turun</button>
                 <button class="act" data-act="dup" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-dup"/></svg>Gandakan</button>
                 <button class="act act-bad" data-act="del" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-trash"/></svg>Hapus</button>
               </div>
-              <button class="act" data-act="code" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-code"/></svg>Lihat kode elemen ini</button>
+              <button class="act" data-act="code" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-code"/></svg>Lihat kode elemen ini</button>
             </div>
           </div>
         </div>
@@ -867,7 +868,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
     <div class="tab-panel" id="tabLayers" hidden>
           <div class="scan-head">
             <p class="sec-title">Struktur halaman</p>
-            <button class="ibtn" id="layersRefresh" type="button" title="Muat ulang daftar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-refresh"/></svg></button>
+            <button class="ibtn" id="layersRefresh" type="button" title="Muat ulang daftar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-refresh"/></svg></button>
           </div>
           <p class="note">Arahkan kursor ke satu baris untuk melihat letaknya di halaman, klik untuk memilihnya.</p>
           <div class="layers" id="layersTree"></div>
@@ -898,11 +899,11 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
   </div>
   <div class="ins" id="insLine" hidden></div>
   <div class="qbar" id="qbar" hidden>
-    <button class="qb" data-act="text" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-pen"/></svg>Ubah teks</button>
-    <button class="qb" data-act="dup" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-dup"/></svg></button>
-    <button class="qb" data-act="up" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-up"/></svg></button>
-    <button class="qb" data-act="down" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-dn"/></svg></button>
-    <button class="qb qb-bad" data-act="del" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-trash"/></svg></button>
+    <button class="qb" data-act="parent" type="button" title="Pilih elemen induk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-up"/></svg></button>
+    <button class="qb" id="qbMove" type="button" title="Seret untuk memindahkan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-move"/></svg></button>
+    <button class="qb" data-act="text" type="button" title="Ubah teks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-pen"/></svg>Teks</button>
+    <button class="qb" data-act="dup" type="button" title="Gandakan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-dup"/></svg></button>
+    <button class="qb qb-bad" data-act="del" type="button" title="Hapus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-trash"/></svg></button>
   </div>
 </div>
 <div class="shield" id="shield" hidden></div>
@@ -912,7 +913,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
   <div class="sheet">
     <div class="sheet-h">
       <h2 class="sheet-t" id="codeTitle">Kode HTML</h2>
-      <button class="ibtn" data-close type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-x"/></svg></button>
+      <button class="ibtn" data-close type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-x"/></svg></button>
     </div>
     <div class="sheet-b"><pre class="pre" id="codeOut"></pre></div>
     <div class="sheet-f">
@@ -927,11 +928,16 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
   <div class="sheet sheet-sm">
     <div class="sheet-h">
       <h2 class="sheet-t">Ganti ikon</h2>
-      <button class="ibtn" data-close type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-x"/></svg></button>
+      <button class="ibtn" data-close type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-x"/></svg></button>
     </div>
     <div class="sheet-b">
       <p class="sec-title">Pilih yang siap pakai</p>
       <div class="icons" id="iconGrid"></div>
+      <p class="sec-title">Atau pakai alamat ikon (URL)</p>
+      <div class="url-row">
+        <input id="iconUrl" class="inp mono" type="text" placeholder="https://.../ikon.svg atau .png">
+        <button class="btn btn-plain btn-sm" id="iconUrlApply" type="button">Pakai</button>
+      </div>
       <p class="sec-title">Atau tempel kode SVG sendiri</p>
       <textarea id="iconSvg" class="code-area code-area-sm" spellcheck="false" placeholder="&lt;svg viewBox=&quot;0 0 24 24&quot;&gt;...&lt;/svg&gt;"></textarea>
       <p class="note">Ikon akan mewarisi warna dan ukuran dari tempatnya sekarang.</p>
@@ -950,7 +956,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
   <div class="cpop-sv" id="cpSv"><div class="cpop-sv-thumb" id="cpSvThumb"></div></div>
   <div class="cpop-hue" id="cpHue"><div class="cpop-hue-thumb" id="cpHueThumb"></div></div>
   <div class="cpop-row">
-    <button class="cpop-eye" id="cpEye" type="button" title="Ambil warna dari layar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-drop"/></svg></button>
+    <button class="cpop-eye" id="cpEye" type="button" title="Ambil warna dari layar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-drop"/></svg></button>
     <input class="cpop-hex" id="cpHex" type="text" maxlength="7" spellcheck="false" autocomplete="off">
   </div>
   <div class="cpop-swatches" id="cpSwatches"></div>
@@ -964,13 +970,14 @@ var E = {};
 ['devSeg','zoomGroup','zoomOut','zoomIn','zoomFit','zoomLabel','undoBtn','redoBtn','codeBtn','copyBtn','dlBtn',
  'tabProps','tabBlocks','tabLayers','tabScan','layersTree','layersRefresh','scanBtn','fixAllBtn','issueList','scanPill','scanBadge',
  'startView','srcInput','cssInput','jsInput','extraToggle','extraFields','startErr','demoBtn','openBtn',
- 'canvasBar','backBtn','hintText','canvas','sizer','device','frame',
+ 'backBtn','hintText','canvas','sizer','device','frame',
  'ovl','boxHover','boxPeek','boxDrop','boxSel','selTag','insLine','qbar','shield',
  'propsEmpty','propsBody','crumbs','cText','pText','cLink','pHref','linkErr','linkFix','pBlank',
  'cImg','imgPick','pAlt','cIcon','iconPick','pFont','pSize','pWeight','pLh','pAlign',
  'pW','pH','pPad','pMar','fileInput','toast',
  'pColorBtn','pColorChip','pColorVal','pBgBtn','pBgChip','pBgVal',
  'colorPop','cpSv','cpSvThumb','cpHue','cpHueThumb','cpEye','cpHex','cpSwatches',
+ 'outlineBtn','qbMove','iconUrl','iconUrlApply',
  'codeModal','codeOut','codeTitle','codeCopy','iconModal','iconGrid','iconSvg','iconApply'
 ].forEach(function(id){ E[id] = $(id); });
 
@@ -1069,7 +1076,8 @@ E.backBtn.addEventListener('click', function(){
   ready = false; fd = null; pristine = null;
   deselect(); undoS.length = 0; redoS.length = 0; histBtns();
   E.frame.removeAttribute('srcdoc');
-  E.canvas.hidden = true; E.canvasBar.hidden = true; E.ovl.hidden = true;
+  E.canvas.hidden = true; E.backBtn.hidden = true; E.ovl.hidden = true;
+  E.hintText.textContent = '';
   E.devSeg.hidden = true; E.zoomGroup.hidden = true;
   E.startView.hidden = false;
   E.dlBtn.disabled = E.copyBtn.disabled = E.codeBtn.disabled = true;
@@ -1095,7 +1103,7 @@ function open(raw, css, js){
   catch(err){ pristine = null; }
   E.frame.srcdoc = doc;
   E.startView.hidden = true;
-  E.canvas.hidden = false; E.canvasBar.hidden = false;
+  E.canvas.hidden = false; E.backBtn.hidden = false;
   E.devSeg.hidden = false; E.zoomGroup.hidden = false;
 }
 
@@ -1108,7 +1116,7 @@ E.frame.addEventListener('load', function(){
   ready = true;
   E.dlBtn.disabled = E.copyBtn.disabled = E.codeBtn.disabled = false;
   E.ovl.hidden = false;
-  layout(); buildLayers(); deselect();
+  layout(); applyOutline(); buildLayers(); deselect();
   runScan(true);
   hint('Klik elemen untuk memilih. Klik dua kali untuk mengubah teksnya.');
 });
@@ -1142,6 +1150,29 @@ E.devSeg.addEventListener('click', function(e){
 E.zoomIn.addEventListener('click', function(){ zoomMode = Math.min(2, scale + .1); layout(); });
 E.zoomOut.addEventListener('click', function(){ zoomMode = Math.max(.2, scale - .1); layout(); });
 E.zoomFit.addEventListener('click', function(){ zoomMode = 'fit'; layout(); });
+
+/* Rangka semua komponen, seperti "view components" di GrapesJS. Disuntikkan sebagai
+   satu <style> ber-id, dan dibuang lagi saat ekspor sehingga tidak ikut tersimpan. */
+var outlineOn = false;
+E.outlineBtn.addEventListener('click', function(){
+  if (!fd){ toast('Buka halaman dulu di kanvas.', true); return; }
+  outlineOn = !outlineOn;
+  applyOutline();
+  toast(outlineOn ? 'Rangka komponen ditampilkan.' : 'Rangka komponen disembunyikan.');
+});
+function applyOutline(){
+  if (!fd || !fd.head) return;
+  var st = fd.getElementById('__sunting_outline__');
+  if (outlineOn){
+    if (!st){
+      st = fd.createElement('style');
+      st.id = '__sunting_outline__';
+      st.textContent = 'body *:not(script):not(style){outline:1px dashed rgba(61,99,221,.5) !important;outline-offset:-1px !important;}';
+      fd.head.appendChild(st);
+    }
+  } else if (st){ st.remove(); }
+  E.outlineBtn.classList.toggle('on', outlineOn);
+}
 
 function layout(){
   var avail = E.canvas.clientWidth - 40;
@@ -1304,6 +1335,11 @@ function actDel(){
   snap(); var el = sel; deselect(); el.remove(); buildLayers(); toast('Elemen dihapus.');
 }
 function act(a){
+  if (a==='parent'){
+    if (sel && sel.parentElement && !skip(sel.parentElement)) select(sel.parentElement);
+    else toast('Sudah di elemen terluar.', true);
+    return;
+  }
   if (a==='text') startEdit();
   else if (a==='up') actUp();
   else if (a==='down') actDown();
@@ -1312,6 +1348,11 @@ function act(a){
   else if (a==='code') showCode(true);
 }
 E.qbar.addEventListener('click', function(e){ var b = e.target.closest('[data-act]'); if (b) act(b.dataset.act); });
+E.qbMove.addEventListener('mousedown', function(e){
+  if (!sel) return;
+  e.preventDefault(); e.stopPropagation();
+  startDrag(sel);
+});
 E.propsBody.addEventListener('click', function(e){ var b = e.target.closest('[data-act]'); if (b) act(b.dataset.act); });
 
 /* ---------------- panel properti ---------------- */
@@ -1669,6 +1710,10 @@ function onDown(e){
   if (e.button!==0 || editing(e.target)) return;
   var t = e.target;
   if (skip(t)) return;
+  // Tahan aksi bawaan browser (seleksi teks / seret bawaan link & gambar). Tanpa ini
+  // browser menganggap gerakan mouse sebagai seret-seleksi dan terus mengirim event
+  // ke dalam iframe, sehingga pelepasan mouse tidak pernah sampai ke editor.
+  e.preventDefault();
   // Elemen apa pun bisa langsung diseret. Kalau target ada di dalam elemen yang
   // sedang dipilih, seret elemen terpilih itu (bukan anak yang tersentuh kursor).
   var el = (sel && (t===sel || sel.contains(t))) ? sel : t;
@@ -1685,22 +1730,34 @@ function pendMove(e){
 function pendUp(){ clearPend(); }
 function clearPend(){
   pend = null;
+  if (!fd) return;
   fd.removeEventListener('mousemove', pendMove, true);
   fd.removeEventListener('mouseup', pendUp, true);
 }
+
+/* Selama menyeret, kursor bisa berada di dokumen induk ATAU di dalam iframe.
+   Keduanya didengarkan, dan koordinatnya dinormalkan ke ruang koordinat iframe. */
 function startDrag(el){
-  if (!el || !el.parentNode) return;
+  if (!el || !el.parentNode || drag) return;
   snap();
   drag = { el:el, target:null, before:true };
   E.shield.hidden = false; E.shield.classList.remove('rz');
   el.style.opacity = '.4';
-  document.addEventListener('mousemove', dragMove);
-  document.addEventListener('mouseup', dragUp);
-  hint('Lepaskan di garis biru untuk menaruh elemen di sana.');
+  document.addEventListener('mousemove', dragMoveOuter, true);
+  document.addEventListener('mouseup', dragEndOuter, true);
+  if (fd){
+    fd.addEventListener('mousemove', dragMoveInner, true);
+    fd.addEventListener('mouseup', dragEndInner, true);
+  }
+  hint('Lepaskan di garis biru untuk menaruh elemen di sana. Tekan Esc untuk batal.');
 }
-function dragMove(e){
+function dragMoveOuter(e){ dragMove(pt(e)); }
+function dragMoveInner(e){ dragMove({ x:e.clientX, y:e.clientY }); }
+function dragEndOuter(e){ dragMove(pt(e)); dragEnd(false); }
+function dragEndInner(e){ dragMove({ x:e.clientX, y:e.clientY }); dragEnd(false); }
+function dragMove(p){
   if (!drag) return;
-  var p = pt(e), t = fd.elementFromPoint(p.x, p.y);
+  var t = fd.elementFromPoint(p.x, p.y);
   if (!t || skip(t) || t===drag.el || drag.el.contains(t)){
     E.insLine.hidden = true; drag.target = null; return;
   }
@@ -1712,19 +1769,24 @@ function dragMove(e){
   E.insLine.style.width = (r.width*scale) + 'px';
   E.insLine.style.top = ((before ? r.top : r.bottom)*scale - 1) + 'px';
 }
-function dragUp(){
+function dragEnd(cancel){
   if (!drag) return;
   var d = drag; drag = null;
-  document.removeEventListener('mousemove', dragMove);
-  document.removeEventListener('mouseup', dragUp);
+  document.removeEventListener('mousemove', dragMoveOuter, true);
+  document.removeEventListener('mouseup', dragEndOuter, true);
+  if (fd){
+    fd.removeEventListener('mousemove', dragMoveInner, true);
+    fd.removeEventListener('mouseup', dragEndInner, true);
+  }
   E.shield.hidden = true; E.insLine.hidden = true;
   d.el.style.removeProperty('opacity');
   if (!d.el.getAttribute('style')) d.el.removeAttribute('style');
-  if (d.target && d.target.parentNode){
+  if (!cancel && d.target && d.target.parentNode){
     if (d.before) d.target.parentNode.insertBefore(d.el, d.target);
     else d.target.parentNode.insertBefore(d.el, d.target.nextSibling);
   }
   select(d.el); buildLayers();
+  if (cancel) toast('Pemindahan dibatalkan.');
 }
 E.boxSel.addEventListener('mousedown', function(e){
   var h = e.target.closest('[data-hdl]'); if (!h || !sel) return;
@@ -1732,21 +1794,35 @@ E.boxSel.addEventListener('mousedown', function(e){
   var r = sel.getBoundingClientRect();
   resize = { dir:h.dataset.hdl, x:e.clientX, y:e.clientY, w:r.width, h:r.height };
   E.shield.hidden = false; E.shield.classList.add('rz');
-  document.addEventListener('mousemove', rzMove);
-  document.addEventListener('mouseup', rzUp);
+  document.addEventListener('mousemove', rzMoveOuter, true);
+  document.addEventListener('mouseup', rzUp, true);
+  if (fd){
+    fd.addEventListener('mousemove', rzMoveInner, true);
+    fd.addEventListener('mouseup', rzUp, true);
+  }
 });
-function rzMove(e){
+function rzMoveOuter(e){ rzMove(e.clientX, e.clientY); }
+function rzMoveInner(e){
+  var r = E.frame.getBoundingClientRect();
+  rzMove(r.left + e.clientX*scale, r.top + e.clientY*scale);
+}
+function rzMove(cx, cy){
   if (!resize || !sel) return;
   markEdited(sel);
-  if (resize.dir==='e' || resize.dir==='se') sel.style.width = Math.max(16, Math.round(resize.w + (e.clientX-resize.x)/scale)) + 'px';
-  if (resize.dir==='s' || resize.dir==='se') sel.style.height = Math.max(16, Math.round(resize.h + (e.clientY-resize.y)/scale)) + 'px';
+  if (resize.dir==='e' || resize.dir==='se') sel.style.width = Math.max(16, Math.round(resize.w + (cx-resize.x)/scale)) + 'px';
+  if (resize.dir==='s' || resize.dir==='se') sel.style.height = Math.max(16, Math.round(resize.h + (cy-resize.y)/scale)) + 'px';
   redraw();
 }
 function rzUp(){
+  if (!resize) return;
   resize = null;
   E.shield.hidden = true; E.shield.classList.remove('rz');
-  document.removeEventListener('mousemove', rzMove);
-  document.removeEventListener('mouseup', rzUp);
+  document.removeEventListener('mousemove', rzMoveOuter, true);
+  document.removeEventListener('mouseup', rzUp, true);
+  if (fd){
+    fd.removeEventListener('mousemove', rzMoveInner, true);
+    fd.removeEventListener('mouseup', rzUp, true);
+  }
   fillProps();
 }
 
@@ -1756,32 +1832,12 @@ function isFile(e){
     Array.prototype.indexOf.call(e.dataTransfer.types,'Files') !== -1);
 }
 function onFileOver(e){
-  if (paletteKind){
-    e.preventDefault(); e.dataTransfer.dropEffect = 'copy';
-    var pp = fd.elementFromPoint(e.clientX, e.clientY);
-    if (!pp || skip(pp) || pp.tagName==='BODY'){ E.insLine.hidden = true; paletteDrop = null; return; }
-    var pr = pp.getBoundingClientRect();
-    var pBefore = (e.clientY - pr.top) < pr.height/2;
-    paletteDrop = { el:pp, before:pBefore };
-    E.insLine.hidden = false;
-    E.insLine.style.left = (pr.left*scale) + 'px';
-    E.insLine.style.width = (pr.width*scale) + 'px';
-    E.insLine.style.top = ((pBefore ? pr.top : pr.bottom)*scale - 1) + 'px';
-    return;
-  }
   if (!isFile(e)) return;
   e.preventDefault(); e.dataTransfer.dropEffect = 'copy';
   var t = fd.elementFromPoint(e.clientX, e.clientY);
   setDrop(skip(t) ? null : t);
 }
 function onFileDrop(e){
-  if (paletteKind){
-    e.preventDefault();
-    var kind = paletteKind, drop = paletteDrop;
-    paletteKind = null; paletteDrop = null; E.insLine.hidden = true;
-    insertBlock(kind, drop);
-    return;
-  }
   if (!isFile(e)) return;
   e.preventDefault();
   var fs = Array.prototype.filter.call(e.dataTransfer.files, function(f){ return f.type.indexOf('image/')===0; });
@@ -1796,8 +1852,8 @@ function onFileDrop(e){
   };
   rd.readAsDataURL(f);
 }
-window.addEventListener('dragover', function(e){ if (isFile(e) || paletteKind) e.preventDefault(); });
-window.addEventListener('drop', function(e){ if (isFile(e) || paletteKind) e.preventDefault(); });
+window.addEventListener('dragover', function(e){ if (isFile(e)) e.preventDefault(); });
+window.addEventListener('drop', function(e){ if (isFile(e)) e.preventDefault(); });
 
 /* ---------------- papan ketik ---------------- */
 function onKey(e){
@@ -1810,7 +1866,7 @@ function onKey(e){
   }
   if (mod && String(e.key).toLowerCase()==='y'){ if (!typing){ e.preventDefault(); redo(); } return; }
   if (typing) return;
-  if (e.key==='Escape'){ if (closeColorPop()) return; closeModals(); deselect(); return; }
+  if (e.key==='Escape'){ if (drag){ dragEnd(true); return; } if (palDrag){ palEnd(true); return; } if (closeColorPop()) return; closeModals(); deselect(); return; }
   if ((e.key==='Delete'||e.key==='Backspace') && sel){ e.preventDefault(); actDel(); }
 }
 document.addEventListener('keydown', onKey);
@@ -1836,7 +1892,35 @@ function buildLayers(){
   E.layersTree.innerHTML = '';
   layerMap = [];
   var count = { n:0 };
-  walk(fd.body, E.layersTree, 0, count);
+
+  // Baris akar "Body", seperti di GrapesJS. Tidak bisa dipilih atau disembunyikan,
+  // hanya untuk melipat seluruh isi halaman.
+  var kids = 0;
+  for (var i=0;i<fd.body.children.length;i++) if (!skip(fd.body.children[i])) kids++;
+  var rootRow = document.createElement('div');
+  rootRow.className = 'layer layer-root'; rootRow.title = 'Isi halaman';
+  var rootTw = document.createElement('span');
+  rootTw.className = 'layer-twist';
+  rootTw.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>';
+  var rootNm = document.createElement('span');
+  rootNm.className = 'layer-name'; rootNm.textContent = 'Body';
+  rootRow.appendChild(rootTw); rootRow.appendChild(rootNm);
+  if (kids){
+    var rootCnt = document.createElement('span');
+    rootCnt.className = 'layer-count'; rootCnt.textContent = String(kids);
+    rootRow.appendChild(rootCnt);
+  }
+  E.layersTree.appendChild(rootRow);
+
+  var rootBox = document.createElement('div');
+  rootBox.className = 'layer-kids';
+  E.layersTree.appendChild(rootBox);
+  rootTw.addEventListener('click', function(){
+    rootBox.hidden = !rootBox.hidden;
+    rootTw.classList.toggle('closed', rootBox.hidden);
+  });
+
+  walk(fd.body, rootBox, 1, count);
   markLayer(sel);
 }
 E.layersRefresh.addEventListener('click', function(){ buildLayers(); toast('Daftar lapisan dimuat ulang.'); });
@@ -1857,7 +1941,7 @@ function walk(parent, host, depth, count){
 
     var eyeBtn = document.createElement('button');
     eyeBtn.type = 'button'; eyeBtn.className = 'layer-eye'; eyeBtn.title = 'Sembunyikan / tampilkan';
-    eyeBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-eye"/></svg>';
+    eyeBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-eye"/></svg>';
     if (el.style.display === 'none') eyeBtn.classList.add('off');
     eyeBtn.addEventListener('click', function(ev){
       ev.stopPropagation();
@@ -1877,6 +1961,8 @@ function walk(parent, host, depth, count){
     var nm = document.createElement('span');
     nm.className = 'layer-name';
     nm.textContent = niceName(el);
+    var snip = niceHint(el);
+    row.title = snip ? (niceName(el) + ' — ' + snip) : niceName(el);
 
     var tg = document.createElement('span');
     tg.className = 'layer-tag';
@@ -1892,7 +1978,7 @@ function walk(parent, host, depth, count){
 
     var grip = document.createElement('button');
     grip.type = 'button'; grip.className = 'layer-grip'; grip.title = 'Seret untuk memindahkan';
-    grip.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><use href="#i-grip"/></svg>';
+    grip.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-move"/></svg>';
     grip.addEventListener('click', function(ev){ ev.stopPropagation(); });
     grip.addEventListener('mousedown', function(target){
       return function(ev){
@@ -1909,7 +1995,7 @@ function walk(parent, host, depth, count){
       kidBox = document.createElement('div');
       kidBox.className = 'layer-kids';
       host.appendChild(kidBox);
-      if (depth >= 1){ kidBox.hidden = true; tw.classList.add('closed'); }
+      if (depth >= 2){ kidBox.hidden = true; tw.classList.add('closed'); }
       walk(el, kidBox, depth+1, count);
       tw.addEventListener('click', function(box, twist){
         return function(ev){
@@ -1934,12 +2020,24 @@ function walk(parent, host, depth, count){
     })(el, row);
   }
 }
+var TYPE_NAME = {
+  BODY:'Body', HEADER:'Header', NAV:'Nav', MAIN:'Main', SECTION:'Section',
+  ARTICLE:'Artikel', ASIDE:'Aside', FOOTER:'Footer', DIV:'Div', SPAN:'Teks',
+  P:'Teks', STRONG:'Teks', EM:'Teks', SMALL:'Teks', BLOCKQUOTE:'Kutipan',
+  A:'Link', BUTTON:'Tombol', IMG:'Gambar', PICTURE:'Gambar', FIGURE:'Figur',
+  SVG:'Ikon', H1:'Judul', H2:'Judul', H3:'Judul', H4:'Judul', H5:'Judul', H6:'Judul',
+  UL:'Daftar', OL:'Daftar', LI:'Item', HR:'Garis', FORM:'Form', LABEL:'Label',
+  INPUT:'Isian', TEXTAREA:'Isian', SELECT:'Pilihan', TABLE:'Tabel', TR:'Baris',
+  TD:'Sel', TH:'Sel', VIDEO:'Video', IFRAME:'Bingkai', CANVAS:'Kanvas'
+};
 function niceName(el){
+  return TYPE_NAME[el.tagName.toUpperCase()] || el.tagName.toLowerCase();
+}
+/* Cuplikan isi dipakai sebagai tooltip supaya baris yang senama tetap bisa dibedakan. */
+function niceHint(el){
+  if (el.tagName==='IMG') return el.getAttribute('alt') || el.getAttribute('src') || '';
   var t = (el.textContent || '').trim().replace(/\s+/g,' ');
-  if (el.tagName==='IMG') return el.getAttribute('alt') || 'Gambar';
-  if (t && t.length <= 34) return t;
-  if (t) return t.slice(0,32) + '…';
-  return label(el);
+  return t.length > 70 ? t.slice(0,68) + '…' : t;
 }
 function markLayer(el){
   layerMap.forEach(function(x){ x.row.classList.toggle('on', x.el === el); });
@@ -1983,22 +2081,97 @@ function insertBlock(kind, dropInfo){
   buildLayers(); toast('Elemen ditambahkan.');
 }
 
-var paletteKind = null, paletteDrop = null;
+/* Seret blok dari palet memakai peristiwa mouse biasa, bukan drag-and-drop bawaan
+   HTML5. Alasannya sama dengan seret elemen di kanvas: peristiwa harus bisa
+   ditangkap baik di dokumen induk maupun di dalam iframe. */
+var palDrag = null, palPend = null, palJustDragged = false;
 document.querySelectorAll('[data-block]').forEach(function(b){
-  b.addEventListener('click', function(){ insertBlock(b.dataset.block, null); });
-  b.setAttribute('draggable', 'true');
-  b.addEventListener('dragstart', function(e){
-    if (!fd){ e.preventDefault(); toast('Buka halaman dulu di kanvas.', true); return; }
-    paletteKind = b.dataset.block;
-    b.classList.add('dragging');
-    e.dataTransfer.effectAllowed = 'copy';
-    try { e.dataTransfer.setData('text/plain', 'block'); } catch(err){}
+  b.addEventListener('click', function(){
+    if (palJustDragged) return;
+    insertBlock(b.dataset.block, null);
   });
-  b.addEventListener('dragend', function(){
-    b.classList.remove('dragging');
-    paletteKind = null; paletteDrop = null; E.insLine.hidden = true;
+  b.addEventListener('mousedown', function(e){
+    if (e.button !== 0) return;
+    if (!fd){ toast('Buka halaman dulu di kanvas.', true); return; }
+    e.preventDefault();
+    palPend = { x:e.clientX, y:e.clientY, kind:b.dataset.block, btn:b };
+    document.addEventListener('mousemove', palPendOuter, true);
+    document.addEventListener('mouseup', palPendUp, true);
+    if (fd){
+      fd.addEventListener('mousemove', palPendInner, true);
+      fd.addEventListener('mouseup', palPendUp, true);
+    }
   });
 });
+/* Kursor yang bergerak dari panel ke kanvas membuat peristiwa mouse pindah ke
+   dokumen iframe. Karena itu fase tunggu ini mendengarkan kedua dokumen; begitu
+   peristiwa datang dari iframe, artinya kursor sudah jauh dari kartu asalnya. */
+function palPendOuter(e){
+  if (!palPend) return;
+  if (Math.abs(e.clientX-palPend.x) + Math.abs(e.clientY-palPend.y) > 5) palPendGo();
+}
+function palPendInner(){ if (palPend) palPendGo(); }
+function palPendGo(){
+  var k = palPend.kind, b = palPend.btn;
+  palPendClear();
+  palStart(k, b);
+}
+function palPendUp(){ palPendClear(); }
+function palPendClear(){
+  palPend = null;
+  document.removeEventListener('mousemove', palPendOuter, true);
+  document.removeEventListener('mouseup', palPendUp, true);
+  if (fd){
+    fd.removeEventListener('mousemove', palPendInner, true);
+    fd.removeEventListener('mouseup', palPendUp, true);
+  }
+}
+function palStart(kind, btn){
+  if (palDrag) return;
+  palDrag = { kind:kind, btn:btn, target:null, before:true };
+  btn.classList.add('dragging');
+  E.shield.hidden = false; E.shield.classList.remove('rz');
+  document.addEventListener('mousemove', palMoveOuter, true);
+  document.addEventListener('mouseup', palEndOuter, true);
+  if (fd){
+    fd.addEventListener('mousemove', palMoveInner, true);
+    fd.addEventListener('mouseup', palEndInner, true);
+  }
+  hint('Lepaskan di garis biru untuk menaruh elemen baru di sana.');
+}
+function palMoveOuter(e){ palMove(pt(e)); }
+function palMoveInner(e){ palMove({ x:e.clientX, y:e.clientY }); }
+function palMove(p){
+  if (!palDrag || !fd) return;
+  var t = fd.elementFromPoint(p.x, p.y);
+  if (!t || skip(t)){ E.insLine.hidden = true; palDrag.target = null; return; }
+  var r = t.getBoundingClientRect();
+  var before = (p.y - r.top) < r.height/2;
+  palDrag.target = t; palDrag.before = before;
+  E.insLine.hidden = false;
+  E.insLine.style.left = (r.left*scale) + 'px';
+  E.insLine.style.width = (r.width*scale) + 'px';
+  E.insLine.style.top = ((before ? r.top : r.bottom)*scale - 1) + 'px';
+}
+function palEndOuter(e){ palMove(pt(e)); palEnd(false); }
+function palEndInner(e){ palMove({ x:e.clientX, y:e.clientY }); palEnd(false); }
+function palEnd(cancel){
+  if (!palDrag) return;
+  var d = palDrag; palDrag = null;
+  document.removeEventListener('mousemove', palMoveOuter, true);
+  document.removeEventListener('mouseup', palEndOuter, true);
+  if (fd){
+    fd.removeEventListener('mousemove', palMoveInner, true);
+    fd.removeEventListener('mouseup', palEndInner, true);
+  }
+  d.btn.classList.remove('dragging');
+  E.shield.hidden = true; E.insLine.hidden = true;
+  palJustDragged = true;
+  setTimeout(function(){ palJustDragged = false; }, 80);
+  if (cancel) toast('Dibatalkan.');
+  else if (d.target) insertBlock(d.kind, { el:d.target, before:d.before });
+  else toast('Lepaskan di atas kanvas untuk menaruh elemen.', true);
+}
 
 /* ---------------- pemeriksa masalah ---------------- */
 var SINGLE = ['font-size','color','opacity','z-index','width','height','background-color'];
@@ -2196,7 +2369,7 @@ function renderIssues(){
     E.scanBadge.hidden = true; E.fixAllBtn.hidden = true;
     var ok = document.createElement('div');
     ok.className = 'empty';
-    ok.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-check"/></svg><span>Tidak ada masalah yang terdeteksi.</span>';
+    ok.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-check"/></svg><span>Tidak ada masalah yang terdeteksi.</span>';
     E.issueList.appendChild(ok);
     return;
   }
@@ -2298,8 +2471,32 @@ E.iconPick.addEventListener('click', function(){
   if (!sel) return;
   iconTarget = sel.tagName.toLowerCase()==='svg' ? sel : sel.querySelector('svg');
   if (!iconTarget){ toast('Tidak ada ikon di elemen ini.', true); return; }
-  E.iconSvg.value = '';
+  E.iconSvg.value = ''; E.iconUrl.value = '';
   E.iconModal.hidden = false;
+});
+E.iconUrlApply.addEventListener('click', function(){
+  var u = (E.iconUrl.value || '').trim();
+  if (!/^(https?:\/\/|data:image\/)/i.test(u)){
+    toast('Alamat harus diawali https:// atau data:image/', true); return;
+  }
+  if (!iconTarget) return;
+  snap();
+  var img = fd.createElement('img');
+  img.setAttribute('src', u);
+  img.setAttribute('alt', '');
+  // warisi penampilan ikon lama supaya ukurannya tidak melompat
+  ['class','width','height','style'].forEach(function(a){
+    var v = iconTarget.getAttribute(a);
+    if (v !== null) img.setAttribute(a, v);
+  });
+  if (!img.getAttribute('width') && !/width/i.test(img.getAttribute('style')||'')){
+    img.style.width = '1em'; img.style.height = '1em';
+  }
+  markEdited(img);
+  iconTarget.replaceWith(img);
+  iconTarget = null;
+  select(img);
+  closeModals(); buildLayers(); toast('Ikon diganti dari URL.');
 });
 Object.keys(ICONS).forEach(function(name){
   var b = document.createElement('button');
@@ -2361,6 +2558,8 @@ function cleanClone(clone, liveRoot){
       }
     }
   }
+  var ol = clone.querySelector && clone.querySelector('#__sunting_outline__');
+  if (ol) ol.remove();
   var ce = clone.querySelectorAll('[contenteditable]');
   for (var j=0;j<ce.length;j++) ce[j].removeAttribute('contenteditable');
   if (clone.hasAttribute && clone.hasAttribute('contenteditable')) clone.removeAttribute('contenteditable');
