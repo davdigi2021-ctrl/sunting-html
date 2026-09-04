@@ -371,10 +371,23 @@ button,input,select,textarea{font:inherit;color:inherit;}
 }
 .err[hidden]{display:none;}
 
-.hint{
-  flex:1;min-width:0;font-size:12px;color:var(--ink-3);margin:0;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
+.spacer{flex:1;min-width:0;}
+.hint-btn{color:var(--ink-3);}
+.hint-btn[hidden]{display:none;}
+
+/* ---------- Pratinjau: semua alat bantu disingkirkan ---------- */
+.app.preview{grid-template-columns:1fr;}
+.app.preview .pane-r{display:none;}
+body.preview .topbar-group,
+body.preview .seg,
+body.preview .wbox,
+body.preview .hint-btn,
+body.preview #backBtn{display:none;}
+body.preview .topbar-group.always,
+body.preview .exit-preview{display:flex;}
+body.preview .canvas{padding:0;}
+body.preview .device{border-radius:0;box-shadow:none;}
+.exit-preview[hidden]{display:none;}
 .zoom-label{
   font-family:var(--mono);font-size:11px;color:var(--ink-2);
   min-width:38px;text-align:center;
@@ -662,6 +675,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
     <g id="i-zout"><circle cx="10.8" cy="10.8" r="7"/><path d="M20.5 20.5 15.8 15.8M7.8 10.8h6"/></g>
     <g id="i-wand"><path d="m14.5 3.5 1.3 2.9 2.9 1.3-2.9 1.3-1.3 2.9-1.3-2.9L10.3 7.7l2.9-1.3Z"/><path d="M4 20 12.2 11.8M5 4v3.4M3.3 5.7h3.4"/></g>
     <g id="i-check"><path d="m5 12.5 4.5 4.5L19 7.5"/></g>
+    <g id="i-info"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.2"/><circle cx="12" cy="7.8" r=".9" fill="currentColor" stroke="none"/></g>
     <g id="i-desktop"><rect x="2.5" y="4" width="19" height="12.5" rx="2"/><path d="M9 20.5h6M12 16.5v4"/></g>
     <g id="i-tablet"><rect x="5" y="2.5" width="14" height="19" rx="2.4"/><path d="M10.6 18.6h2.8"/></g>
     <g id="i-mobile"><rect x="7" y="2.5" width="10" height="19" rx="2.4"/><path d="M10.8 18.7h2.4"/></g>
@@ -703,12 +717,18 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
     <button class="ibtn" id="zoomIn" type="button" title="Perbesar tampilan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-zin"/></svg></button>
     <button class="ibtn" id="zoomFit" type="button" title="Pas-kan ke layar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-target"/></svg></button>
     <button class="ibtn" id="outlineBtn" type="button" title="Tampilkan rangka semua komponen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-frame"/></svg></button>
+    <button class="ibtn" id="previewBtn" type="button" title="Pratinjau — sembunyikan semua alat bantu (Esc untuk keluar)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-eye"/></svg></button>
   </div>
 
     <button class="btn btn-quiet btn-sm" id="backBtn" type="button" hidden>Ganti kode</button>
   </div>
 
-  <p class="hint" id="hintText"></p>
+  <!-- Keterangan panjang dulu ditulis penuh di bar dan tetap terpotong. Sekarang
+       jadi satu ikon; keterangannya muncul saat kursor menyentuhnya. -->
+  <button class="ibtn hint-btn" id="hintBtn" type="button" hidden aria-label="Keterangan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-info"/></svg></button>
+  <span class="spacer"></span>
+
+  <button class="btn btn-primary btn-sm exit-preview" id="exitPreview" type="button" hidden>Keluar pratinjau</button>
 
   <div class="topbar-group">
     <button class="ibtn" id="themeBtn" type="button" title="Ganti tema terang / gelap" aria-label="Ganti tema terang atau gelap"><svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sun"/></svg><svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-moon"/></svg></button>
@@ -1034,14 +1054,14 @@ var E = {};
 ['devSeg','zoomGroup','zoomOut','zoomIn','zoomFit','zoomLabel','undoBtn','redoBtn','codeBtn','copyBtn','dlBtn',
  'tabProps','tabBlocks','tabLayers','tabScan','layersTree','layersRefresh','scanBtn','fixAllBtn','issueList','scanPill','scanBadge',
  'startView','srcInput','cssInput','jsInput','extraToggle','extraFields','startErr','demoBtn','openBtn',
- 'backBtn','hintText','canvas','sizer','device','frame',
+ 'backBtn','canvas','sizer','device','frame',
  'ovl','boxHover','boxPeek','boxDrop','boxSel','selTag','hoverTag','insLine','qbar','shield','widthBox','devWidth','devHeight',
  'propsEmpty','propsBody','crumbs','cText','pText','cLink','pHref','linkErr','linkFix','pBlank',
  'cImg','imgPick','pAlt','cIcon','iconPick','pFont','pSize','pWeight','pLh','pAlign',
  'pW','pH','pPad','pMar','fileInput','toast',
  'pColorBtn','pColorChip','pColorVal','pBgBtn','pBgChip','pBgVal',
  'colorPop','cpSv','cpSvThumb','cpHue','cpHueThumb','cpEye','cpHex','cpSwatches',
- 'outlineBtn','outlineCv','qbMove','iconUrl','iconUrlApply','themeBtn',
+ 'outlineBtn','outlineCv','qbMove','iconUrl','iconUrlApply','themeBtn','previewBtn','exitPreview','hintBtn',
  'codeModal','codeOut','codeTitle','codeCopy','iconModal','iconGrid','iconSvg','iconApply'
 ].forEach(function(id){ E[id] = $(id); });
 
@@ -1111,7 +1131,9 @@ function toast(msg, bad){
     setTimeout(function(){ E.toast.hidden = true; }, 240);
   }, 2600);
 }
-function hint(t){ E.hintText.textContent = t; }
+/* Keterangannya tinggal muncul saat kursor menyentuh ikonnya, jadi bar atas
+   tetap lega dan tidak ada lagi kalimat yang terpotong di tengah. */
+function hint(t){ E.hintBtn.title = t || ''; E.hintBtn.hidden = !t; }
 function skip(el){
   if (!el || el.nodeType !== 1) return true;
   /* Isi dalam <svg> — path, circle, g — bukan komponen yang bisa disunting, tapi
@@ -1200,7 +1222,7 @@ E.backBtn.addEventListener('click', function(){
   deselect(); undoS.length = 0; redoS.length = 0; histBtns();
   E.frame.removeAttribute('srcdoc');
   E.canvas.hidden = true; E.backBtn.hidden = true; E.ovl.hidden = true;
-  E.hintText.textContent = '';
+  hint('');
   E.devSeg.hidden = true; E.widthBox.hidden = true; E.zoomGroup.hidden = true;
   E.startView.hidden = false;
   E.dlBtn.disabled = E.copyBtn.disabled = E.codeBtn.disabled = true;
@@ -1369,6 +1391,39 @@ E.devHeight.addEventListener('change', function(){
 E.zoomIn.addEventListener('click', function(){ zoomMode = Math.min(2, scale + .1); layout(); });
 E.zoomOut.addEventListener('click', function(){ zoomMode = Math.max(.2, scale - .1); layout(); });
 E.zoomFit.addEventListener('click', function(){ zoomMode = 'fit'; layout(); });
+
+/* ---------------- pratinjau ----------------
+   Semua alat bantu disingkirkan supaya halaman terlihat persis seperti yang
+   akan dilihat pengunjung, dan halamannya jadi bisa dipakai betulan: menu HP
+   membuka, tombol buka-tutup bekerja, animasi "muncul saat digulir" jalan.
+   Satu-satunya yang tetap ditahan adalah link yang berpindah halaman — kalau
+   dibiarkan, pratinjau melompat keluar dan pekerjaan yang belum diunduh ikut
+   hilang. */
+var previewOn = false, outlineSebelumPreview = false;
+function setPreview(on){
+  if (!fd && on){ toast('Buka halaman dulu di kanvas.', true); return; }
+  previewOn = on;
+  document.body.classList.toggle('preview', on);
+  document.querySelector('.app').classList.toggle('preview', on);
+  E.previewBtn.classList.toggle('on', on);
+  E.exitPreview.hidden = !on;
+  if (on){
+    outlineSebelumPreview = outlineOn;
+    if (outlineOn) E.outlineBtn.click();
+    deselect(); setHover(null); setPeek(null);
+    E.ovl.hidden = true;
+    toast('Pratinjau. Tekan Esc atau tombol "Keluar pratinjau" untuk kembali menyunting.');
+  } else {
+    E.ovl.hidden = false;
+    if (outlineSebelumPreview && !outlineOn) E.outlineBtn.click();
+    layout(); outlineRebuild();
+    toast('Kembali menyunting.');
+  }
+  layout();
+}
+E.previewBtn.addEventListener('click', function(){ setPreview(!previewOn); });
+E.exitPreview.addEventListener('click', function(){ setPreview(false); });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && previewOn) setPreview(false); });
 
 /* Rangka semua komponen, seperti "view components" di GrapesJS.
 
@@ -1612,11 +1667,25 @@ function bind(){
   fd.addEventListener('drop', onFileDrop);
 }
 function onMove(e){
-  if (drag || resize) return;
+  if (drag || resize || previewOn) return;
   var t = e.target;
   setHover(skip(t) || t===sel ? null : t);
 }
 function onClick(e){
+  /* Saat pratinjau, halaman dibiarkan bekerja sendiri. Yang ditahan hanya link
+     yang berpindah halaman; link ke bagian lain di halaman yang sama (#) tetap
+     boleh supaya menu navigasinya bisa dicoba. */
+  if (previewOn){
+    var tautan = e.target.closest && e.target.closest('a[href]');
+    if (tautan){
+      var alamat = (tautan.getAttribute('href') || '').trim();
+      if (alamat && alamat.charAt(0) !== '#'){
+        e.preventDefault();
+        toast('Saat pratinjau link tidak dibuka: ' + alamat);
+      }
+    }
+    return;
+  }
   if (editing(e.target)) return;
   e.preventDefault(); e.stopPropagation();
   flushEdit();
@@ -1625,6 +1694,7 @@ function onClick(e){
   select(t);
 }
 function onDbl(e){
+  if (previewOn) return;
   var t = e.target; if (skip(t)) return;
   e.preventDefault(); select(t); startEdit();
 }
@@ -2135,7 +2205,7 @@ document.addEventListener('mousedown', function(e){
 
 /* ---------------- geser & ubah ukuran ---------------- */
 function onDown(e){
-  if (e.button!==0 || editing(e.target)) return;
+  if (previewOn || e.button!==0 || editing(e.target)) return;
   var t = e.target;
   if (skip(t)) return;
   // Tahan aksi bawaan browser (seleksi teks / seret bawaan link & gambar). Tanpa ini
@@ -2283,6 +2353,9 @@ window.addEventListener('drop', function(e){ if (isFile(e)) e.preventDefault(); 
 
 /* ---------------- papan ketik ---------------- */
 function onKey(e){
+  // Esc juga bekerja saat fokus ada di dalam halaman yang dipratinjau
+  if (e.key === 'Escape' && previewOn){ e.preventDefault(); setPreview(false); return; }
+  if (previewOn) return;
   var tag = (e.target && e.target.tagName || '').toLowerCase();
   var typing = tag==='input'||tag==='textarea'||tag==='select'||editing(e.target);
   var mod = e.ctrlKey || e.metaKey;

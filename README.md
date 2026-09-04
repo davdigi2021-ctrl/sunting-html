@@ -33,6 +33,7 @@ Editor ini **tidak melakukan itu**. Halaman dirender apa adanya di dalam iframe,
 - Kanvas rata tepi saat lebar penuh, dan berbingkai saat pratinjau lebih sempit
 - **Rangka semua komponen** (seperti *view components* di GrapesJS), dengan label nama komponen saat kursor menyentuh elemen
 - **Panel lapisan** berisi struktur halaman. Arahkan kursor ke satu baris untuk melihat letaknya disorot di kanvas
+- **Pratinjau**: semua alat bantu disingkirkan dan halaman jadi bisa dipakai betulan — menu HP membuka, tombol buka-tutup bekerja, animasi masuk jalan. Link yang berpindah halaman tetap ditahan supaya pratinjau tidak melompat keluar. Tekan Esc untuk kembali menyunting
 - **Lihat kode** untuk seluruh halaman atau satu elemen saja
 
 **Memeriksa**
