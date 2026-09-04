@@ -1135,7 +1135,7 @@ function tanda(el){
   if (el.classList && el.classList.length) return ' .' + el.classList[0];
   return '';
 }
-function markEdited(el){ if (el) el.__edited = true; }
+function markEdited(el){ if (el && el.setAttribute) el.setAttribute(P_UBAH, '1'); }
 
 /* ---------------- riwayat ---------------- */
 function snap(){
@@ -1302,14 +1302,30 @@ function attrs(el){
   for (var i=0;i<el.attributes.length;i++) m[el.attributes[i].name] = el.attributes[i].value;
   return m;
 }
+/* Penanda asal ditulis sebagai atribut, bukan properti JavaScript.
+
+   Undo dan redo bekerja dengan mengganti `body.innerHTML`, dan itu membuat
+   seluruh elemen dibuat ulang dari nol — properti JavaScript apa pun yang
+   menempel padanya lenyap. Dulu penanda asal disimpan begitu, jadi begitu ada
+   satu saja undo setelah menambah elemen, seluruh peta atribut asli hilang dan
+   jejak yang ditinggalkan skrip halaman saat berjalan ikut terbawa ke hasil
+   unduhan. Atribut ikut tersalin lewat innerHTML, jadi penandanya selamat.
+   Keduanya selalu dibuang saat ekspor dan saat melihat kode, sama seperti
+   `contenteditable`. */
+var P_ASAL = 'data-sunting-asal', P_UBAH = 'data-sunting-ubah';
+var pristineAttrs = [];
 function stamp(){
+  pristineAttrs = [];
   if (!pristine || !fd || !fd.documentElement) return;
   var a = fd.documentElement.querySelectorAll('*');
   var b = pristine.documentElement.querySelectorAll('*');
   if (a.length !== b.length) return;
   var i;
   for (i=0;i<a.length;i++) if (a[i].tagName !== b[i].tagName) return;
-  for (i=0;i<a.length;i++) a[i].__pristine = attrs(b[i]);
+  for (i=0;i<a.length;i++){
+    pristineAttrs[i] = attrs(b[i]);
+    a[i].setAttribute(P_ASAL, i);
+  }
 }
 
 /* ---------------- ukuran layar & zoom ---------------- */
@@ -2964,13 +2980,18 @@ function applyIcon(src, isPath){
 
 /* ---------------- ekspor ---------------- */
 function cleanClone(clone, liveRoot){
-  // kembalikan atribut asli untuk elemen yang tidak disunting
-  var live = liveRoot.querySelectorAll('*'), cl = clone.querySelectorAll('*');
-  if (live.length === cl.length){
-    for (var i=0;i<live.length;i++){
-      var orig = live[i].__pristine;
-      if (!orig || live[i].__edited) continue;
-      var el = cl[i], k;
+  /* Penandanya ikut tersalin ke klon, jadi pemulihan atribut asli cukup
+     dikerjakan pada klon itu sendiri — tidak perlu lagi mencocokkan dua pohon
+     berdasarkan urutan, yang dulu gagal begitu ada elemen ditambah atau
+     dipindah. */
+  var semua = [clone].concat(Array.prototype.slice.call(clone.querySelectorAll('*')));
+  for (var i=0;i<semua.length;i++){
+    var el = semua[i];
+    if (!el.getAttribute) continue;
+    var idx = el.getAttribute(P_ASAL);
+    var orig = idx === null ? null : pristineAttrs[+idx];
+    if (orig && !el.hasAttribute(P_UBAH)){
+      var k;
       for (k = el.attributes.length-1; k>=0; k--){
         var nm = el.attributes[k].name;
         if (!Object.prototype.hasOwnProperty.call(orig, nm)) el.removeAttribute(nm);
@@ -2979,10 +3000,11 @@ function cleanClone(clone, liveRoot){
         if (Object.prototype.hasOwnProperty.call(orig,k) && el.getAttribute(k) !== orig[k]) el.setAttribute(k, orig[k]);
       }
     }
+    // selalu dibuang, termasuk dari elemen yang disunting dan yang baru ditambah
+    el.removeAttribute(P_ASAL);
+    el.removeAttribute(P_UBAH);
+    el.removeAttribute('contenteditable');
   }
-  var ce = clone.querySelectorAll('[contenteditable]');
-  for (var j=0;j<ce.length;j++) ce[j].removeAttribute('contenteditable');
-  if (clone.hasAttribute && clone.hasAttribute('contenteditable')) clone.removeAttribute('contenteditable');
   return clone;
 }
 function exportHtml(){
