@@ -23,13 +23,13 @@ Editor ini **tidak melakukan itu**. Halaman dirender apa adanya di dalam iframe,
 - **Ganti font**, tebal huruf, jarak baris, dan perataan. Font Google dimuat otomatis
 - Atur jarak dalam/luar, warna tulisan dan latar
 - **Ganti ikon SVG** dari daftar siap pakai atau tempel kode SVG sendiri
-- **Ganti/tambah gambar** lewat pemilih file atau seret langsung ke kanvas
+- **Ganti/tambah gambar** lewat pemilih file atau seret langsung ke kanvas. Foto besar otomatis diperkecil ke 1600px dan disandikan ulang sebagai WebP sebelum ditanam, jadi berkasnya tidak membengkak — foto 1,5 MB biasanya turun ke sekitar 150 KB. SVG dan GIF tidak disentuh supaya vektor dan animasinya tetap utuh
 - Geser posisi dengan menyeret, gandakan, dan hapus elemen
 - **Tambah elemen**: section, judul, paragraf, tombol, gambar, 2 kolom, garis, jarak
 - Undo/redo (Ctrl+Z / Ctrl+Shift+Z)
 
 **Melihat**
-- Pratinjau **ukuran layar asli** lewat tiga tombol ikon: Desktop 1440px, Tablet 820px, HP 390px — atau isi sendiri lebarnya (240–3000px) di kotak sebelahnya. Zoom menyesuaikan otomatis
+- Pratinjau **ukuran layar asli** lewat tiga tombol ikon: Desktop 1440px, Tablet 820×1180, HP 390×844 — atau isi sendiri lebar dan tingginya di kotak sebelahnya. Tinggi yang dikosongkan mengikuti tinggi kanvas. Zoom menyesuaikan otomatis
 - Kanvas rata tepi saat lebar penuh, dan berbingkai saat pratinjau lebih sempit
 - **Rangka semua komponen** (seperti *view components* di GrapesJS), dengan label nama komponen saat kursor menyentuh elemen
 - **Panel lapisan** berisi struktur halaman. Arahkan kursor ke satu baris untuk melihat letaknya disorot di kanvas
@@ -37,6 +37,14 @@ Editor ini **tidak melakukan itu**. Halaman dirender apa adanya di dalam iframe,
 
 **Memeriksa**
 - Pemeriksa masalah otomatis dengan penjelasan bahasa sehari-hari dan tombol perbaiki. Yang dicek: link yang tidak akan sampai tujuan, nomor WhatsApp salah format, link tab baru yang belum aman, gambar tanpa teks pengganti, gambar dengan alamat lokal, alamat http yang rawan diblokir, link menu yang menuju bagian tidak ada, id kembar, kurung CSS yang belum ditutup, aturan CSS salah tulis, serta bahasa/judul/viewport halaman
+
+## Kalau file kamu terpisah-pisah
+
+Tempel HTML di kotak utama, lalu buka **"Punya file CSS atau JS terpisah?"** dan tempel isi masing-masing. Keduanya disatukan ke dalam hasil unduhan sebagai satu berkas.
+
+Saat itu dilakukan, acuan ke berkas lokal seperti `<link href="gaya.css">` dan `<script src="skrip.js">` dibuang. Alasannya: berkas lokal semacam itu memang tidak pernah bisa dimuat di pratinjau, dan kalau dibiarkan sementara berkas lamanya masih ada di folder yang sama, isinya akan jalan dua kali — skrip yang jalan dua kali sering justru membatalkan dirinya sendiri. Alamat penuh seperti CDN dan Google Fonts tidak disentuh.
+
+Punya beberapa halaman HTML? Sunting satu per satu: unduh yang pertama, tekan **"Ganti kode"**, lalu tempel yang berikutnya.
 
 ## Privasi
 

@@ -131,10 +131,14 @@ button,input,select,textarea{font:inherit;color:inherit;}
 }
 .wbox[hidden]{display:none;}
 .wbox-in{
-  width:46px;border:0;background:transparent;color:var(--ink);
+  width:42px;border:0;background:transparent;color:var(--ink);
   font-family:var(--mono);font-size:12px;text-align:right;padding:4px 2px;
   -moz-appearance:textfield;appearance:textfield;
 }
+/* Angka tinggi yang sedang mengikuti kanvas ditulis samar, supaya terlihat
+   bahwa itu hasil hitungan dan bukan angka yang dikunci. */
+.wbox-in.auto{color:var(--ink-3);}
+.wbox-x{font-family:var(--mono);font-size:11px;color:var(--ink-3);}
 .wbox-in::-webkit-outer-spin-button,.wbox-in::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .wbox-in:focus{outline:none;}
 .wbox:focus-within{box-shadow:0 0 0 2px var(--accent) inset;}
@@ -676,8 +680,10 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
     <button class="seg-btn" data-dev="mobile" type="button" title="HP — 390px" aria-label="HP"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-mobile"/></svg></button>
   </div>
 
-  <div class="wbox" id="widthBox" hidden title="Atur sendiri lebar pratinjau, dalam piksel">
+  <div class="wbox" id="widthBox" hidden title="Atur sendiri ukuran pratinjau, dalam piksel. Kosongkan tinggi untuk mengikuti tinggi kanvas.">
     <input class="wbox-in" id="devWidth" type="number" min="240" max="3000" step="10" value="1440" aria-label="Lebar pratinjau dalam piksel">
+    <span class="wbox-x">×</span>
+    <input class="wbox-in auto" id="devHeight" type="number" min="240" max="4000" step="10" aria-label="Tinggi pratinjau dalam piksel, kosong berarti mengikuti kanvas">
     <span class="wbox-unit">px</span>
   </div>
 
@@ -1019,7 +1025,7 @@ var E = {};
  'tabProps','tabBlocks','tabLayers','tabScan','layersTree','layersRefresh','scanBtn','fixAllBtn','issueList','scanPill','scanBadge',
  'startView','srcInput','cssInput','jsInput','extraToggle','extraFields','startErr','demoBtn','openBtn',
  'backBtn','hintText','canvas','sizer','device','frame',
- 'ovl','boxHover','boxPeek','boxDrop','boxSel','selTag','hoverTag','insLine','qbar','shield','widthBox','devWidth',
+ 'ovl','boxHover','boxPeek','boxDrop','boxSel','selTag','hoverTag','insLine','qbar','shield','widthBox','devWidth','devHeight',
  'propsEmpty','propsBody','crumbs','cText','pText','cLink','pHref','linkErr','linkFix','pBlank',
  'cImg','imgPick','pAlt','cIcon','iconPick','pFont','pSize','pWeight','pLh','pAlign',
  'pW','pH','pPad','pMar','fileInput','toast',
@@ -1032,12 +1038,19 @@ var E = {};
 /* ---------------- keadaan ---------------- */
 var fd = null;            // dokumen di dalam iframe
 var pristine = null;      // hasil parse tanpa menjalankan script
+var lastDoc = null;       // HTML terakhir yang dipasang ke iframe, untuk memulihkan
+var recovering = false;
 var ready = false;
 var sel = null, hoverEl = null, dropEl = null;
 var undoS = [], redoS = [];
 var dlCap = null;
 var scale = 1, devW = 1440, zoomMode = 'fit';
-var DEV = { desktop:1440, tablet:820, mobile:390 };
+/* Lebar dan tinggi tiap perangkat. Tinggi 0 berarti "ikuti tinggi kanvas":
+   untuk desktop itu yang paling enak dilihat karena bingkainya jadi rata tepi,
+   sedangkan tablet dan HP memakai tinggi layar sebenarnya supaya terasa seperti
+   perangkatnya. */
+var DEV = { desktop:[1440,0], tablet:[820,1180], mobile:[390,844] };
+var devH = 0;
 var drag = null, resize = null, pend = null;
 var toastT = null;
 var issues = [];
@@ -1164,31 +1177,82 @@ E.backBtn.addEventListener('click', function(){
   E.scanBadge.hidden = true; E.fixAllBtn.hidden = true;
 });
 
+/* Kalau isi CSS/JS ditempel terpisah, acuan ke berkas lokal seperti
+   `<link href="gaya.css">` atau `<script src="skrip.js">` dibuang.
+
+   Dua alasan. Pertama, berkas lokal semacam itu memang tidak pernah bisa dimuat
+   di pratinjau, jadi membuangnya membuat hasil unduhan sama persis dengan yang
+   dilihat. Kedua, kalau dibiarkan dan berkas lamanya masih ada di folder yang
+   sama, isinya jalan dua kali — dan skrip yang jalan dua kali biasanya justru
+   membatalkan dirinya sendiri, misalnya tombol buka-tutup yang jadi tidak
+   bereaksi. Alamat penuh (CDN, Google Fonts) tidak disentuh karena itu memang
+   perlu tetap dimuat dari internet. */
+function buangLokal(doc, pola, atribut){
+  return doc.replace(pola, function(tag){
+    var m = tag.match(new RegExp(atribut + '\\s*=\\s*["\']([^"\']*)["\']', 'i'));
+    if (!m) return tag;
+    var url = m[1].trim();
+    if (/^(https?:)?\/\//i.test(url) || /^data:/i.test(url)) return tag;   // dari internet, biarkan
+    return '';
+  });
+}
 function open(raw, css, js){
   var full = /<html[\s>]/i.test(raw) || /<!doctype/i.test(raw);
   var doc = full ? raw :
     '<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body>' + raw + '</body></html>';
   css = (css||'').trim(); js = (js||'').trim();
   if (css){
+    doc = buangLokal(doc, /<link\b[^>]*\brel\s*=\s*["']?stylesheet["']?[^>]*>/gi, 'href');
     var st = '<style>' + css + '</style>';
     doc = /<\/head>/i.test(doc) ? doc.replace(/<\/head>/i, st + '</head>') : st + doc;
   }
   if (js){
+    doc = buangLokal(doc, /<script\b[^>]*\bsrc\s*=[^>]*>\s*<\/script>/gi, 'src');
     var sc = '<scr' + 'ipt>' + js + '</scr' + 'ipt>';
     doc = /<\/body>/i.test(doc) ? doc.replace(/<\/body>/i, sc + '</body>') : doc + sc;
   }
   try { pristine = new DOMParser().parseFromString(doc, 'text/html'); }
   catch(err){ pristine = null; }
+  lastDoc = doc;
   E.frame.srcdoc = doc;
   E.startView.hidden = true;
   E.canvas.hidden = false; E.backBtn.hidden = false;
   E.devSeg.hidden = false; E.widthBox.hidden = false; E.zoomGroup.hidden = false;
 }
 
+/* Kembalikan pratinjau ke keadaan terakhir yang tersimpan. Suntingan yang belum
+   sempat masuk riwayat memang hilang — tidak ada cara membacanya lagi setelah
+   dokumennya berpindah asal — jadi lebih baik dikatakan terus terang daripada
+   meninggalkan editor yang tombolnya semua diam. */
+function frameLost(){
+  ready = false;
+  deselect();
+  E.ovl.hidden = true;
+  if (recovering || !lastDoc){
+    toast('Pratinjau berpindah halaman dan tidak bisa dipulihkan. Tekan "Ganti kode" lalu tempel ulang.', true);
+    return;
+  }
+  recovering = true;
+  var pulih = undoS.length ? undoS[undoS.length - 1] : null;
+  var doc = lastDoc;
+  // fungsi pengganti, bukan string: isi halaman bisa mengandung $& atau $1
+  if (pulih && /<body[^>]*>/i.test(doc)){
+    doc = doc.replace(/(<body[^>]*>)[\s\S]*(<\/body>)/i, function(_, buka, tutup){ return buka + pulih + tutup; });
+  }
+  E.frame.srcdoc = doc;
+  toast('Halaman ini sempat berpindah sendiri. Pratinjau dikembalikan.', true);
+  setTimeout(function(){ recovering = false; }, 1200);
+}
+
 E.frame.addEventListener('load', function(){
   if (!E.frame.srcdoc) return;
   fd = E.frame.contentDocument;
-  if (!fd) return;
+  /* Halaman yang disunting bisa saja memindahkan dirinya sendiri: ada `meta
+     refresh`, ada skrip yang menyetel `location`. Kalau tujuannya beda asal,
+     dokumennya tidak bisa dibaca lagi dan editor kehilangan pijakan — dulu
+     setiap tombol setelah itu diam saja sambil melempar error. Sekarang
+     keadaannya dikenali dan halaman dikembalikan. */
+  if (!fd){ frameLost(); return; }
   stamp();
   bind();
   ready = true;
@@ -1222,26 +1286,38 @@ function stamp(){
    dengan salah satu dari ketiganya, tidak ada tombol yang menyala. */
 E.devSeg.addEventListener('click', function(e){
   var b = e.target.closest('.seg-btn'); if (!b) return;
-  setDevW(DEV[b.dataset.dev] || 1440);
-  toast('Pratinjau ' + (b.getAttribute('aria-label') || '') + ', lebar ' + devW + 'px');
+  var d = DEV[b.dataset.dev] || DEV.desktop;
+  setDevSize(d[0], d[1]);
+  toast('Pratinjau ' + (b.getAttribute('aria-label') || '') + ', ' + devW + (devH ? ' × ' + devH : '') + 'px');
 });
 function markDev(){
   Array.prototype.forEach.call(E.devSeg.querySelectorAll('.seg-btn'), function(x){
-    x.classList.toggle('on', DEV[x.dataset.dev] === devW);
+    var d = DEV[x.dataset.dev];
+    x.classList.toggle('on', !!d && d[0] === devW && d[1] === devH);
   });
 }
-function setDevW(w){
+function setDevSize(w, h){
   devW = Math.max(240, Math.min(3000, Math.round(w) || 1440));
+  devH = h ? Math.max(240, Math.min(4000, Math.round(h))) : 0;
   E.devWidth.value = devW;
+  E.devHeight.value = devH ? devH : '';
   markDev();
   zoomMode = 'fit';
   layout(); outlineRebuild();
 }
 E.devWidth.addEventListener('change', function(){
-  setDevW(parseInt(E.devWidth.value, 10));
+  setDevSize(parseInt(E.devWidth.value, 10), devH);
   toast('Lebar pratinjau ' + devW + 'px');
 });
-E.devWidth.addEventListener('keydown', function(e){ if (e.key === 'Enter') E.devWidth.blur(); });
+/* Dikosongkan berarti kembali mengikuti tinggi kanvas. */
+E.devHeight.addEventListener('change', function(){
+  var v = E.devHeight.value.trim();
+  setDevSize(devW, v === '' ? 0 : parseInt(v, 10));
+  toast(devH ? 'Tinggi pratinjau ' + devH + 'px' : 'Tinggi mengikuti kanvas.');
+});
+[E.devWidth, E.devHeight].forEach(function(i){
+  i.addEventListener('keydown', function(e){ if (e.key === 'Enter') i.blur(); });
+});
 E.zoomIn.addEventListener('click', function(){ zoomMode = Math.min(2, scale + .1); layout(); });
 E.zoomOut.addEventListener('click', function(){ zoomMode = Math.max(.2, scale - .1); layout(); });
 E.zoomFit.addEventListener('click', function(){ zoomMode = 'fit'; layout(); });
@@ -1253,13 +1329,13 @@ E.zoomFit.addEventListener('click', function(){ zoomMode = 'fit'; layout(); });
    tombol atau gambar, bentuk asli halaman tidak disentuh sama sekali, dan tidak
    ada apa pun yang perlu dibersihkan saat ekspor. Satu elemen kanvas jauh lebih
    ringan daripada ratusan div penanda. */
-var outlineOn = false, outlineRects = [], outlineTimer = null;
+var outlineOn = false, outlineRects = [], outlineLive = [], outlineTimer = null;
 E.outlineBtn.addEventListener('click', function(){
   if (!fd){ toast('Buka halaman dulu di kanvas.', true); return; }
   outlineOn = !outlineOn;
   E.outlineBtn.classList.toggle('on', outlineOn);
   E.outlineCv.hidden = !outlineOn;
-  if (outlineOn) outlineBuild(); else outlineRects = [];
+  if (outlineOn) outlineBuild(); else { outlineRects = []; outlineLive = []; }
   toast(outlineOn ? 'Rangka komponen ditampilkan.' : 'Rangka komponen disembunyikan.');
 });
 /* Satu warna untuk semua garis, sama seperti kotak hover dan seperti GrapesJS.
@@ -1268,20 +1344,41 @@ E.outlineBtn.addEventListener('click', function(){
    terbaca sebagai garis bantu editor. */
 var OUTLINE_COL = 'rgba(0,113,227,.55)';
 /* Letak kotak disimpan dalam koordinat dokumen halaman, bukan koordinat layar,
-   supaya menggulir dan zoom cukup menggambar ulang tanpa mengukur ulang. */
+   supaya menggulir dan zoom cukup menggambar ulang tanpa mengukur ulang.
+
+   Kecuali elemen yang tidak ikut bergulir: `position:fixed` seperti tombol
+   WhatsApp melayang, dan `position:sticky` seperti header yang menempel di
+   atas. Letaknya terhadap dokumen berubah terus saat halaman digulir, jadi
+   kalau ikut disimpan, garisnya ditinggal melayang di ruang kosong. Elemen
+   seperti itu — berikut seluruh isinya, karena anak-anaknya ikut menempel —
+   diukur ulang setiap kali menggambar. Jumlahnya selalu sedikit, jadi
+   ongkosnya tetap kecil. */
 function outlineBuild(){
-  outlineRects = [];
+  outlineRects = []; outlineLive = [];
   if (!outlineOn || !fd || !fd.body) return;
   var win = fd.defaultView;
   var sx = win.scrollX || 0, sy = win.scrollY || 0;
   var list = fd.body.querySelectorAll('*');
   var max = Math.min(list.length, 1500);
+  var menempel = [];   // elemen fixed/sticky yang sudah ditemukan
   for (var i = 0; i < max; i++){
     var el = list[i];
     if (skip(el)) continue;
     var r = el.getBoundingClientRect();
     if (r.width < 2 || r.height < 2) continue;
-    outlineRects.push({ x: r.left + sx, y: r.top + sy, w: r.width, h: r.height });
+    var pos = win.getComputedStyle(el).position;
+    var ikut = pos === 'fixed' || pos === 'sticky';
+    if (!ikut){
+      for (var j = 0; j < menempel.length; j++){
+        if (menempel[j].contains(el)){ ikut = true; break; }
+      }
+    }
+    if (ikut){
+      if (pos === 'fixed' || pos === 'sticky') menempel.push(el);
+      outlineLive.push(el);
+    } else {
+      outlineRects.push({ x: r.left + sx, y: r.top + sy, w: r.width, h: r.height });
+    }
   }
   outlineDraw();
 }
@@ -1316,6 +1413,18 @@ function outlineDraw(){
     ctx.rect(Math.round(x) + 0.5, Math.round(y) + 0.5,
              Math.max(1, Math.round(ww) - 1), Math.max(1, Math.round(hh) - 1));
   }
+  /* Yang menempel diukur ulang: letaknya di layar memang tidak ikut bergulir. */
+  for (var k = 0; k < outlineLive.length; k++){
+    var el = outlineLive[k];
+    if (!fd.contains(el)) continue;
+    var lr = el.getBoundingClientRect();
+    if (lr.width < 2 || lr.height < 2) continue;
+    var lx = lr.left * scale, ly = lr.top * scale;
+    var lw = lr.width * scale, lh = lr.height * scale;
+    if (lx > w || ly > h || lx + lw < 0 || ly + lh < 0) continue;
+    ctx.rect(Math.round(lx) + 0.5, Math.round(ly) + 0.5,
+             Math.max(1, Math.round(lw) - 1), Math.max(1, Math.round(lh) - 1));
+  }
   ctx.stroke();   // semua kotak digambar dalam satu jalur
 }
 
@@ -1324,13 +1433,15 @@ function layout(){
      dan tanpa bayangan — seperti GrapesJS. Begitu lebarnya lebih kecil dari
      kanvas (tablet, HP, atau lebar isian sendiri), barulah diberi jarak dan
      bayangan supaya jelas di mana batas halamannya. */
-  var full = E.canvas.clientWidth <= devW + 24;
+  var full = !devH && E.canvas.clientWidth <= devW + 24;
   E.canvas.classList.toggle('full', full);
   var pad = full ? 0 : 40;
   var avail = E.canvas.clientWidth - pad;
   var availH = E.canvas.clientHeight - pad;
   scale = zoomMode === 'fit' ? Math.min(1, avail / devW) : zoomMode;
-  var h = Math.max(560, Math.round(availH / scale));
+  var h = devH ? devH : Math.max(560, Math.round(availH / scale));
+  E.devHeight.classList.toggle('auto', !devH);
+  if (!devH) E.devHeight.value = h;
   E.device.style.width = devW + 'px';
   E.device.style.height = h + 'px';
   E.device.style.transform = 'scale(' + scale + ')';
@@ -1684,6 +1795,57 @@ E.pAlt.addEventListener('focus', snap);
 E.pAlt.addEventListener('input', function(){
   if (sel && sel.tagName==='IMG'){ markEdited(sel); sel.setAttribute('alt', E.pAlt.value); }
 });
+/* Gambar ditanam sebagai base64 supaya hasilnya tetap satu berkas yang bisa
+   dibuka di mana saja tanpa folder pendamping. Ongkosnya: base64 membuat data
+   membengkak sekitar sepertiga, dan foto dari kamera HP bisa 3-4 MB. Karena itu
+   gambar diperkecil dulu ke sisi terpanjang 1600 px lalu disandikan ulang
+   sebagai WebP. Untuk foto biasa hasilnya jauh lebih kecil daripada aslinya,
+   dan di layar tidak ada bedanya.
+
+   Yang tidak disentuh: SVG (gambar vektor, kalau dirasterkan malah rusak dan
+   membesar), GIF (animasinya akan hilang, tinggal satu bingkai), berkas yang
+   memang sudah kecil, dan hasil peringkasan yang ternyata tidak lebih kecil
+   dari aslinya. PNG hanya diringkas kalau WebP tersedia, karena kalau jatuh ke
+   JPEG bagian tembus pandangnya akan jadi hitam. */
+var IMG_MAKS = 1600, IMG_MUTU = 0.82, IMG_MIN = 40000;
+function siapkanGambar(f, cb){
+  var rd = new FileReader();
+  rd.onerror = function(){ toast('Gambar tidak terbaca.', true); };
+  rd.onload = function(){
+    var asli = rd.result;
+    var apaAdanya = function(){ cb(asli, asli.length, asli.length); };
+    if (f.type === 'image/svg+xml' || f.type === 'image/gif' || asli.length < IMG_MIN) return apaAdanya();
+    var im = new Image();
+    im.onerror = apaAdanya;
+    im.onload = function(){
+      var w = im.naturalWidth, h = im.naturalHeight;
+      if (!w || !h) return apaAdanya();
+      var r = Math.min(1, IMG_MAKS / Math.max(w, h));
+      var cv = document.createElement('canvas');
+      cv.width = Math.max(1, Math.round(w * r));
+      cv.height = Math.max(1, Math.round(h * r));
+      var cx = cv.getContext('2d');
+      if (!cx) return apaAdanya();
+      cx.drawImage(im, 0, 0, cv.width, cv.height);
+      var out = null;
+      try { out = cv.toDataURL('image/webp', IMG_MUTU); } catch(err){ out = null; }
+      var adaWebp = out && out.indexOf('data:image/webp') === 0;
+      if (!adaWebp){
+        if (f.type !== 'image/jpeg') return apaAdanya();   // jaga tembus pandang
+        try { out = cv.toDataURL('image/jpeg', IMG_MUTU); } catch(err){ return apaAdanya(); }
+      }
+      if (!out || out.length >= asli.length) return apaAdanya();
+      cb(out, asli.length, out.length);
+    };
+    im.src = asli;
+  };
+  rd.readAsDataURL(f);
+}
+function kabarGambar(sebelum, sesudah){
+  if (sesudah >= sebelum) return 'Gambar dipasang.';
+  var kb = function(n){ return Math.round(n / 1024) + ' KB'; };
+  return 'Gambar dipasang, diringkas ' + kb(sebelum) + ' → ' + kb(sesudah) + '.';
+}
 var imgTarget = null, imgMode = 'replace';
 E.imgPick.addEventListener('click', function(){
   if (!sel) return;
@@ -1693,9 +1855,11 @@ E.imgPick.addEventListener('click', function(){
 E.fileInput.addEventListener('change', function(){
   var f = E.fileInput.files && E.fileInput.files[0];
   if (!f || !imgTarget) return;
-  var t = imgTarget, m = imgMode, rd = new FileReader();
-  rd.onload = function(){ snap(); select(putImage(t, rd.result, m)); buildLayers(); toast('Gambar dipasang.'); };
-  rd.readAsDataURL(f);
+  var t = imgTarget, m = imgMode;
+  siapkanGambar(f, function(url, sebelum, sesudah){
+    snap(); select(putImage(t, url, m)); buildLayers();
+    toast(kabarGambar(sebelum, sesudah));
+  });
 });
 function putImage(target, url, mode){
   if (mode==='replace' && target.tagName==='IMG'){
@@ -2025,13 +2189,11 @@ function onFileDrop(e){
   var f = fs[0], t = dropEl;
   setDrop(null);
   if (!f || !t) return;
-  var rd = new FileReader();
-  rd.onload = function(){
+  siapkanGambar(f, function(url, sebelum, sesudah){
     snap();
-    select(putImage(t, rd.result, t.tagName==='IMG' ? 'replace' : 'add'));
-    buildLayers(); toast('Gambar dimasukkan.');
-  };
-  rd.readAsDataURL(f);
+    select(putImage(t, url, t.tagName==='IMG' ? 'replace' : 'add'));
+    buildLayers(); toast(kabarGambar(sebelum, sesudah));
+  });
 }
 window.addEventListener('dragover', function(e){ if (isFile(e)) e.preventDefault(); });
 window.addEventListener('drop', function(e){ if (isFile(e)) e.preventDefault(); });
