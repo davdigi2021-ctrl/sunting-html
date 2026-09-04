@@ -612,6 +612,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
     <g id="i-zout"><circle cx="10.8" cy="10.8" r="7"/><path d="M20.5 20.5 15.8 15.8M7.8 10.8h6"/></g>
     <g id="i-wand"><path d="m14.5 3.5 1.3 2.9 2.9 1.3-2.9 1.3-1.3 2.9-1.3-2.9L10.3 7.7l2.9-1.3Z"/><path d="M4 20 12.2 11.8M5 4v3.4M3.3 5.7h3.4"/></g>
     <g id="i-check"><path d="m5 12.5 4.5 4.5L19 7.5"/></g>
+    <g id="i-sliders"><path d="M4 7.2h8.4M17.6 7.2H20M4 12h3.4M12.6 12H20M4 16.8h8.4M17.6 16.8H20"/><circle cx="15" cy="7.2" r="2.4"/><circle cx="10" cy="12" r="2.4"/><circle cx="15" cy="16.8" r="2.4"/></g>
     <g id="i-target"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.6"/><path d="M12 1.8v2.6M12 19.6v2.6M1.8 12h2.6M19.6 12h2.6"/></g>
     <g id="i-refresh"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6"/><path d="M20.5 3v5.2h-5.2"/></g>
     <g id="i-move"><path d="M12 3.2v17.6M3.2 12h17.6"/><path d="m9.2 6 2.8-2.8L14.8 6M9.2 18l2.8 2.8L14.8 18M6 9.2 3.2 12 6 14.8M18 9.2l2.8 2.8L18 14.8"/></g>
@@ -705,7 +706,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
   <!-- ============ Panel samping ============ -->
   <aside class="pane pane-r">
     <nav class="pane-tabs" role="tablist">
-      <div class="tab-wrap"><button class="tab on" data-tab="props" type="button" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-target"/></svg> Properti</button></div>
+      <div class="tab-wrap"><button class="tab on" data-tab="props" type="button" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-sliders"/></svg> Properti</button></div>
       <div class="tab-wrap"><button class="tab" data-tab="blocks" type="button" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-blocks"/></svg> Tambah</button></div>
       <div class="tab-wrap"><button class="tab" data-tab="layers" type="button" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><use href="#i-layers"/></svg> Lapisan</button></div>
       <div class="tab-wrap">
@@ -715,7 +716,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
     </nav>
     <div class="tab-panel" id="tabProps">
           <div class="empty" id="propsEmpty">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-target"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-sliders"/></svg>
             <span>Belum ada yang dipilih.<br>Klik elemen mana pun di kanvas untuk mengatur teks, link, ukuran, font, dan warnanya.</span>
           </div>
 
@@ -1167,7 +1168,10 @@ function applyOutline(){
     if (!st){
       st = fd.createElement('style');
       st.id = '__sunting_outline__';
-      st.textContent = 'body *:not(script):not(style){outline:1px dashed rgba(61,99,221,.5) !important;outline-offset:-1px !important;}';
+      st.textContent =
+        'body *:not(script):not(style):not(br){outline:1px dashed rgba(61,99,221,.6) !important;outline-offset:-1px !important;}' +
+        '@supports (outline-color:color-mix(in srgb,currentColor 50%,transparent)){' +
+        'body *:not(script):not(style):not(br){outline-color:color-mix(in srgb,currentColor 45%,transparent) !important;}}';
       fd.head.appendChild(st);
     }
   } else if (st){ st.remove(); }
