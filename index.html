@@ -445,6 +445,9 @@ button,input,select,textarea{font:inherit;color:inherit;}
 .shield.rz{cursor:nwse-resize;}
 
 /* ---------- Panel properti ---------- */
+/* Kartunya ada di dalam #propsBody, jadi gap milik .tab-panel tidak sampai ke
+   sini dan semua kartu tadinya menempel tanpa jarak sama sekali. */
+#propsBody{display:flex;flex-direction:column;gap:11px;}
 .card{
   border:1px solid var(--line);border-radius:var(--r);background:var(--surface-2);
   padding:10px;display:flex;flex-direction:column;gap:8px;
@@ -472,13 +475,20 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
 .check input{width:15px;height:15px;accent-color:var(--accent);cursor:pointer;}
 
 .crumbs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;}
+/* Nama bagian ditulis biasa supaya mudah dibaca; penanda #id atau .kelas
+   menyusul dengan huruf mesin ketik dan warna redup, jadi jelas mana nama dan
+   mana penanda teknis. */
 .crumb{
   border:1px solid var(--line);background:var(--surface);color:var(--ink);
-  border-radius:var(--r-xs);padding:3px 7px;font-family:var(--mono);font-size:11px;
+  border-radius:var(--r-xs);padding:3px 8px;font-size:12px;font-weight:500;
+  display:inline-flex;align-items:baseline;gap:4px;
   cursor:pointer;transition:border-color var(--t),background var(--t),color var(--t);
 }
+.crumb-id{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);}
 .crumb:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);}
+.crumb:hover .crumb-id{color:var(--accent);}
 .crumb.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+.crumb.on .crumb-id{color:rgba(255,255,255,.72);}
 .crumb-sep{color:var(--ink-3);font-size:11px;}
 
 .swatch{display:flex;align-items:center;gap:5px;}
@@ -1104,15 +1114,26 @@ function toast(msg, bad){
 function hint(t){ E.hintText.textContent = t; }
 function skip(el){
   if (!el || el.nodeType !== 1) return true;
+  /* Isi dalam <svg> — path, circle, g — bukan komponen yang bisa disunting, tapi
+     tetap punya kotak ukuran. Kalau ikut dihitung, tiap ikon kecil menumbuhkan
+     kotak-kotak nyasar di rangka komponen dan bisa terpilih tanpa guna. Yang
+     diperlakukan sebagai satu komponen adalah tag <svg> paling luar; untuk itu
+     `ownerSVGElement` bernilai null, jadi ia tetap lolos. */
+  if (el.ownerSVGElement) return true;
   var t = el.tagName;
   return t==='HTML'||t==='BODY'||t==='HEAD'||t==='SCRIPT'||t==='STYLE'||t==='LINK'||t==='META'||t==='TITLE';
 }
 function editing(el){ return el && el.getAttribute && el.getAttribute('contenteditable')==='true'; }
+/* Nama yang bisa dibaca lebih dulu, penanda teknis menyusul: "Wadah .container",
+   bukan "div.container". Penandanya tetap ditampilkan karena itu yang membedakan
+   dua elemen sejenis dan yang dicari saat membuka kodenya. */
 function label(el){
-  var s = el.tagName.toLowerCase();
-  if (el.id) return s + '#' + el.id;
-  if (el.classList && el.classList.length) return s + '.' + el.classList[0];
-  return s;
+  return niceName(el) + tanda(el);
+}
+function tanda(el){
+  if (el.id) return ' #' + el.id;
+  if (el.classList && el.classList.length) return ' .' + el.classList[0];
+  return '';
 }
 function markEdited(el){ if (el) el.__edited = true; }
 
@@ -1691,7 +1712,9 @@ function fillProps(){
     if (i){ var s = document.createElement('span'); s.className='crumb-sep'; s.textContent='›'; E.crumbs.appendChild(s); }
     var b = document.createElement('button');
     b.type='button'; b.className = 'crumb' + (el===sel ? ' on':'');
-    b.textContent = label(el);
+    b.appendChild(document.createTextNode(niceName(el)));
+    var tg = tanda(el);
+    if (tg){ var sp = document.createElement('span'); sp.className='crumb-id'; sp.textContent = tg; b.appendChild(sp); }
     b.addEventListener('mouseenter', function(){ setPeek(el); });
     b.addEventListener('mouseleave', function(){ setPeek(null); });
     b.addEventListener('click', function(){ setPeek(null); select(el); setPeek(el, true); setTimeout(function(){ setPeek(null); }, 900); });
@@ -2247,7 +2270,7 @@ function buildLayers(){
   layerMap = [];
   var count = { n:0 };
 
-  // Baris akar "Body", seperti di GrapesJS. Tidak bisa dipilih atau disembunyikan,
+  // Baris akar "Halaman", seperti Body di GrapesJS. Tidak bisa dipilih atau disembunyikan,
   // hanya untuk melipat seluruh isi halaman.
   var kids = 0;
   for (var i=0;i<fd.body.children.length;i++) if (!skip(fd.body.children[i])) kids++;
@@ -2257,7 +2280,7 @@ function buildLayers(){
   rootTw.className = 'layer-twist';
   rootTw.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>';
   var rootNm = document.createElement('span');
-  rootNm.className = 'layer-name'; rootNm.textContent = 'Body';
+  rootNm.className = 'layer-name'; rootNm.textContent = 'Halaman';
   rootRow.appendChild(rootTw); rootRow.appendChild(rootNm);
   if (kids){
     var rootCnt = document.createElement('span');
@@ -2376,8 +2399,8 @@ function walk(parent, host, depth, count){
   }
 }
 var TYPE_NAME = {
-  BODY:'Body', HEADER:'Header', NAV:'Nav', MAIN:'Main', SECTION:'Section',
-  ARTICLE:'Artikel', ASIDE:'Aside', FOOTER:'Footer', DIV:'Div', SPAN:'Teks',
+  BODY:'Halaman', HEADER:'Header', NAV:'Menu', MAIN:'Isi utama', SECTION:'Bagian',
+  ARTICLE:'Kartu', ASIDE:'Sisi', FOOTER:'Kaki', DIV:'Wadah', SPAN:'Teks',
   P:'Teks', STRONG:'Teks', EM:'Teks', SMALL:'Teks', BLOCKQUOTE:'Kutipan',
   A:'Link', BUTTON:'Tombol', IMG:'Gambar', PICTURE:'Gambar', FIGURE:'Figur',
   SVG:'Ikon', H1:'Judul', H2:'Judul', H3:'Judul', H4:'Judul', H5:'Judul', H6:'Judul',
