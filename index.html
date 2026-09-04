@@ -13,15 +13,15 @@
    ============================================================ */
 :root{
   /* Netral sedikit dingin, bukan abu datar. Aksen biru pekat yang dipakai hemat. */
-  --bg:#f7f7f9;
+  --bg:#eef0f4;
   --surface:#ffffff;
-  --surface-2:#fbfbfc;
-  --surface-3:#eeeef1;
-  --line:rgba(16,17,20,.08);
-  --line-2:rgba(16,17,20,.16);
+  --surface-2:#f5f6f9;
+  --surface-3:#e7eaf0;
+  --line:rgba(16,17,20,.12);
+  --line-2:rgba(16,17,20,.22);
   --ink:#101114;
-  --ink-2:#5f6470;
-  --ink-3:#9096a1;
+  --ink-2:#565c6b;
+  --ink-3:#848b9a;
   --accent:#3d63dd;
   --accent-hov:#3358d4;
   --accent-ink:#ffffff;
@@ -39,9 +39,9 @@
   --float-line:rgba(255,255,255,.12);
 
   --r-xs:7px; --r-sm:10px; --r:13px; --r-lg:20px; --r-pill:999px;
-  --sh-1:0 1px 2px rgba(16,17,20,.05);
-  --sh-2:0 2px 6px rgba(16,17,20,.05),0 12px 28px rgba(16,17,20,.07);
-  --sh-3:0 8px 20px rgba(16,17,20,.12),0 24px 60px rgba(16,17,20,.18);
+  --sh-1:0 1px 2px rgba(16,17,20,.07);
+  --sh-2:0 2px 6px rgba(16,17,20,.07),0 12px 28px rgba(16,17,20,.09);
+  --sh-3:0 8px 20px rgba(16,17,20,.14),0 24px 60px rgba(16,17,20,.2);
 
   --font:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,"Helvetica Neue",Arial,sans-serif;
   --mono:ui-monospace,SFMono-Regular,"SF Mono","Cascadia Code","Segoe UI Mono",Consolas,monospace;
@@ -1225,8 +1225,13 @@ function applyOutline(){
   // 1px dan ikut menghilang. Karena itu dibulatkan ke atas.
   var w = Math.min(4, Math.max(1, Math.ceil(1 / Math.max(scale, 0.25))));
   var q = 'body *:not(script):not(style):not(br)';
+  // Garis outline selalu mengikuti border-radius elemen, sehingga di tombol pil dan
+  // gambar melengkung ia ikut membulat. Selama mode rangka menyala radiusnya
+  // dinolkan agar semua rangka tampil sebagai kotak; begitu dimatikan, tampilan
+  // halaman kembali seperti semula.
   st.textContent =
-    q + '{outline:' + w + 'px dashed rgba(61,99,221,.9) !important;outline-offset:-' + w + 'px !important;}' +
+    q + '{outline:' + w + 'px dashed rgba(61,99,221,.9) !important;outline-offset:-' + w + 'px !important;' +
+    'border-radius:0 !important;}' +
     '@supports (outline-color:color-mix(in srgb,currentColor 50%,transparent)){' +
     q + '{outline-color:color-mix(in srgb,currentColor 78%,transparent) !important;}}';
   E.outlineBtn.classList.toggle('on', true);
