@@ -1164,18 +1164,28 @@ E.outlineBtn.addEventListener('click', function(){
 function applyOutline(){
   if (!fd || !fd.head) return;
   var st = fd.getElementById('__sunting_outline__');
-  if (outlineOn){
-    if (!st){
-      st = fd.createElement('style');
-      st.id = '__sunting_outline__';
-      st.textContent =
-        'body *:not(script):not(style):not(br){outline:1px dashed rgba(61,99,221,.6) !important;outline-offset:-1px !important;}' +
-        '@supports (outline-color:color-mix(in srgb,currentColor 50%,transparent)){' +
-        'body *:not(script):not(style):not(br){outline-color:color-mix(in srgb,currentColor 45%,transparent) !important;}}';
-      fd.head.appendChild(st);
-    }
-  } else if (st){ st.remove(); }
-  E.outlineBtn.classList.toggle('on', outlineOn);
+  if (!outlineOn){
+    if (st) st.remove();
+    E.outlineBtn.classList.toggle('on', false);
+    return;
+  }
+  if (!st){
+    st = fd.createElement('style');
+    st.id = '__sunting_outline__';
+    fd.head.appendChild(st);
+  }
+  // Kanvas diperkecil dengan transform: scale(), jadi garis 1px ikut menyusut sampai
+  // nyaris hilang saat zoom di bawah 100%. Tebalnya dikompensasi agar tetap terlihat
+  // setebal satu piksel di layar, berapa pun zoomnya.
+  // Chrome membulatkan outline-width ke piksel bulat, jadi 1,28px jatuh kembali ke
+  // 1px dan ikut menghilang. Karena itu dibulatkan ke atas.
+  var w = Math.min(4, Math.max(1, Math.ceil(1 / Math.max(scale, 0.25))));
+  var q = 'body *:not(script):not(style):not(br)';
+  st.textContent =
+    q + '{outline:' + w + 'px dashed rgba(61,99,221,.9) !important;outline-offset:-' + w + 'px !important;}' +
+    '@supports (outline-color:color-mix(in srgb,currentColor 50%,transparent)){' +
+    q + '{outline-color:color-mix(in srgb,currentColor 78%,transparent) !important;}}';
+  E.outlineBtn.classList.toggle('on', true);
 }
 
 function layout(){
@@ -1189,6 +1199,7 @@ function layout(){
   E.sizer.style.width = Math.round(devW * scale) + 'px';
   E.sizer.style.height = Math.round(h * scale) + 'px';
   E.zoomLabel.textContent = Math.round(scale * 100) + '%';
+  if (outlineOn) applyOutline();
   syncOvl(); redraw();
 }
 window.addEventListener('resize', function(){ if (ready) layout(); });
