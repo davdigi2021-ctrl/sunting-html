@@ -1398,6 +1398,12 @@ function outlineBuild(){
     if (skip(el)) continue;
     var r = el.getBoundingClientRect();
     if (r.width < 2 || r.height < 2) continue;
+    /* Yang tidak kelihatan tidak diberi rangka. Halaman hasil AI sering memakai
+       pola "muncul saat digulir" — `opacity:0` sampai kena giliran — dan kotak
+       yang menggantung di sekitar isi yang belum terlihat cuma membingungkan.
+       checkVisibility ikut memperhitungkan induk, jadi satu bagian yang masih
+       tersembunyi tidak perlu ditelusuri anak-anaknya satu per satu. */
+    if (el.checkVisibility && !el.checkVisibility({ opacityProperty:true, visibilityProperty:true })) continue;
     var pos = win.getComputedStyle(el).position;
     var ikut = pos === 'fixed' || pos === 'sticky';
     if (!ikut){
@@ -1528,16 +1534,36 @@ function redraw(){
    Pengawas ini jalan di jendela induk: satu perbandingan angka per frame, dan
    baru menggambar ulang kalau posisi gulir benar-benar berubah DAN memang ada
    yang perlu diselaraskan. Kalau tidak ada, ongkosnya nyaris nol. */
-var lastSX = -1, lastSY = -1;
+var lastSX = -1, lastSY = -1, lastSize = '', lastBuild = 0;
 function watchScroll(){
   requestAnimationFrame(watchScroll);
   if (!fd || !(outlineOn || sel || hoverEl || dropEl)) return;
-  var win = fd.defaultView;
-  if (!win) return;
+  var win = fd.defaultView, de = fd.documentElement;
+  if (!win || !de) return;
+
+  /* Letak kotak rangka disimpan supaya menggulir tidak perlu mengukur ulang.
+     Tapi halamannya sendiri bisa bergeser tanpa ada yang menyentuhnya: gambar
+     `loading="lazy"` selesai dimuat, font web akhirnya datang, scrollbar muncul
+     lalu hilang sehingga isi yang di-tengah bergeser beberapa piksel, atau
+     bagian ber-`data-reveal` bergerak naik dari `translateY(28px)` ke tempatnya.
+     Kalau ukuran dokumen berubah, yang tersimpan sudah basi dan harus diukur
+     ulang — kalau tidak, garisnya meleset dari elemennya. Perbandingannya cuma
+     empat angka per frame, jadi murah. */
+  var size = de.scrollWidth + 'x' + de.scrollHeight + 'x' + de.clientWidth + 'x' + de.clientHeight;
+  if (outlineOn && size !== lastSize){ lastSize = size; outlineBuild(); lastBuild = Date.now(); return; }
+
   var sx = win.scrollX || 0, sy = win.scrollY || 0;
-  if (sx === lastSX && sy === lastSY) return;
-  lastSX = sx; lastSY = sy;
-  redraw();
+  if (sx !== lastSX || sy !== lastSY){
+    lastSX = sx; lastSY = sy;
+    redraw();
+    /* Menggulir memicu animasi "muncul saat digulir", dan itu memindahkan
+       elemen tanpa mengubah ukuran dokumen. Diukur ulang sebentar setelahnya. */
+    if (outlineOn) outlineRebuild();
+    return;
+  }
+
+  /* Jaring pengaman untuk perpindahan yang tidak terdeteksi cara lain. */
+  if (outlineOn && Date.now() - lastBuild > 1500){ lastBuild = Date.now(); outlineBuild(); }
 }
 requestAnimationFrame(watchScroll);
 
@@ -1553,6 +1579,13 @@ function bind(){
   fd.addEventListener('dragstart', function(e){ e.preventDefault(); }, true);
   fd.addEventListener('scroll', redraw, true);
   fd.defaultView.addEventListener('scroll', redraw, true);
+  /* Tiga kejadian yang memindahkan isi halaman setelah rangka diukur: animasi
+     "muncul saat digulir" selesai, dan gambar yang baru selesai dimuat lalu
+     mendorong isi di bawahnya. `load` tidak menggelembung, jadi disadap di
+     tahap tangkap. */
+  fd.addEventListener('transitionend', outlineRebuild, true);
+  fd.addEventListener('animationend', outlineRebuild, true);
+  fd.addEventListener('load', outlineRebuild, true);
   fd.addEventListener('keydown', onKey);
   fd.addEventListener('blur', function(e){ if (editing(e.target)) stopEdit(e.target); }, true);
   fd.addEventListener('dragenter', onFileOver);
