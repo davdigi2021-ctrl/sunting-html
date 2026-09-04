@@ -38,6 +38,10 @@ Editor ini **tidak melakukan itu**. Halaman dirender apa adanya di dalam iframe,
 **Memeriksa**
 - Pemeriksa masalah otomatis dengan penjelasan bahasa sehari-hari dan tombol perbaiki. Yang dicek: link yang tidak akan sampai tujuan, nomor WhatsApp salah format, link tab baru yang belum aman, gambar tanpa teks pengganti, gambar dengan alamat lokal, alamat http yang rawan diblokir, link menu yang menuju bagian tidak ada, id kembar, kurung CSS yang belum ditutup, aturan CSS salah tulis, serta bahasa/judul/viewport halaman
 
+## Coba dulu tanpa menyiapkan apa-apa
+
+Tekan **"Pakai contoh halaman"**. Ketiga kotak langsung terisi — HTML, CSS, dan JS terpisah, seperti bentuk yang biasa keluar dari AI. Contohnya juga memuat header yang menempel, tombol WhatsApp melayang, gambar, dan beberapa kekeliruan khas (alamat WhatsApp tanpa `https://`, nomor diawali 0, link tab baru tanpa `rel`, gambar tanpa `alt`) supaya tab **Periksa** ada isinya untuk dicoba.
+
 ## Kalau file kamu terpisah-pisah
 
 Tempel HTML di kotak utama, lalu buka **"Punya file CSS atau JS terpisah?"** dan tempel isi masing-masing. Keduanya disatukan ke dalam hasil unduhan sebagai satu berkas.
