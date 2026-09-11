@@ -26,6 +26,7 @@ Editor ini **tidak melakukan itu**. Halaman dirender apa adanya di dalam iframe,
 - **Ganti/tambah gambar** lewat pemilih file atau seret langsung ke kanvas. Foto besar otomatis diperkecil ke 1600px dan disandikan ulang sebagai WebP sebelum ditanam, jadi berkasnya tidak membengkak — foto 1,5 MB biasanya turun ke sekitar 150 KB. SVG dan GIF tidak disentuh supaya vektor dan animasinya tetap utuh
 - Geser posisi dengan menyeret, gandakan, dan hapus elemen
 - **Tambah elemen**: section, judul, paragraf, tombol, gambar, 2 kolom, garis, jarak
+- **Ganti satu link di semua tempat sekaligus**. Masukkan link lama dan link barunya, lihat dulu berapa tempat yang akan berubah, lalu ganti semuanya dalam sekali klik. Dicari di semua atribut — termasuk `onclick`/`onsubmit` dan `action` pada form, bukan cuma `href` — dan bisa sekalian mengganti tulisan yang terlihat di halaman. Kalau elemen yang sedang dipilih memakai link yang berulang, pintasannya muncul langsung di panel Properti
 - Undo/redo (Ctrl+Z / Ctrl+Shift+Z)
 
 **Melihat**

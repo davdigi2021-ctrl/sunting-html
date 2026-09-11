@@ -487,6 +487,18 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
 .check{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;color:var(--ink);}
 .check input{width:15px;height:15px;accent-color:var(--accent);cursor:pointer;}
 
+.swap-list{
+  display:flex;flex-direction:column;gap:4px;max-height:210px;overflow-y:auto;
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-2);
+}
+.swap-row{
+  display:flex;gap:7px;align-items:baseline;padding:5px 8px;
+  background:var(--surface-2);border-radius:var(--r-xs);
+}
+.swap-where{color:var(--ink-3);flex:0 0 auto;}
+.swap-val{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.swap-list:empty{display:none;}
+
 .crumbs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;}
 /* Nama bagian ditulis biasa supaya mudah dibaca; penanda #id atau .kelas
    menyusul dengan huruf mesin ketik dan warna redup, jadi jelas mana nama dan
@@ -651,6 +663,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
     <g id="i-pen"><path d="M13.8 6.2 17.8 10.2"/><path d="M4 20.2 4.9 16.3 16.1 5.1a2 2 0 0 1 2.8 2.8L7.7 19.3 4 20.2Z"/></g>
     <g id="i-undo"><path d="M9.5 14.5 4.5 9.5 9.5 4.5"/><path d="M4.5 9.5h9.3a5.7 5.7 0 0 1 0 11.4H9.5"/></g>
     <g id="i-redo"><path d="M14.5 14.5 19.5 9.5 14.5 4.5"/><path d="M19.5 9.5h-9.3a5.7 5.7 0 0 0 0 11.4h4.3"/></g>
+    <g id="i-chain"><path d="M9.6 14.4a4.2 4.2 0 0 0 6.1.3l2.6-2.6a4.2 4.2 0 0 0-6-6l-1.5 1.5"/><path d="M14.4 9.6a4.2 4.2 0 0 0-6.1-.3l-2.6 2.6a4.2 4.2 0 0 0 6 6l1.5-1.5"/></g>
     <g id="i-code"><path d="M8.6 6.6 3.2 12l5.4 5.4M15.4 6.6 20.8 12l-5.4 5.4M13.4 4.6l-2.8 14.8"/></g>
     <g id="i-down"><path d="M12 3.5v11.8M7.5 11l4.5 4.5 4.5-4.5M4.5 20.5h15"/></g>
     <g id="i-blocks"><rect x="3.5" y="3.5" width="7.2" height="7.2" rx="2"/><rect x="13.3" y="3.5" width="7.2" height="7.2" rx="2"/><rect x="3.5" y="13.3" width="7.2" height="7.2" rx="2"/><rect x="13.3" y="13.3" width="7.2" height="7.2" rx="2"/></g>
@@ -734,6 +747,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
     <button class="ibtn" id="themeBtn" type="button" title="Ganti tema terang / gelap" aria-label="Ganti tema terang atau gelap"><svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sun"/></svg><svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-moon"/></svg></button>
     <button class="ibtn" id="undoBtn" type="button" title="Batalkan (Ctrl+Z)" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-undo"/></svg></button>
     <button class="ibtn" id="redoBtn" type="button" title="Ulangi (Ctrl+Shift+Z)" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-redo"/></svg></button>
+    <button class="btn btn-quiet btn-sm" id="swapBtn" type="button" disabled title="Ganti satu link di semua tempat sekaligus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-chain"/></svg>Ganti Link</button>
     <button class="btn btn-quiet btn-sm" id="codeBtn" type="button" disabled title="Lihat kode HTML"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-code"/></svg>Kode</button>
     <button class="btn btn-plain btn-sm" id="copyBtn" type="button" disabled>Salin</button>
     <button class="btn btn-primary btn-sm" id="dlBtn" type="button" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-down"/></svg>Unduh</button>
@@ -819,6 +833,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
               <input id="pHref" class="inp mono" type="text" placeholder="https://wa.me/62812...">
               <div class="err" id="linkErr" hidden></div>
               <button class="btn btn-plain btn-sm btn-full" id="linkFix" type="button" hidden>Perbaiki otomatis</button>
+              <button class="btn btn-plain btn-sm btn-full" id="linkSwapAll" type="button" hidden></button>
               <label class="check"><input type="checkbox" id="pBlank"> Buka di tab baru</label>
             </div>
 
@@ -993,6 +1008,36 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
 <div class="shield" id="shield" hidden></div>
 
 <!-- Modal: lihat kode -->
+<!-- Ganti satu alamat di semua tempat sekaligus. Di halaman jualan, satu link
+     WhatsApp biasanya dipakai di banyak tombol; menggantinya satu per satu
+     melelahkan dan gampang ada yang kelewat. -->
+<div class="modal" id="swapModal" hidden>
+  <div class="sheet">
+    <div class="sheet-h">
+      <h2 class="sheet-t">Ganti link di semua tempat</h2>
+      <button class="ibtn" data-close type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="sheet-b">
+      <div class="field">
+        <label class="lbl" for="swapFrom">Link lama — yang mau diganti</label>
+        <input id="swapFrom" class="inp mono" type="text" placeholder="https://wa.me/628123456789" spellcheck="false">
+      </div>
+      <div class="field">
+        <label class="lbl" for="swapTo">Link baru — penggantinya</label>
+        <input id="swapTo" class="inp mono" type="text" placeholder="https://wa.me/628999888777" spellcheck="false">
+      </div>
+      <label class="check"><input type="checkbox" id="swapText"> Ganti juga kalau tertulis sebagai teks di halaman</label>
+      <p class="note" id="swapCount">Ketik link lamanya untuk melihat berapa tempat yang akan berubah.</p>
+      <p class="note">Dicari di semua atribut — link, tombol, form, dan meta. Isi <span class="mono">&lt;script&gt;</span> tidak ikut diganti.</p>
+      <div class="swap-list" id="swapList"></div>
+    </div>
+    <div class="sheet-f">
+      <button class="btn btn-plain" data-close type="button">Batal</button>
+      <button class="btn btn-primary" id="swapApply" type="button" disabled>Ganti semua</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="codeModal" hidden>
   <div class="sheet">
     <div class="sheet-h">
@@ -1062,7 +1107,8 @@ var E = {};
  'pColorBtn','pColorChip','pColorVal','pBgBtn','pBgChip','pBgVal',
  'colorPop','cpSv','cpSvThumb','cpHue','cpHueThumb','cpEye','cpHex','cpSwatches',
  'outlineBtn','outlineCv','qbMove','iconUrl','iconUrlApply','themeBtn','previewBtn','exitPreview','hintBtn',
- 'codeModal','codeOut','codeTitle','codeCopy','iconModal','iconGrid','iconSvg','iconApply'
+ 'codeModal','codeOut','codeTitle','codeCopy','iconModal','iconGrid','iconSvg','iconApply',
+ 'swapBtn','swapModal','swapFrom','swapTo','swapText','swapCount','swapList','swapApply','linkSwapAll'
 ].forEach(function(id){ E[id] = $(id); });
 
 /* ---------------- keadaan ---------------- */
@@ -1225,7 +1271,7 @@ E.backBtn.addEventListener('click', function(){
   hint('');
   E.devSeg.hidden = true; E.widthBox.hidden = true; E.zoomGroup.hidden = true;
   E.startView.hidden = false;
-  E.dlBtn.disabled = E.copyBtn.disabled = E.codeBtn.disabled = true;
+  E.dlBtn.disabled = E.copyBtn.disabled = E.codeBtn.disabled = E.swapBtn.disabled = true;
   E.layersTree.innerHTML = ''; E.issueList.innerHTML = '';
   E.scanPill.textContent = 'Belum diperiksa'; E.scanPill.className = 'pill';
   E.scanBadge.hidden = true; E.fixAllBtn.hidden = true;
@@ -1310,7 +1356,7 @@ E.frame.addEventListener('load', function(){
   stamp();
   bind();
   ready = true;
-  E.dlBtn.disabled = E.copyBtn.disabled = E.codeBtn.disabled = false;
+  E.dlBtn.disabled = E.copyBtn.disabled = E.codeBtn.disabled = E.swapBtn.disabled = false;
   E.ovl.hidden = false;
   layout(); outlineBuild(); buildLayers(); deselect();
   runScan(true);
@@ -1855,7 +1901,14 @@ function fillProps(){
     E.pHref.value = link.getAttribute('href') || '';
     E.pBlank.checked = link.getAttribute('target')==='_blank';
     checkLink();
-  } else { E.linkErr.hidden = true; E.linkFix.hidden = true; }
+    /* Kalau alamat yang sama dipakai di beberapa tombol, tawarkan langsung
+       menggantinya sekaligus — itu yang paling sering dibutuhkan. */
+    var alamat = link.getAttribute('href') || '';
+    var sama = alamat ? swapCari(alamat, false).atribut.length : 0;
+    E.linkSwapAll.hidden = sama < 2;
+    if (sama >= 2) E.linkSwapAll.textContent = 'Link ini dipakai di ' + sama + ' tempat — ganti semuanya';
+    E.linkSwapAll.dataset.href = alamat;
+  } else { E.linkErr.hidden = true; E.linkFix.hidden = true; E.linkSwapAll.hidden = true; }
 
   var img = sel.tagName==='IMG';
   E.cImg.hidden = !img;
@@ -2942,6 +2995,106 @@ E.fixAllBtn.addEventListener('click', function(){
   buildLayers(); if (sel) fillProps();
 });
 
+/* ---------------- ganti link di semua tempat ----------------
+   Dicocokkan sebagai potongan teks, bukan harus sama persis, supaya satu nomor
+   WhatsApp yang dipakai di beberapa bentuk alamat tetap kena semuanya. Yang
+   ditelusuri: atribut `href` dan `src`, dan — kalau diminta — tulisan yang
+   terlihat di halaman, karena nomor telepon biasanya muncul di keduanya. */
+function swapCari(dari, ikutTeks){
+  var hasil = { atribut:[], teks:[] };
+  if (!fd || !fd.body || !dari) return hasil;
+  var i, el, nm, v;
+  /* Semua atribut ditelusuri, bukan cuma href dan src. Halaman hasil AI sering
+     menyimpan alamat di tempat lain juga: `onclick`/`onsubmit` yang memanggil
+     window.open, `action` pada form, `content` pada meta og:url, atau url()
+     di dalam `style`. Nama atributnya ikut ditampilkan di daftar sebelum
+     diganti, jadi tidak ada yang berubah diam-diam. */
+  var kandidat = fd.body.querySelectorAll('*');
+  for (i=0;i<kandidat.length;i++){
+    el = kandidat[i];
+    for (var k=0;k<el.attributes.length;k++){
+      nm = el.attributes[k].name;
+      if (nm === P_ASAL || nm === P_UBAH) continue;
+      v = el.attributes[k].value;
+      if (v && v.indexOf(dari) !== -1) hasil.atribut.push({ el:el, nama:nm, nilai:v });
+    }
+  }
+  if (ikutTeks){
+    // dari documentElement, bukan body, supaya judul halaman di <head> ikut
+    var jalan = fd.createTreeWalker(fd.documentElement, NodeFilter.SHOW_TEXT, null);
+    var n;
+    while ((n = jalan.nextNode())){
+      var induk = n.parentElement;
+      if (!induk || induk.tagName==='SCRIPT' || induk.tagName==='STYLE') continue;
+      if (n.nodeValue && n.nodeValue.indexOf(dari) !== -1) hasil.teks.push(n);
+    }
+  }
+  return hasil;
+}
+function swapPratinjau(){
+  var dari = E.swapFrom.value;
+  var ikutTeks = E.swapText.checked;
+  E.swapList.innerHTML = '';
+  if (!dari){
+    E.swapCount.textContent = 'Ketik link lamanya untuk melihat berapa tempat yang akan berubah.';
+    E.swapApply.disabled = true;
+    return;
+  }
+  var h = swapCari(dari, ikutTeks);
+  var total = h.atribut.length + h.teks.length;
+  if (!total){
+    E.swapCount.textContent = 'Tidak ada yang cocok dengan "' + dari + '".';
+    E.swapApply.disabled = true;
+    return;
+  }
+  E.swapCount.textContent = 'Ditemukan di ' + total + ' tempat' +
+    (h.teks.length ? ' (' + h.atribut.length + ' link, ' + h.teks.length + ' tulisan)' : '') + '.';
+  E.swapApply.disabled = false;
+  var maks = Math.min(total, 40), n = 0, i;
+  for (i=0;i<h.atribut.length && n<maks;i++,n++) swapBaris(label(h.atribut[i].el) + ' · ' + h.atribut[i].nama, h.atribut[i].nilai);
+  for (i=0;i<h.teks.length && n<maks;i++,n++) swapBaris('teks', h.teks[i].nodeValue.trim().slice(0,80));
+  if (total > maks) swapBaris('', 'dan ' + (total - maks) + ' lagi…');
+}
+function swapBaris(dimana, isi){
+  var row = document.createElement('div'); row.className = 'swap-row';
+  var a = document.createElement('span'); a.className = 'swap-where'; a.textContent = dimana;
+  var b = document.createElement('span'); b.className = 'swap-val'; b.textContent = isi;
+  row.appendChild(a); row.appendChild(b); E.swapList.appendChild(row);
+}
+function swapBuka(dari){
+  if (!fd){ toast('Buka halaman dulu di kanvas.', true); return; }
+  E.swapModal.hidden = false;
+  if (dari !== undefined) E.swapFrom.value = dari;
+  swapPratinjau();
+  E.swapTo.focus();
+}
+E.swapBtn.addEventListener('click', function(){ swapBuka(); });
+E.linkSwapAll.addEventListener('click', function(){ swapBuka(E.linkSwapAll.dataset.href || ''); });
+E.swapFrom.addEventListener('input', swapPratinjau);
+E.swapText.addEventListener('change', swapPratinjau);
+E.swapApply.addEventListener('click', function(){
+  var dari = E.swapFrom.value, ke = E.swapTo.value;
+  if (!dari) return;
+  var h = swapCari(dari, E.swapText.checked);
+  var total = h.atribut.length + h.teks.length;
+  if (!total){ toast('Tidak ada yang cocok.', true); return; }
+  snap();
+  var i;
+  for (i=0;i<h.atribut.length;i++){
+    var t = h.atribut[i];
+    markEdited(t.el);
+    t.el.setAttribute(t.nama, t.nilai.split(dari).join(ke));
+  }
+  for (i=0;i<h.teks.length;i++){
+    var n = h.teks[i];
+    if (n.parentElement) markEdited(n.parentElement);
+    n.nodeValue = n.nodeValue.split(dari).join(ke);
+  }
+  E.swapModal.hidden = true;
+  buildLayers(); runScan(true); if (sel) fillProps(); outlineRebuild();
+  toast(total + ' tempat diganti.');
+});
+
 /* ---------------- lihat kode ---------------- */
 function showCode(onlyEl){
   if (!fd) return;
@@ -2958,7 +3111,7 @@ function showCode(onlyEl){
 }
 E.codeBtn.addEventListener('click', function(){ showCode(false); });
 E.codeCopy.addEventListener('click', function(){ copy(E.codeOut.textContent).then(function(){ toast('Kode disalin.'); }); });
-function closeModals(){ E.codeModal.hidden = true; E.iconModal.hidden = true; }
+function closeModals(){ E.codeModal.hidden = true; E.iconModal.hidden = true; E.swapModal.hidden = true; }
 document.querySelectorAll('[data-close]').forEach(function(b){ b.addEventListener('click', closeModals); });
 [E.codeModal, E.iconModal].forEach(function(m){
   m.addEventListener('click', function(e){ if (e.target === m) closeModals(); });
