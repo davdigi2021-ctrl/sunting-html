@@ -1453,15 +1453,16 @@ function attrs(el){
    Keduanya selalu dibuang saat ekspor dan saat melihat kode, sama seperti
    `contenteditable`. */
 var P_ASAL = 'data-sunting-asal', P_UBAH = 'data-sunting-ubah', P_KUNCI = 'data-sunting-kunci';
-var pristineAttrs = [];
+var pristineAttrs = [], pristineList = [];   // daftar elemen asli, disimpan sekali
 function stamp(){
-  pristineAttrs = [];
+  pristineAttrs = []; pristineList = [];
   if (!pristine || !fd || !fd.documentElement) return;
   var a = fd.documentElement.querySelectorAll('*');
   var b = pristine.documentElement.querySelectorAll('*');
   if (a.length !== b.length) return;
   var i;
   for (i=0;i<a.length;i++) if (a[i].tagName !== b[i].tagName) return;
+  pristineList = b;
   for (i=0;i<a.length;i++){
     pristineAttrs[i] = attrs(b[i]);
     a[i].setAttribute(P_ASAL, i);
@@ -3287,12 +3288,12 @@ function bisaReset(el){
   if (!el || !pristine || !el.getAttribute) return false;
   var idx = el.getAttribute(P_ASAL);
   if (idx === null) return false;
-  return !!pristine.documentElement.querySelectorAll('*')[+idx];
+  return !!pristineList[+idx];
 }
 function resetElemen(){
   if (!sel || !bisaReset(sel)) return;
   var idx = +sel.getAttribute(P_ASAL);
-  var asal = pristine.documentElement.querySelectorAll('*')[idx];
+  var asal = pristineList[idx];
   if (!asal || !sel.parentNode) return;
   snap();
   var baru = fd.importNode(asal, true);
