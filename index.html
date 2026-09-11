@@ -161,7 +161,9 @@ button,input,select,textarea{font:inherit;color:inherit;}
 .btn-quiet:hover:not(:disabled){background:var(--surface-3);color:var(--ink);}
 .btn:disabled{opacity:.35;cursor:not-allowed;}
 .btn-sm{padding:5px 10px;font-size:13px;}
-.btn-full{width:100%;justify-content:center;}
+/* Tombol selebar kartu boleh turun baris. Tanpa ini, label panjang seperti
+   "Link ini dipakai di 18 tempat" menabrak keluar dari kartunya. */
+.btn-full{width:100%;justify-content:center;white-space:normal;text-align:center;line-height:1.35;}
 
 .ibtn{
   width:30px;height:30px;border:0;border-radius:var(--r-xs);
@@ -487,6 +489,33 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
 .check{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;color:var(--ink);}
 .check input{width:15px;height:15px;accent-color:var(--accent);cursor:pointer;}
 
+.draft-bar{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:11px 13px;border-radius:var(--r);border:1px solid var(--accent);
+  background:var(--accent-soft);
+}
+.draft-bar[hidden]{display:none;}
+.draft-txt{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0;font-size:13px;}
+.draft-txt strong{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.draft-txt span{font-size:11.5px;color:var(--ink-2);}
+.draft-act{display:flex;gap:6px;flex:0 0 auto;}
+
+.theme-list{display:flex;flex-direction:column;gap:6px;}
+.theme-row{display:flex;align-items:center;gap:7px;}
+.theme-name{
+  flex:1;min-width:0;font-family:var(--mono);font-size:11px;color:var(--ink-2);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.theme-dot{
+  width:26px;height:26px;border-radius:7px;border:1px solid var(--line-2);
+  cursor:pointer;flex:0 0 auto;padding:0;
+}
+.act.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+.row-2{display:flex;gap:6px;align-items:center;}
+.row-2 .inp{flex:1;min-width:0;}
+.row-2 .btn{flex:0 0 auto;}
+
 .swap-list{
   display:flex;flex-direction:column;gap:4px;max-height:210px;overflow-y:auto;
   font-family:var(--mono);font-size:11.5px;color:var(--ink-2);
@@ -783,6 +812,14 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
 
         <p class="err" id="startErr" hidden></p>
 
+        <div class="draft-bar" id="draftBar" hidden>
+          <div class="draft-txt"><strong id="draftTitle">Pekerjaan terakhir</strong><span id="draftWhen"></span></div>
+          <div class="draft-act">
+            <button class="btn btn-plain btn-sm" id="draftDrop" type="button">Buang</button>
+            <button class="btn btn-primary btn-sm" id="draftOpen" type="button">Lanjutkan</button>
+          </div>
+        </div>
+
         <div class="start-foot">
           <button class="link-btn" id="demoBtn" type="button">Pakai contoh halaman</button>
           <button class="btn btn-primary" id="openBtn" type="button">Buka di kanvas</button>
@@ -837,9 +874,25 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
               <label class="check"><input type="checkbox" id="pBlank"> Buka di tab baru</label>
             </div>
 
+            <div class="card" id="cVideo" hidden>
+              <div class="card-h"><span class="card-t">Video</span></div>
+              <label class="lbl" for="pVideo">Alamat video</label>
+              <div class="row-2">
+                <input id="pVideo" class="inp mono" type="text" placeholder="https://youtu.be/xxxxxxxxxxx" spellcheck="false">
+                <button class="btn btn-plain btn-sm" id="pVideoApply" type="button">Pasang</button>
+              </div>
+              <p class="note">Tempel link YouTube atau Vimeo biasa — alamatnya diubah sendiri ke bentuk yang bisa disematkan.</p>
+            </div>
+
             <div class="card" id="cImg" hidden>
               <div class="card-h"><span class="card-t">Gambar</span></div>
               <button class="btn btn-plain btn-sm btn-full" id="imgPick" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-image"/></svg>Pilih gambar dari komputer</button>
+              <label class="lbl" for="imgUrl">atau tempel alamat gambar</label>
+              <div class="row-2">
+                <input id="imgUrl" class="inp mono" type="text" placeholder="https://situs.com/foto.jpg" spellcheck="false">
+                <button class="btn btn-plain btn-sm" id="imgUrlApply" type="button">Pasang</button>
+              </div>
+              <p class="note" id="imgUrlNote">Alamat dari internet tidak ikut membesarkan berkas, tapi gambarnya harus tetap online.</p>
               <label class="lbl" for="pAlt">Teks pengganti (kalau gambar gagal tampil)</label>
               <input id="pAlt" class="inp" type="text" placeholder="misalnya: foto rumah tampak depan">
             </div>
@@ -935,10 +988,20 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
                 <button class="act" data-act="up" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-up"/></svg>Naik</button>
                 <button class="act" data-act="down" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-dn"/></svg>Turun</button>
                 <button class="act" data-act="dup" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-dup"/></svg>Gandakan</button>
+                <button class="act" data-act="lock" type="button" id="lockBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-shield"/></svg><span id="lockLabel">Kunci</span></button>
                 <button class="act act-bad" data-act="del" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-trash"/></svg>Hapus</button>
               </div>
+              <button class="act" data-act="reset" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-refresh"/></svg>Kembalikan elemen ini ke asal</button>
               <button class="act" data-act="code" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-code"/></svg>Lihat kode elemen ini</button>
             </div>
+          </div>
+
+          <!-- Di luar #propsBody supaya tetap terlihat walau belum ada yang dipilih:
+               ini pengaturan tingkat halaman, bukan tingkat elemen. -->
+          <div class="card" id="cTheme" hidden>
+            <div class="card-h"><span class="card-t">Warna tema halaman</span></div>
+            <p class="note">Halaman ini memakai beberapa warna berulang. Mengubahnya di sini mengubah semua tempat yang memakainya.</p>
+            <div class="theme-list" id="themeList"></div>
           </div>
         </div>
 
@@ -1108,7 +1171,9 @@ var E = {};
  'colorPop','cpSv','cpSvThumb','cpHue','cpHueThumb','cpEye','cpHex','cpSwatches',
  'outlineBtn','outlineCv','qbMove','iconUrl','iconUrlApply','themeBtn','previewBtn','exitPreview','hintBtn',
  'codeModal','codeOut','codeTitle','codeCopy','iconModal','iconGrid','iconSvg','iconApply',
- 'swapBtn','swapModal','swapFrom','swapTo','swapText','swapCount','swapList','swapApply','linkSwapAll'
+ 'swapBtn','swapModal','swapFrom','swapTo','swapText','swapCount','swapList','swapApply','linkSwapAll',
+ 'imgUrl','imgUrlApply','cVideo','pVideo','pVideoApply',
+ 'draftBar','draftTitle','draftWhen','draftOpen','draftDrop','cTheme','themeList','lockBtn','lockLabel'
 ].forEach(function(id){ E[id] = $(id); });
 
 /* ---------------- keadaan ---------------- */
@@ -1203,7 +1268,13 @@ function tanda(el){
   if (el.classList && el.classList.length) return ' .' + el.classList[0];
   return '';
 }
-function markEdited(el){ if (el && el.setAttribute) el.setAttribute(P_UBAH, '1'); }
+/* Setiap perubahan nyata melewati sini, jadi ini titik paling tepat untuk
+   menjadwalkan penyimpanan draf — lebih andal daripada menggantung di snap(),
+   yang tidak dipanggil di semua jalur sunting. */
+function markEdited(el){
+  if (el && el.setAttribute) el.setAttribute(P_UBAH, '1');
+  simpanDraf();
+}
 
 /* ---------------- riwayat ---------------- */
 function snap(){
@@ -1212,6 +1283,7 @@ function snap(){
   if (undoS.length > 60) undoS.shift();
   redoS.length = 0;
   histBtns();
+  simpanDraf();
 }
 function histBtns(){
   E.undoBtn.disabled = !undoS.length;
@@ -1270,7 +1342,7 @@ E.backBtn.addEventListener('click', function(){
   E.canvas.hidden = true; E.backBtn.hidden = true; E.ovl.hidden = true;
   hint('');
   E.devSeg.hidden = true; E.widthBox.hidden = true; E.zoomGroup.hidden = true;
-  E.startView.hidden = false;
+  E.startView.hidden = false; E.cTheme.hidden = true; tampilkanDraf();
   E.dlBtn.disabled = E.copyBtn.disabled = E.codeBtn.disabled = E.swapBtn.disabled = true;
   E.layersTree.innerHTML = ''; E.issueList.innerHTML = '';
   E.scanPill.textContent = 'Belum diperiksa'; E.scanPill.className = 'pill';
@@ -1358,8 +1430,8 @@ E.frame.addEventListener('load', function(){
   ready = true;
   E.dlBtn.disabled = E.copyBtn.disabled = E.codeBtn.disabled = E.swapBtn.disabled = false;
   E.ovl.hidden = false;
-  layout(); outlineBuild(); buildLayers(); deselect();
-  runScan(true);
+  layout(); outlineBuild(); buildLayers(); deselect(); bangunTema();
+  runScan(true); simpanDraf();
   hint('Klik elemen untuk memilih. Klik dua kali untuk mengubah teksnya.');
 });
 
@@ -1380,7 +1452,7 @@ function attrs(el){
    unduhan. Atribut ikut tersalin lewat innerHTML, jadi penandanya selamat.
    Keduanya selalu dibuang saat ekspor dan saat melihat kode, sama seperti
    `contenteditable`. */
-var P_ASAL = 'data-sunting-asal', P_UBAH = 'data-sunting-ubah';
+var P_ASAL = 'data-sunting-asal', P_UBAH = 'data-sunting-ubah', P_KUNCI = 'data-sunting-kunci';
 var pristineAttrs = [];
 function stamp(){
   pristineAttrs = [];
@@ -1821,6 +1893,7 @@ function actDup(){
 }
 function actDel(){
   if (!sel || !sel.parentNode) return;
+  if (terkunci(sel)){ toast('Elemen ini terkunci. Buka kuncinya dulu.', true); return; }
   snap(); var el = sel; deselect(); el.remove(); buildLayers(); toast('Elemen dihapus.');
 }
 function act(a){
@@ -1835,6 +1908,8 @@ function act(a){
   else if (a==='dup') actDup();
   else if (a==='del') actDel();
   else if (a==='code') showCode(true);
+  else if (a==='reset') resetElemen();
+  else if (a==='lock') toggleKunci();
 }
 E.qbar.addEventListener('click', function(e){ var b = e.target.closest('[data-act]'); if (b) act(b.dataset.act); });
 E.qbMove.addEventListener('mousedown', function(e){
@@ -1906,13 +1981,28 @@ function fillProps(){
     var alamat = link.getAttribute('href') || '';
     var sama = alamat ? swapCari(alamat, false).atribut.length : 0;
     E.linkSwapAll.hidden = sama < 2;
-    if (sama >= 2) E.linkSwapAll.textContent = 'Link ini dipakai di ' + sama + ' tempat — ganti semuanya';
+    if (sama >= 2) E.linkSwapAll.textContent = 'Dipakai di ' + sama + ' tempat — ganti semuanya';
     E.linkSwapAll.dataset.href = alamat;
   } else { E.linkErr.hidden = true; E.linkFix.hidden = true; E.linkSwapAll.hidden = true; }
 
   var img = sel.tagName==='IMG';
   E.cImg.hidden = !img;
   if (img) E.pAlt.value = sel.getAttribute('alt') || '';
+
+  var bingkai = sel.tagName==='IFRAME' ? sel : (sel.querySelector && sel.querySelector('iframe'));
+  E.cVideo.hidden = !bingkai;
+  if (bingkai){
+    var vs = bingkai.getAttribute('src') || '';
+    E.pVideo.value = (vs === 'about:blank') ? '' : vs;
+  }
+
+  var kunci = terkunci(sel);
+  E.lockBtn.classList.toggle('on', kunci);
+  E.lockLabel.textContent = kunci ? 'Terkunci' : 'Kunci';
+  E.propsBody.querySelector('[data-act="del"]').disabled = kunci;
+
+  var tombolReset = E.propsBody.querySelector('[data-act="reset"]');
+  if (tombolReset) tombolReset.hidden = !bisaReset(sel);
 
   var svg = sel.tagName.toLowerCase()==='svg' ? sel : sel.querySelector && sel.querySelector('svg');
   E.cIcon.hidden = !svg;
@@ -2259,6 +2349,7 @@ document.addEventListener('mousedown', function(e){
 /* ---------------- geser & ubah ukuran ---------------- */
 function onDown(e){
   if (previewOn || e.button!==0 || editing(e.target)) return;
+  if (terkunci(e.target) || (sel && terkunci(sel) && sel.contains(e.target))) return;
   var t = e.target;
   if (skip(t)) return;
   // Tahan aksi bawaan browser (seleksi teks / seret bawaan link & gambar). Tanpa ini
@@ -2995,6 +3086,223 @@ E.fixAllBtn.addEventListener('click', function(){
   buildLayers(); if (sel) fillProps();
 });
 
+/* ---------------- kunci elemen ----------------
+   Header dan tombol melayang gampang tergeser tidak sengaja saat menyeret
+   elemen lain. Statusnya disimpan sebagai atribut supaya selamat dari undo,
+   dan seperti penanda lain ia selalu dibuang saat ekspor. */
+function terkunci(el){ return !!(el && el.getAttribute && el.hasAttribute(P_KUNCI)); }
+function toggleKunci(){
+  if (!sel) return;
+  if (terkunci(sel)) sel.removeAttribute(P_KUNCI); else sel.setAttribute(P_KUNCI, '1');
+  fillProps(); redraw();
+  toast(terkunci(sel) ? 'Elemen dikunci — tidak bisa digeser atau dihapus.' : 'Kunci dibuka.');
+}
+
+/* ---------------- warna tema halaman ----------------
+   Halaman hasil AI hampir selalu menaruh warna mereknya di beberapa variabel
+   CSS pada `:root`. Mengubahnya satu kali mengubah semua tempat yang
+   memakainya — jauh lebih cepat daripada mengecat elemen satu per satu.
+   Nilainya dipasang sebagai gaya pada <html>, yang mengalahkan `:root` tanpa
+   perlu menulis ulang isi <style> milikmu. */
+function warnaSah(v){
+  v = (v||'').trim();
+  if (!v) return null;
+  if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)) return v;
+  if (/^rgba?\(/i.test(v)) return v;
+  return null;
+}
+function bacaVarTema(){
+  var hasil = [], lihat = {};
+  if (!fd) return hasil;
+  var lembar = fd.styleSheets, i, j;
+  for (i=0;i<lembar.length;i++){
+    var aturan;
+    try { aturan = lembar[i].cssRules; } catch(err){ continue; }   // lembar dari domain lain
+    if (!aturan) continue;
+    for (j=0;j<aturan.length;j++){
+      var r = aturan[j];
+      if (!r.style || !r.selectorText) continue;
+      if (!/(^|,)\s*(:root|html)\s*($|,)/i.test(r.selectorText)) continue;
+      for (var k=0;k<r.style.length;k++){
+        var nama = r.style[k];
+        if (nama.slice(0,2) !== '--') continue;
+        var nilai = warnaSah(r.style.getPropertyValue(nama));
+        if (!nilai || lihat[nama]) continue;
+        lihat[nama] = 1;
+        hasil.push({ nama:nama, nilai:nilai });
+      }
+    }
+  }
+  return hasil;
+}
+function bangunTema(){
+  E.themeList.innerHTML = '';
+  var daftar = bacaVarTema();
+  E.cTheme.hidden = daftar.length === 0;
+  if (!daftar.length) return;
+  daftar.forEach(function(v){
+    var baris = document.createElement('div'); baris.className = 'theme-row';
+    var dot = document.createElement('button');
+    dot.type = 'button'; dot.className = 'theme-dot';
+    var kini = fd.documentElement.style.getPropertyValue(v.nama) || v.nilai;
+    dot.style.background = kini;
+    var nm = document.createElement('span'); nm.className = 'theme-name';
+    nm.textContent = v.nama.replace(/^--/, '');
+    dot.addEventListener('click', function(){
+      openColorPop(dot, hexDari(dot.style.background) || '#000000', function(hexBaru){
+        markEdited(fd.documentElement);
+        fd.documentElement.style.setProperty(v.nama, hexBaru);
+        dot.style.background = hexBaru;
+        redraw(); outlineRebuild();
+      });
+    });
+    baris.appendChild(dot); baris.appendChild(nm);
+    E.themeList.appendChild(baris);
+  });
+}
+function hexDari(v){
+  var m = String(v).match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+  if (!m) return /^#/.test(v) ? v : null;
+  function h(n){ var t=(+n).toString(16); return t.length<2?'0'+t:t; }
+  return '#' + h(m[1]) + h(m[2]) + h(m[3]);
+}
+
+/* ---------------- simpan otomatis ----------------
+   Satu-satunya cara kehilangan pekerjaan di alat ini adalah menutup tab
+   sebelum sempat mengunduh. Draf terakhir disimpan diam-diam di peramban —
+   tidak dikirim ke mana pun — lalu ditawarkan saat dibuka lagi. Kalau halaman
+   terlalu besar untuk muat (misalnya penuh gambar tertanam), penyimpanan
+   dilewati diam-diam daripada melempar error. */
+var DRAF = 'sunting-html-draf';
+var drafTimer = null;
+function simpanDraf(){
+  clearTimeout(drafTimer);
+  drafTimer = setTimeout(function(){
+    if (!fd || !fd.body || !lastDoc || previewOn) return;
+    try {
+      localStorage.setItem(DRAF, JSON.stringify({
+        doc: lastDoc, body: fd.body.innerHTML, judul: fd.title || '', pada: Date.now()
+      }));
+    } catch(err){ try { localStorage.removeItem(DRAF); } catch(e2){} }
+  }, 1200);
+}
+function bacaDraf(){
+  try { var d = JSON.parse(localStorage.getItem(DRAF) || 'null'); return (d && d.doc) ? d : null; }
+  catch(err){ return null; }
+}
+function tampilkanDraf(){
+  var d = bacaDraf();
+  E.draftBar.hidden = !d;
+  if (!d) return;
+  E.draftTitle.textContent = d.judul || 'Pekerjaan terakhir';
+  var menit = Math.round((Date.now() - d.pada) / 60000);
+  E.draftWhen.textContent = menit < 1 ? 'baru saja' :
+    menit < 60 ? menit + ' menit lalu' :
+    menit < 1440 ? Math.round(menit/60) + ' jam lalu' : Math.round(menit/1440) + ' hari lalu';
+}
+E.draftOpen.addEventListener('click', function(){
+  var d = bacaDraf(); if (!d) return;
+  var doc = d.doc;
+  if (d.body && /<body[^>]*>/i.test(doc)){
+    doc = doc.replace(/(<body[^>]*>)[\s\S]*(<\/body>)/i, function(_, buka, tutup){ return buka + d.body + tutup; });
+  }
+  E.srcInput.value = doc;
+  E.cssInput.value = ''; E.jsInput.value = '';
+  E.startErr.hidden = true;
+  E.openBtn.click();
+});
+E.draftDrop.addEventListener('click', function(){
+  try { localStorage.removeItem(DRAF); } catch(err){}
+  E.draftBar.hidden = true;
+  toast('Draf dibuang.');
+});
+
+/* ---------------- gambar dari alamat ----------------
+   Menanam gambar sebagai base64 membuat berkasnya membengkak; halaman dengan
+   dua puluhan foto bisa jadi beberapa MB. Kalau gambarnya sudah punya alamat
+   sendiri di internet, memakai alamat itu jauh lebih ringan — konsekuensinya
+   gambar harus tetap online. Dua-duanya disediakan, tinggal pilih. */
+function pasangGambarUrl(){
+  if (!sel) return;
+  var url = E.imgUrl.value.trim();
+  if (!url){ toast('Tempel dulu alamat gambarnya.', true); return; }
+  if (!/^(https?:)?\/\//i.test(url) && !/^data:image\//i.test(url)){
+    toast('Alamatnya harus diawali https:// supaya bisa dimuat.', true); return;
+  }
+  snap();
+  var target = sel;
+  select(putImage(target, url, target.tagName === 'IMG' ? 'replace' : 'add'));
+  buildLayers(); E.imgUrl.value = '';
+  toast('Gambar dipasang dari alamat.');
+}
+E.imgUrlApply.addEventListener('click', pasangGambarUrl);
+E.imgUrl.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); pasangGambarUrl(); } });
+
+/* ---------------- video ----------------
+   Blok video dulu dipasang dengan src="about:blank" dan tidak ada satu pun
+   cara mengisinya, jadi yang muncul cuma kotak hitam. Sekarang alamat biasa
+   yang disalin dari bilah alamat YouTube atau Vimeo diubah sendiri ke bentuk
+   sematan yang benar. */
+function embedVideo(url){
+  url = (url || '').trim();
+  if (!url) return '';
+  var m;
+  if ((m = url.match(/[?&]v=([\w-]{6,})/))) return 'https://www.youtube.com/embed/' + m[1];
+  if ((m = url.match(/youtu\.be\/([\w-]{6,})/i))) return 'https://www.youtube.com/embed/' + m[1];
+  if ((m = url.match(/youtube\.com\/(?:shorts|embed|live)\/([\w-]{6,})/i))) return 'https://www.youtube.com/embed/' + m[1];
+  if ((m = url.match(/vimeo\.com\/(?:video\/)?(\d{6,})/i))) return 'https://player.vimeo.com/video/' + m[1];
+  return url;
+}
+function pasangVideo(){
+  if (!sel) return;
+  var bingkai = sel.tagName === 'IFRAME' ? sel : (sel.querySelector && sel.querySelector('iframe'));
+  if (!bingkai){ toast('Pilih dulu bagian videonya.', true); return; }
+  var url = embedVideo(E.pVideo.value);
+  if (!url){ toast('Tempel dulu alamat videonya.', true); return; }
+  snap();
+  markEdited(bingkai);
+  bingkai.setAttribute('src', url);
+  toast(url.indexOf('youtube') >= 0 || url.indexOf('vimeo') >= 0 ? 'Video dipasang.' : 'Alamat dipasang apa adanya.');
+}
+E.pVideoApply.addEventListener('click', pasangVideo);
+E.pVideo.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); pasangVideo(); } });
+
+/* ---------------- kembalikan satu elemen ke asal ----------------
+   Setelah coba-coba, mengurungkan satu per satu itu melelahkan dan gampang
+   kebablasan sampai membatalkan perubahan lain yang justru mau dipertahankan.
+   Karena salinan halaman aslinya masih tersimpan utuh, elemennya cukup
+   diambil ulang dari sana — jadi tidak perlu menyimpan riwayat tambahan.
+
+   Penanda asal dipasang lagi ke seluruh isinya: pada urutan dokumen, semua
+   keturunan sebuah elemen berada persis di belakangnya, jadi nomornya
+   berurutan dari nomor elemen itu sendiri. */
+function stampCabang(akar, mulai){
+  var daftar = [akar].concat(Array.prototype.slice.call(akar.querySelectorAll('*')));
+  for (var i=0;i<daftar.length;i++){
+    daftar[i].setAttribute(P_ASAL, mulai + i);
+    daftar[i].removeAttribute(P_UBAH);
+  }
+}
+function bisaReset(el){
+  if (!el || !pristine || !el.getAttribute) return false;
+  var idx = el.getAttribute(P_ASAL);
+  if (idx === null) return false;
+  return !!pristine.documentElement.querySelectorAll('*')[+idx];
+}
+function resetElemen(){
+  if (!sel || !bisaReset(sel)) return;
+  var idx = +sel.getAttribute(P_ASAL);
+  var asal = pristine.documentElement.querySelectorAll('*')[idx];
+  if (!asal || !sel.parentNode) return;
+  snap();
+  var baru = fd.importNode(asal, true);
+  stampCabang(baru, idx);
+  sel.parentNode.replaceChild(baru, sel);
+  select(baru);
+  buildLayers(); runScan(true); outlineRebuild();
+  toast('Elemen dikembalikan ke bentuk aslinya.');
+}
+
 /* ---------------- ganti link di semua tempat ----------------
    Dicocokkan sebagai potongan teks, bukan harus sama persis, supaya satu nomor
    WhatsApp yang dipakai di beberapa bentuk alamat tetap kena semuanya. Yang
@@ -3229,6 +3537,7 @@ function cleanClone(clone, liveRoot){
     // selalu dibuang, termasuk dari elemen yang disunting dan yang baru ditambah
     el.removeAttribute(P_ASAL);
     el.removeAttribute(P_UBAH);
+    el.removeAttribute(P_KUNCI);
     el.removeAttribute('contenteditable');
   }
   return clone;
@@ -3449,6 +3758,7 @@ function demoJs(){
 
 applyTheme();
 histBtns();
+tampilkanDraf();
 })();
 </script>
 <!--ARTIFACT_BODY_END-->

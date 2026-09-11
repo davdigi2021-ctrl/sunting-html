@@ -23,11 +23,15 @@ Editor ini **tidak melakukan itu**. Halaman dirender apa adanya di dalam iframe,
 - **Ganti font**, tebal huruf, jarak baris, dan perataan. Font Google dimuat otomatis
 - Atur jarak dalam/luar, warna tulisan dan latar
 - **Ganti ikon SVG** dari daftar siap pakai atau tempel kode SVG sendiri
-- **Ganti/tambah gambar** lewat pemilih file atau seret langsung ke kanvas. Foto besar otomatis diperkecil ke 1600px dan disandikan ulang sebagai WebP sebelum ditanam, jadi berkasnya tidak membengkak — foto 1,5 MB biasanya turun ke sekitar 150 KB. SVG dan GIF tidak disentuh supaya vektor dan animasinya tetap utuh
+- **Ganti/tambah gambar** lewat pemilih file, seret langsung ke kanvas, atau tempel alamat gambarnya (alamat tidak membesarkan berkas, tapi gambarnya harus tetap online). Foto besar otomatis diperkecil ke 1600px dan disandikan ulang sebagai WebP sebelum ditanam, jadi berkasnya tidak membengkak — foto 1,5 MB biasanya turun ke sekitar 150 KB. SVG dan GIF tidak disentuh supaya vektor dan animasinya tetap utuh
 - Geser posisi dengan menyeret, gandakan, dan hapus elemen
 - **Tambah elemen**: section, judul, paragraf, tombol, gambar, 2 kolom, garis, jarak
 - **Ganti satu link di semua tempat sekaligus**. Masukkan link lama dan link barunya, lihat dulu berapa tempat yang akan berubah, lalu ganti semuanya dalam sekali klik. Dicari di semua atribut — termasuk `onclick`/`onsubmit` dan `action` pada form, bukan cuma `href` — dan bisa sekalian mengganti tulisan yang terlihat di halaman. Kalau elemen yang sedang dipilih memakai link yang berulang, pintasannya muncul langsung di panel Properti
-- Undo/redo (Ctrl+Z / Ctrl+Shift+Z)
+- **Kembalikan satu elemen ke asal** dalam sekali klik, tanpa perlu undo berkali-kali — teks, ukuran, warna, semuanya balik seperti di kode sumber
+- **Kunci elemen** supaya tidak tergeser atau terhapus tidak sengaja saat menyeret yang lain
+- **Ubah warna tema halaman**: warna merek yang dipakai berulang lewat variabel CSS bisa diubah sekali untuk semua tempat
+- **Pasang video** YouTube atau Vimeo — tempel alamat biasa, diubah sendiri ke bentuk sematan
+- Undo/redo (Ctrl+Z / Ctrl+Shift+Z), dan **draf tersimpan otomatis di peramban** sehingga tab yang tertutup tidak menghilangkan pekerjaan
 
 **Melihat**
 - Pratinjau **ukuran layar asli** lewat tiga tombol ikon: Desktop 1440px, Tablet 820×1180, HP 390×844 — atau isi sendiri lebar dan tingginya di kotak sebelahnya. Tinggi yang dikosongkan mengikuti tinggi kanvas. Zoom menyesuaikan otomatis
