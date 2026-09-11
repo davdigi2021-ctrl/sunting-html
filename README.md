@@ -67,3 +67,5 @@ Buka `index.html` langsung di browser, atau taruh di hosting statis apa pun.
 ## Lisensi
 
 MIT
+
+Ikon memakai [Hugeicons](https://github.com/hugeicons/hugeicons) gaya *stroke-rounded*, juga berlisensi MIT. Logo dan favicon dibuat sendiri untuk proyek ini.
