@@ -104,7 +104,14 @@ button,input,select,textarea{font:inherit;color:inherit;}
   background:var(--surface);
   border-bottom:1px solid var(--line);
   position:relative;z-index:60;
+  /* Jaring pengaman terakhir. Aturan @media di bawah sudah melepas isi bar satu
+     per satu supaya muat, tapi lebar huruf bisa berbeda di komputer lain. Kalau
+     sampai tetap tidak muat, bar bergeser dan kelompok tombol utama tetap
+     menempel di kanan — tombol unduh tidak pernah ikut terpotong. */
+  overflow-x:auto;scrollbar-width:none;
 }
+.topbar::-webkit-scrollbar{display:none;}
+.topbar-group.primary{position:sticky;right:-12px;background:var(--surface);padding-right:12px;margin-right:-12px;}
 .brand{display:flex;align-items:center;gap:9px;min-width:0;}
 .brand-mark{
   width:26px;height:26px;border-radius:7px;flex:0 0 auto;
@@ -391,6 +398,9 @@ body.preview .topbar-group,
 body.preview .seg,
 body.preview .wbox,
 body.preview .hint-btn,
+body.preview .topbar-sep,
+body.preview .steps,
+body.preview .tour,
 body.preview #backBtn{display:none;}
 body.preview .topbar-group.always,
 body.preview .exit-preview{display:flex;}
@@ -401,6 +411,87 @@ body.preview .device{border-radius:0;box-shadow:none;}
   font-family:var(--mono);font-size:11px;color:var(--ink-2);
   min-width:38px;text-align:center;
 }
+
+/* ---------- Tiga langkah ----------
+   Orang yang baru pertama membuka hanya melihat kotak kode besar, dan tidak tahu
+   ini akan berakhir di mana. Bar ini menyebut urutannya sejak awal lalu menandai
+   langkah yang sedang berjalan, jadi bukan sekadar hiasan. */
+.steps{
+  flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:6px 12px;background:var(--surface);border-bottom:1px solid var(--line);
+  overflow-x:auto;scrollbar-width:none;
+}
+.steps::-webkit-scrollbar{display:none;}
+.steps[hidden]{display:none;}
+.step{
+  display:flex;align-items:center;gap:7px;padding:4px 10px;border-radius:var(--r-pill);
+  font-size:12.5px;font-weight:500;color:var(--ink-3);white-space:nowrap;flex:0 0 auto;
+  transition:color var(--t),background var(--t);
+}
+.step-n{
+  width:19px;height:19px;flex:0 0 auto;border-radius:50%;
+  background:var(--surface-3);color:var(--ink-3);
+  display:grid;place-items:center;font-size:11px;font-weight:700;line-height:1;
+  transition:background var(--t),color var(--t);
+}
+.step.on{background:var(--accent-soft);color:var(--accent);}
+.step.on .step-n{background:var(--accent);color:var(--accent-ink);}
+.step.done{color:var(--ok);}
+.step.done .step-n{background:var(--ok-soft);color:var(--ok);}
+.step-line{width:18px;height:1px;background:var(--line-2);flex:0 0 auto;}
+/* Di layar sempit angkanya saja sudah cukup menjelaskan urutan. Batasnya 880px,
+   bukan lebar bar itu sendiri: panggung selalu 272px lebih sempit dari jendela
+   karena panel kanan, jadi tulisannya harus lepas sebelum benar-benar mentok. */
+@media (max-width:880px){
+  .step-txt{display:none;}
+  .step{padding:4px;}
+  .step-line{width:10px;}
+}
+
+/* ---------- Sambutan sekali jalan ----------
+   Tiga hal yang paling sering membuat orang berhenti di langkah pertama.
+   Warnanya memakai lapisan mengambang, sama seperti toast, supaya terbaca
+   di tema terang maupun gelap. */
+.tour{
+  position:fixed;z-index:1100;left:50%;bottom:22px;transform:translateX(-50%);
+  width:min(370px,calc(100vw - 32px));
+  background:var(--float);color:var(--float-ink);
+  border:1px solid var(--float-line);border-radius:var(--r);
+  box-shadow:var(--sh-3);padding:15px 16px 12px;
+  display:flex;flex-direction:column;gap:9px;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+}
+.tour[hidden]{display:none;}
+.tour-t{font-size:14px;font-weight:600;margin:0;letter-spacing:-.01em;}
+.tour-d{font-size:13px;line-height:1.55;margin:0;opacity:.82;}
+.tour-f{display:flex;align-items:center;gap:8px;margin-top:2px;}
+.tour-dots{display:flex;gap:5px;flex:1;align-items:center;}
+.tour-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);}
+.tour-dot.on{background:#fff;}
+.tour-skip{
+  background:none;border:0;padding:4px 6px;color:inherit;opacity:.7;
+  font-size:12.5px;cursor:pointer;border-radius:6px;
+}
+.tour-skip:hover{opacity:1;text-decoration:underline;}
+.tour-next{
+  background:#fff;color:#17181c;border:0;border-radius:var(--r-sm);
+  padding:6px 15px;font-size:13px;font-weight:600;cursor:pointer;
+}
+.tour-next:hover{background:rgba(255,255,255,.86);}
+.tour-skip:focus-visible,.tour-next:focus-visible{outline:2px solid #fff;outline-offset:2px;}
+
+/* Tombol unduh adalah tujuan akhir dari semua yang dikerjakan. Dibedakan dari
+   deretan tombol di sebelahnya supaya tidak perlu dicari. */
+.btn-dl{padding:7px 15px;font-size:13.5px;font-weight:600;}
+.topbar-sep{width:1px;height:20px;background:var(--line);flex:0 0 auto;margin:0 3px;}
+/* Di jendela sempit isi bar atas melebihi lebarnya, dan yang terpotong selalu
+   yang paling kanan — tombol unduh, justru satu-satunya yang tidak boleh
+   hilang. Jadi yang paling tidak penting dilepas lebih dulu, bertahap:
+   nama merek (logonya tetap), lalu tulisan pada tombol yang sudah punya ikon,
+   terakhir kotak ukuran sendiri (tiga tombol perangkat masih ada). */
+@media (max-width:1280px){ .brand-name{display:none;} }
+@media (max-width:1180px){ .btn-txt{display:none;} .topbar .btn svg{margin:0 -1px;} }
+@media (max-width:1020px){ .wbox{display:none;} }
 
 .canvas{flex:1;min-height:0;overflow:auto;padding:20px;display:flex;justify-content:center;}
 .canvas[hidden]{display:none;}
@@ -816,30 +907,41 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
     <button class="ibtn" id="previewBtn" type="button" title="Pratinjau — sembunyikan semua alat bantu (Esc untuk keluar)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-eye"/></svg></button>
   </div>
 
-    <button class="btn btn-quiet btn-sm" id="backBtn" type="button" hidden>Ganti kode</button>
-  </div>
+  <button class="btn btn-quiet btn-sm" id="backBtn" type="button" hidden title="Kembali ke layar awal untuk menempel halaman lain">Ganti kode</button>
 
   <!-- Keterangan panjang dulu ditulis penuh di bar dan tetap terpotong. Sekarang
        jadi satu ikon; keterangannya muncul saat kursor menyentuhnya. -->
-  <button class="ibtn hint-btn" id="hintBtn" type="button" hidden aria-label="Keterangan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-info"/></svg></button>
+  <button class="ibtn hint-btn" id="hintBtn" type="button" hidden aria-label="Keterangan dan cara pakai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-info"/></svg></button>
   <span class="spacer"></span>
 
   <button class="btn btn-primary btn-sm exit-preview" id="exitPreview" type="button" hidden>Keluar pratinjau</button>
 
-  <div class="topbar-group">
+  <div class="topbar-group primary">
     <button class="ibtn" id="themeBtn" type="button" title="Ganti tema terang / gelap" aria-label="Ganti tema terang atau gelap"><svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sun"/></svg><svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-moon"/></svg></button>
     <button class="ibtn" id="undoBtn" type="button" title="Batalkan (Ctrl+Z)" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-undo"/></svg></button>
     <button class="ibtn" id="redoBtn" type="button" title="Ulangi (Ctrl+Shift+Z)" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-redo"/></svg></button>
-    <button class="btn btn-quiet btn-sm" id="swapBtn" type="button" disabled title="Ganti satu link di semua tempat sekaligus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-chain"/></svg>Ganti Link</button>
-    <button class="btn btn-quiet btn-sm" id="codeBtn" type="button" disabled title="Lihat kode HTML"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-code"/></svg>Kode</button>
-    <button class="btn btn-plain btn-sm" id="copyBtn" type="button" disabled>Salin</button>
-    <button class="btn btn-primary btn-sm" id="dlBtn" type="button" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-down"/></svg>Unduh</button>
+    <button class="btn btn-quiet btn-sm" id="swapBtn" type="button" disabled title="Ganti satu link di semua tempat sekaligus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-chain"/></svg><span class="btn-txt">Ganti Link</span></button>
+    <button class="btn btn-quiet btn-sm" id="codeBtn" type="button" disabled title="Lihat kode HTML"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-code"/></svg><span class="btn-txt">Kode</span></button>
+    <button class="btn btn-quiet btn-sm" id="copyBtn" type="button" disabled title="Salin seluruh kode ke papan klip">Salin</button>
+    <span class="topbar-sep" aria-hidden="true"></span>
+    <button class="btn btn-primary btn-dl" id="dlBtn" type="button" disabled title="Simpan halaman jadi berkas .html di komputermu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-down"/></svg>Unduh hasilnya</button>
   </div>
 </header>
 
 <div class="app">
   <!-- ============ Panggung ============ -->
   <main class="stage">
+    <!-- Tiga langkah. Ditaruh di atas panggung, bukan di dalam kartu awal, supaya
+         tetap terlihat saat sedang menyunting — jadi selalu jelas sudah sampai
+         mana dan apa langkah berikutnya. Disembunyikan di mode pratinjau. -->
+    <div class="steps" id="stepBar">
+      <span class="step on" id="step1"><span class="step-n">1</span><span class="step-txt">Tempel kode halamanmu</span></span>
+      <span class="step-line" aria-hidden="true"></span>
+      <span class="step" id="step2"><span class="step-n">2</span><span class="step-txt">Ubah yang mau diubah</span></span>
+      <span class="step-line" aria-hidden="true"></span>
+      <span class="step" id="step3"><span class="step-n">3</span><span class="step-txt">Unduh hasilnya</span></span>
+    </div>
+
     <section class="start" id="startView">
       <div class="start-card">
         <div>
@@ -893,11 +995,14 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
   <!-- ============ Panel samping ============ -->
   <aside class="pane pane-r">
     <nav class="pane-tabs" role="tablist">
-      <div class="tab-wrap"><button class="tab on" data-tab="props" type="button" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-sliders"/></svg> Properti</button></div>
-      <div class="tab-wrap"><button class="tab" data-tab="blocks" type="button" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-blocks"/></svg> Tambah</button></div>
-      <div class="tab-wrap"><button class="tab" data-tab="layers" type="button" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><use href="#i-layers"/></svg> Lapisan</button></div>
+      <!-- "Properti" dan "Lapisan" adalah istilah program, bukan bahasa sehari-hari.
+           Namanya diganti jadi kata kerja yang menyebut isinya, dan tiap tab
+           menjelaskan dirinya sendiri saat kursor menyentuhnya. -->
+      <div class="tab-wrap"><button class="tab on" data-tab="props" type="button" role="tab" title="Atur elemen yang sedang dipilih — teks, link, ukuran, huruf, dan warnanya"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-sliders"/></svg> Atur</button></div>
+      <div class="tab-wrap"><button class="tab" data-tab="blocks" type="button" role="tab" title="Tambah bagian baru ke halaman — judul, tombol, gambar, video, kolom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-blocks"/></svg> Tambah</button></div>
+      <div class="tab-wrap"><button class="tab" data-tab="layers" type="button" role="tab" title="Peta seluruh isi halaman dari luar ke dalam — untuk memilih bagian yang susah diklik"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><use href="#i-layers"/></svg> Struktur</button></div>
       <div class="tab-wrap">
-        <button class="tab" data-tab="scan" type="button" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-shield"/></svg> Periksa</button>
+        <button class="tab" data-tab="scan" type="button" role="tab" title="Cari masalah di halaman — link kosong, gambar tanpa keterangan, tombol tanpa tujuan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-shield"/></svg> Periksa</button>
         <span class="badge" id="scanBadge" hidden>0</span>
       </div>
     </nav>
@@ -1217,6 +1322,21 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
 <input type="file" id="fileInput" accept="image/*" hidden>
 <div class="toast" id="toast" hidden></div>
 
+<!-- Sambutan sekali jalan. Alat ini tidak punya halaman bantuan, dan tiga hal
+     inilah yang paling sering membuat orang berhenti di layar pertama: tidak
+     tahu halamannya bisa diklik, tidak tahu teks diubah dengan klik dua kali,
+     dan tidak tahu ada cara membatalkan. Muncul sekali saja; tombol keterangan
+     di bar atas memanggilnya lagi kalau perlu. -->
+<div class="tour" id="tour" hidden role="dialog" aria-label="Cara pakai">
+  <p class="tour-t" id="tourT"></p>
+  <p class="tour-d" id="tourD"></p>
+  <div class="tour-f">
+    <span class="tour-dots" id="tourDots" aria-hidden="true"></span>
+    <button class="tour-skip" id="tourSkip" type="button">Lewati</button>
+    <button class="tour-next" id="tourNext" type="button">Lanjut</button>
+  </div>
+</div>
+
 <div class="cpop" id="colorPop" hidden>
   <div class="cpop-sv" id="cpSv"><div class="cpop-sv-thumb" id="cpSvThumb"></div></div>
   <div class="cpop-hue" id="cpHue"><div class="cpop-hue-thumb" id="cpHueThumb"></div></div>
@@ -1247,7 +1367,8 @@ var E = {};
  'swapBtn','swapModal','swapFrom','swapTo','swapText','swapCount','swapList','swapApply','linkSwapAll',
  'imgUrl','imgUrlApply','cVideo','pVideo','pVideoApply',
  'draftBar','draftTitle','draftWhen','draftOpen','draftDrop','cTheme','themeList','lockBtn','lockLabel',
- 'ghost','ghostTag','textScriptNote','partColorBtn','cCountdown','cdList','memuat'
+ 'ghost','ghostTag','textScriptNote','partColorBtn','cCountdown','cdList','memuat',
+ 'stepBar','step1','step2','step3','tour','tourT','tourD','tourDots','tourSkip','tourNext'
 ].forEach(function(id){ E[id] = $(id); });
 
 /* ---------------- keadaan ---------------- */
@@ -1318,7 +1439,68 @@ function toast(msg, bad){
 }
 /* Keterangannya tinggal muncul saat kursor menyentuh ikonnya, jadi bar atas
    tetap lega dan tidak ada lagi kalimat yang terpotong di tengah. */
-function hint(t){ E.hintBtn.title = t || ''; E.hintBtn.hidden = !t; }
+function hint(t){
+  E.hintBtn.title = (t ? t + '\n\n' : '') + 'Klik untuk melihat cara pakai singkat.';
+  E.hintBtn.hidden = !t;
+}
+
+/* ---------------- tiga langkah ----------------
+   Angka berubah jadi centang begitu langkahnya lewat. Dipanggil dari tiga
+   tempat saja: layar awal, halaman selesai dimuat, dan unduhan berhasil. */
+var stepEls = [E.step1, E.step2, E.step3];
+function setStep(n){
+  for (var i = 0; i < stepEls.length; i++){
+    var el = stepEls[i]; if (!el) continue;
+    var num = el.firstElementChild;
+    el.classList.toggle('on', i === n - 1);
+    el.classList.toggle('done', i < n - 1);
+    if (num) num.textContent = (i < n - 1) ? '✓' : String(i + 1);
+  }
+}
+
+/* ---------------- sambutan sekali jalan ----------------
+   Muncul sekali seumur peramban, sesudah halaman pertama selesai dimuat.
+   Penanda sesi dipakai supaya pemuatan ulang di tengah pekerjaan — misalnya
+   saat tanggal hitung mundur diganti — tidak memunculkannya lagi. */
+var SAMBUT = 'sunting-html-sambutan';
+var TUR = [
+  { t:'Klik apa saja untuk memilihnya',
+    d:'Arahkan kursor ke halaman; garis birunya menunjukkan bagian mana yang akan terpilih. Klik sekali, lalu pengaturannya muncul di panel kanan.' },
+  { t:'Klik dua kali untuk mengubah tulisan',
+    d:'Ketik langsung di halaman seperti di aplikasi tulis biasa, lalu klik di luar kalau sudah selesai.' },
+  { t:'Kalau salah, tekan Ctrl+Z',
+    d:'Setiap perubahan bisa dibatalkan, sebanyak apa pun. Kalau sudah puas, tekan "Unduh hasilnya" di kanan atas untuk menyimpannya ke komputer.' }
+];
+var turIdx = -1, turPernah = false;
+function turTampil(i){
+  if (i >= TUR.length){ turTutup(true); return; }
+  turIdx = i;
+  E.tourT.textContent = TUR[i].t;
+  E.tourD.textContent = TUR[i].d;
+  E.tourDots.innerHTML = '';
+  for (var k = 0; k < TUR.length; k++){
+    var d = document.createElement('span');
+    d.className = 'tour-dot' + (k === i ? ' on' : '');
+    E.tourDots.appendChild(d);
+  }
+  E.tourNext.textContent = (i === TUR.length - 1) ? 'Mengerti' : 'Lanjut';
+  E.tour.hidden = false;
+}
+function turTutup(selesai){
+  E.tour.hidden = true; turIdx = -1;
+  if (selesai){ try { localStorage.setItem(SAMBUT, '1'); } catch(err){} }
+}
+function turMulai(paksa){
+  if (!paksa){
+    if (turPernah) return;
+    try { if (localStorage.getItem(SAMBUT)) return; } catch(err){ return; }
+  }
+  turPernah = true;
+  turTampil(0);
+}
+E.tourNext.addEventListener('click', function(){ turTampil(turIdx + 1); });
+E.tourSkip.addEventListener('click', function(){ turTutup(true); });
+E.hintBtn.addEventListener('click', function(){ turMulai(true); });
 function skip(el){
   if (!el || el.nodeType !== 1) return true;
   /* Isi dalam <svg> — path, circle, g — bukan komponen yang bisa disunting, tapi
@@ -1462,11 +1644,32 @@ E.demoBtn.addEventListener('click', function(){
   E.srcInput.scrollTop = 0;
   toast('Contoh dimuat: HTML, CSS, dan JS terpisah. Tekan "Buka di kanvas".');
 });
+/* Kalau yang ditempel bukan HTML, dulu tetap dibuka dan hasilnya halaman putih
+   berisi satu baris teks — orang tidak tahu salahnya di mana. Sekarang dikenali
+   dulu dan dikatakan dengan kalimat yang menyebut langkah berikutnya, bukan
+   sekadar "tidak valid". */
+function salahnyaApa(raw){
+  if (/<[a-z!/]/i.test(raw)) return null;       // ada tanda tag, anggap HTML
+  var kotakBawah = 'Tekan "+ Punya file CSS atau JS terpisah?" di bawah kotak ini, lalu tempel di kotak ';
+  /* JS diperiksa lebih dulu. Keduanya sama-sama memakai tanda { }, jadi kalau
+     CSS yang dicek duluan, isi file JavaScript ikut tertangkap dan orang
+     disuruh menempelnya di kotak yang salah. */
+  if (/\b(function|=>|var\s|let\s|const\s|return\s|console\.|document\.|window\.|addEventListener)\b|=>/.test(raw))
+    return 'Ini sepertinya isi file JavaScript, bukan HTML. ' + kotakBawah + '"Isi file JavaScript".';
+  if (/[.#a-z][\w-]*\s*\{[^{}]*[a-z-]+\s*:/i.test(raw))
+    return 'Ini sepertinya isi file CSS, bukan HTML. ' + kotakBawah + '"Isi file CSS".';
+  return 'Sepertinya ini bukan kode halaman web. Coba salin lagi dari file .html kamu — isinya selalu ada tanda seperti <!DOCTYPE html> atau <div>.';
+}
 E.openBtn.addEventListener('click', function(){
   var raw = E.srcInput.value.trim();
   if (!raw){
-    E.startErr.textContent = 'Tempel dulu kode HTML-nya, ya.';
-    E.startErr.hidden = false; return;
+    E.startErr.textContent = 'Kotaknya masih kosong. Tempel dulu kode halamanmu di sini, ya.';
+    E.startErr.hidden = false; E.srcInput.focus(); return;
+  }
+  var salah = salahnyaApa(raw);
+  if (salah){
+    E.startErr.textContent = salah;
+    E.startErr.hidden = false; E.srcInput.focus(); return;
   }
   E.startErr.hidden = true;
   open(raw, E.cssInput.value, E.jsInput.value);
@@ -1486,6 +1689,7 @@ E.backBtn.addEventListener('click', function(){
   hint('');
   E.devSeg.hidden = true; E.widthBox.hidden = true; E.zoomGroup.hidden = true;
   E.startView.hidden = false; E.cTheme.hidden = true; E.cCountdown.hidden = true; tampilkanDraf();
+  turTutup(false); setStep(1);
   E.dlBtn.disabled = E.copyBtn.disabled = E.codeBtn.disabled = E.swapBtn.disabled = true;
   E.layersTree.innerHTML = ''; E.issueList.innerHTML = '';
   E.scanPill.textContent = 'Belum diperiksa'; E.scanPill.className = 'pill';
@@ -1584,6 +1788,8 @@ E.frame.addEventListener('load', function(){
   runScan(true); simpanDraf();
   hint('Klik elemen untuk memilih. Klik dua kali untuk mengubah teksnya.');
   tampilMemuat(false);
+  setStep(2);
+  turMulai(false);
 });
 
 /* Penanda memuat menutupi kanvas, jadi ukurannya mengikuti kanvas. */
@@ -1684,7 +1890,7 @@ E.zoomFit.addEventListener('click', function(){ zoomMode = 'fit'; layout(); });
    hilang. */
 var previewOn = false, outlineSebelumPreview = false;
 function setPreview(on){
-  if (!fd && on){ toast('Buka halaman dulu di kanvas.', true); return; }
+  if (!fd && on){ toast('Buka dulu halamanmu — tempel kodenya di layar awal.', true); return; }
   previewOn = on;
   document.body.classList.toggle('preview', on);
   document.querySelector('.app').classList.toggle('preview', on);
@@ -1717,7 +1923,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && prev
    ringan daripada ratusan div penanda. */
 var outlineOn = false, outlineRects = [], outlineLive = [], outlineTimer = null;
 E.outlineBtn.addEventListener('click', function(){
-  if (!fd){ toast('Buka halaman dulu di kanvas.', true); return; }
+  if (!fd){ toast('Buka dulu halamanmu — tempel kodenya di layar awal.', true); return; }
   outlineOn = !outlineOn;
   E.outlineBtn.classList.toggle('on', outlineOn);
   E.outlineCv.hidden = !outlineOn;
@@ -2062,13 +2268,13 @@ function actDup(){
 }
 function actDel(){
   if (!sel || !sel.parentNode) return;
-  if (terkunci(sel)){ toast('Elemen ini terkunci. Buka kuncinya dulu.', true); return; }
+  if (terkunci(sel)){ toast('Bagian ini dikunci. Buka kuncinya dulu lewat tombol Kunci di panel kanan.', true); return; }
   snap(); var el = sel; deselect(); el.remove(); buildLayers(); toast('Elemen dihapus.');
 }
 function act(a){
   if (a==='parent'){
     if (sel && sel.parentElement && !skip(sel.parentElement)) select(sel.parentElement);
-    else toast('Sudah di elemen terluar.', true);
+    else toast('Ini sudah bagian paling luar halaman.', true);
     return;
   }
   if (a==='text') startEdit();
@@ -2276,7 +2482,7 @@ E.pAlt.addEventListener('input', function(){
 var IMG_MAKS = 1600, IMG_MUTU = 0.82, IMG_MIN = 40000;
 function siapkanGambar(f, cb){
   var rd = new FileReader();
-  rd.onerror = function(){ toast('Gambar tidak terbaca.', true); };
+  rd.onerror = function(){ toast('Gambar itu tidak bisa dibuka. Coba berkas JPG, PNG, atau WebP.', true); };
   rd.onload = function(){
     var asli = rd.result;
     var apaAdanya = function(){ cb(asli, asli.length, asli.length); };
@@ -2741,7 +2947,7 @@ function onKey(e){
   }
   if (mod && String(e.key).toLowerCase()==='y'){ if (!typing){ e.preventDefault(); redo(); } return; }
   if (typing) return;
-  if (e.key==='Escape'){ if (drag){ dragEnd(true); return; } if (palDrag){ palEnd(true); return; } if (closeColorPop()) return; closeModals(); deselect(); return; }
+  if (e.key==='Escape'){ if (drag){ dragEnd(true); return; } if (palDrag){ palEnd(true); return; } if (closeColorPop()) return; if (!E.tour.hidden){ turTutup(true); return; } closeModals(); deselect(); return; }
   if ((e.key==='Delete'||e.key==='Backspace') && sel){ e.preventDefault(); actDel(); }
 }
 document.addEventListener('keydown', onKey);
@@ -2938,7 +3144,7 @@ BLOCK.image = '<img src="' + PLACEHOLDER + '" alt="Gambar" style="max-width:100%
 /* dropInfo: {el, before} untuk menaruh tepat di sana (dari drag), atau null untuk
    menaruh di bawah elemen yang sedang dipilih (dari klik). */
 function insertBlock(kind, dropInfo){
-  if (!fd){ toast('Buka halaman dulu di kanvas.', true); return; }
+  if (!fd){ toast('Buka dulu halamanmu — tempel kodenya di layar awal.', true); return; }
   var box = fd.createElement('div');
   box.innerHTML = BLOCK[kind] || '';
   var node = box.firstElementChild;
@@ -2968,7 +3174,7 @@ document.querySelectorAll('[data-block]').forEach(function(b){
   });
   b.addEventListener('mousedown', function(e){
     if (e.button !== 0) return;
-    if (!fd){ toast('Buka halaman dulu di kanvas.', true); return; }
+    if (!fd){ toast('Buka dulu halamanmu — tempel kodenya di layar awal.', true); return; }
     e.preventDefault();
     palPend = { x:e.clientX, y:e.clientY, kind:b.dataset.block, btn:b };
     document.addEventListener('mousemove', palPendOuter, true);
@@ -3091,7 +3297,7 @@ function runScan(quiet){
   list = fd.querySelectorAll('a[target="_blank"]:not([rel])');
   if (list.length){
     issues.push({ el:list[0], sev:'warn', title:'Link tab baru belum aman',
-      desc:list.length + ' link membuka tab baru tanpa rel="noopener". Ini celah keamanan kecil yang sebaiknya ditutup.',
+      desc:list.length + ' link membuka tab baru tanpa pengaman. Halaman tujuan jadi bisa ikut mengubah halamanmu — celah kecil, tapi sebaiknya ditutup.',
       fixLabel:'Tambahkan rel="noopener"',
       fix:(function(items){ return function(){ Array.prototype.forEach.call(items, function(a){ markEdited(a); a.setAttribute('rel','noopener'); }); }; })(list) });
   }
@@ -3100,7 +3306,7 @@ function runScan(quiet){
   list = fd.querySelectorAll('img:not([alt])');
   if (list.length){
     issues.push({ el:list[0], sev:'warn', title:'Gambar tanpa teks pengganti',
-      desc:list.length + ' gambar belum punya alt. Mesin pencari dan pembaca layar jadi tidak tahu isinya.',
+      desc:list.length + ' gambar belum punya teks pengganti. Kalau gambarnya gagal tampil, tidak ada tulisan apa pun yang muncul sebagai gantinya.',
       fixLabel:'Isi otomatis dari judul terdekat',
       fix:(function(items){ return function(){
         Array.prototype.forEach.call(items, function(im){
@@ -3203,7 +3409,7 @@ function runScan(quiet){
       if (seen[key]) continue;
       seen[key] = 1;
       issues.push({ sev:'warn', title:'Aturan CSS kemungkinan salah tulis',
-        desc:'Properti ini hanya menerima satu nilai, tapi di sini ada dua. Browser akan mengabaikan barisnya.',
+        desc:'Baris ini menyebut dua nilai padahal hanya boleh satu, jadi seluruh barisnya diabaikan.',
         code: prop + ': ' + val });
     }
   });
@@ -3240,7 +3446,7 @@ function runScan(quiet){
   var h1 = fd.querySelectorAll('h1');
   if (h1.length > 1){
     issues.push({ el:h1[1], sev:'info', title:'Judul utama lebih dari satu',
-      desc:'Ada ' + h1.length + ' tag h1. Sebaiknya satu saja per halaman supaya struktur jelas untuk Google.' });
+      desc:'Ada ' + h1.length + ' judul utama. Sebaiknya satu saja per halaman supaya Google tahu mana judul yang sebenarnya.' });
   }
 
   renderIssues();
@@ -3353,7 +3559,7 @@ function warnaiSorotan(hexBaru){
   try {
     span.appendChild(sorotanTersimpan.extractContents());
     sorotanTersimpan.insertNode(span);
-  } catch(err){ toast('Bagian itu tidak bisa diwarnai terpisah.', true); return; }
+  } catch(err){ toast('Bagian itu tidak bisa diwarnai sendiri. Sorot hurufnya saja, jangan sampai kena gambar atau tombol.', true); return; }
   markEdited(sel);
   sorotanTersimpan = null;
   buildLayers(); redraw(); outlineRebuild();
@@ -3440,7 +3646,7 @@ function pasangTanggal(d, nilai){
   var baru = nilai + detik + zona;
   var html = exportHtml();
   var ganti = d.penuh.replace(d.tanggal, baru);
-  if (html.indexOf(d.penuh) === -1){ toast('Tanggal itu tidak ditemukan lagi di kode.', true); return; }
+  if (html.indexOf(d.penuh) === -1){ toast('Tanggal lamanya sudah tidak ada di kode halaman ini, jadi tidak bisa diganti dari sini.', true); return; }
   html = html.split(d.penuh).join(ganti);
   toast('Tanggal diganti ke ' + baru + '. Halaman dimuat ulang supaya hitung mundurnya ikut berubah.');
   open(html, '', '');
@@ -3730,7 +3936,7 @@ function swapBaris(dimana, isi){
   row.appendChild(a); row.appendChild(b); E.swapList.appendChild(row);
 }
 function swapBuka(dari){
-  if (!fd){ toast('Buka halaman dulu di kanvas.', true); return; }
+  if (!fd){ toast('Buka dulu halamanmu — tempel kodenya di layar awal.', true); return; }
   E.swapModal.hidden = false;
   if (dari !== undefined) E.swapFrom.value = dari;
   swapPratinjau();
@@ -3745,7 +3951,7 @@ E.swapApply.addEventListener('click', function(){
   if (!dari) return;
   var h = swapCari(dari, E.swapText.checked);
   var total = h.atribut.length + h.teks.length;
-  if (!total){ toast('Tidak ada yang cocok.', true); return; }
+  if (!total){ toast('Link lamanya tidak ditemukan di halaman ini. Salin persis seperti yang tertulis di tombolnya.', true); return; }
   snap();
   var i;
   for (i=0;i<h.atribut.length;i++){
@@ -3802,14 +4008,14 @@ var iconTarget = null;
 E.iconPick.addEventListener('click', function(){
   if (!sel) return;
   iconTarget = sel.tagName.toLowerCase()==='svg' ? sel : sel.querySelector('svg');
-  if (!iconTarget){ toast('Tidak ada ikon di elemen ini.', true); return; }
+  if (!iconTarget){ toast('Bagian yang dipilih tidak punya ikon. Pilih dulu ikon atau tombol yang ada ikonnya.', true); return; }
   E.iconSvg.value = ''; E.iconUrl.value = '';
   E.iconModal.hidden = false;
 });
 E.iconUrlApply.addEventListener('click', function(){
   var u = (E.iconUrl.value || '').trim();
   if (!/^(https?:\/\/|data:image\/)/i.test(u)){
-    toast('Alamat harus diawali https:// atau data:image/', true); return;
+    toast('Alamat ikonnya harus diawali https:// supaya bisa dimuat.', true); return;
   }
   if (!iconTarget) return;
   snap();
@@ -3852,7 +4058,7 @@ function applyIcon(src, isPath){
     box.innerHTML = src;
   }
   var svg = box.querySelector('svg');
-  if (!svg){ toast('Kode SVG tidak terbaca.', true); return; }
+  if (!svg){ toast('Kode SVG-nya tidak terbaca. Pastikan tersalin utuh, dari <svg sampai penutupnya.', true); return; }
   // buang hal yang bisa dieksekusi
   Array.prototype.forEach.call(svg.querySelectorAll('script'), function(s){ s.remove(); });
   Array.prototype.forEach.call(svg.querySelectorAll('*'), function(n){
@@ -3910,10 +4116,10 @@ function exportHtml(){
 function validate(html){
   try{
     var d = new DOMParser().parseFromString(html, 'text/html');
-    if (!d || !d.body) return 'Struktur HTML tidak terbaca.';
-    if (d.querySelector('parsererror')) return 'Ada bagian HTML yang tidak valid.';
+    if (!d || !d.body) return 'Halaman ini tidak bisa dibaca ulang, jadi unduhannya ditahan dulu. Tekan Ctrl+Z beberapa kali lalu coba lagi.';
+    if (d.querySelector('parsererror')) return 'Ada bagian halaman yang rusak, jadi unduhannya ditahan dulu. Tekan Ctrl+Z beberapa kali lalu coba lagi.';
     return null;
-  }catch(err){ return 'Gagal memeriksa HTML.'; }
+  }catch(err){ return 'Halaman ini gagal diperiksa sebelum diunduh. Tekan Ctrl+Z beberapa kali lalu coba lagi.'; }
 }
 function fileName(){
   var t = fd && fd.title && fd.title.trim();
@@ -3929,7 +4135,7 @@ E.dlBtn.addEventListener('click', function(){
   if (bad){ toast(bad, true); return; }
   var name = fileName();
   if (dlCap){
-    dlCap.save({ filename:name, data:html }).then(function(){ toast('Tersimpan.'); },
+    dlCap.save({ filename:name, data:html }).then(function(){ setStep(3); toast('Tersimpan: ' + name); },
       function(err){ if (!err || err.code!=='declined') saveFallback(html, name); });
     return;
   }
@@ -3943,9 +4149,10 @@ function saveFallback(html, name){
     a.href = u; a.download = name;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function(){ URL.revokeObjectURL(u); }, 2000);
-    toast('File diunduh.');
+    setStep(3);
+    toast('Tersimpan sebagai ' + name + ' — cek folder Unduhan.');
   }catch(err){
-    copy(html).then(function(){ toast('Unduh tidak tersedia, kode sudah disalin.'); });
+    copy(html).then(function(){ toast('Peramban ini tidak mengizinkan unduhan. Kodenya sudah disalin — tempel ke berkas .html baru.'); });
   }
 }
 E.copyBtn.addEventListener('click', function(){

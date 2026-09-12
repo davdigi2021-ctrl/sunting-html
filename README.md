@@ -35,6 +35,13 @@ Editor ini **tidak melakukan itu**. Halaman dirender apa adanya di dalam iframe,
 - **Hitung mundur**: angka yang ditulis ulang oleh skrip halaman dikenali dan dikatakan (mengetik di situ percuma — sedetik kemudian tertimpa). Yang bisa diubah adalah tanggal tujuannya, dan kalau tanggalnya sudah lewat itu ditandai merah
 - Undo/redo (Ctrl+Z / Ctrl+Shift+Z), dan **draf tersimpan otomatis di peramban** sehingga tab yang tertutup tidak menghilangkan pekerjaan
 
+**Menemukan jalan**
+- **Tiga langkah bernomor** di atas panggung — tempel, ubah, unduh — dengan langkah yang sedang berjalan ditandai dan yang sudah lewat dicentang, jadi selalu jelas ini akan berakhir di mana
+- **Sambutan sekali jalan** untuk yang baru pertama membuka: tiga hal yang paling sering bikin tersendat (halamannya bisa diklik, teks diubah dengan klik dua kali, ada Ctrl+Z). Bisa dipanggil lagi lewat tombol keterangan di bar atas
+- Empat tab panel kanan memakai nama sehari-hari — **Atur, Tambah, Struktur, Periksa** — dan masing-masing menjelaskan dirinya saat kursor menyentuhnya
+- Tombol **"Unduh hasilnya"** dibedakan dari tombol lain dan tidak pernah ikut terpotong di jendela sempit
+- Pesan salah ditulis dengan kalimat yang menyebut langkah berikutnya, bukan istilah program. Kode yang ditempel juga dikenali dulu: isi file CSS atau JavaScript yang salah kotak dikatakan apa adanya
+
 **Melihat**
 - Pratinjau **ukuran layar asli** lewat tiga tombol ikon: Desktop 1440px, Tablet 820×1180, HP 390×844 — atau isi sendiri lebar dan tingginya di kotak sebelahnya. Tinggi yang dikosongkan mengikuti tinggi kanvas. Zoom menyesuaikan otomatis
 - Kanvas rata tepi saat lebar penuh, dan berbingkai saat pratinjau lebih sempit
