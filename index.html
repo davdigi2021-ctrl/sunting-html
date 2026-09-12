@@ -1474,6 +1474,13 @@ E.openBtn.addEventListener('click', function(){
 E.backBtn.addEventListener('click', function(){
   ready = false; fd = null; pristine = null;
   deselect(); undoS.length = 0; redoS.length = 0; histBtns();
+  /* Kotak kode wajib dikosongkan. Kalau isinya dibiarkan, menempel kode baru
+     tidak mengganti apa pun — tempelan masuk di posisi kursor, jadi halaman
+     baru tersisip di tengah halaman lama dan keduanya terbuka sekaligus.
+     Pekerjaan sebelumnya tetap bisa dipanggil lewat tombol "Lanjutkan". */
+  E.srcInput.value = ''; E.cssInput.value = ''; E.jsInput.value = '';
+  E.extraFields.hidden = true;
+  E.extraToggle.textContent = '+ Punya file CSS atau JS terpisah?';
   E.frame.removeAttribute('srcdoc');
   E.canvas.hidden = true; E.backBtn.hidden = true; E.ovl.hidden = true; tampilMemuat(false);
   hint('');
@@ -1522,6 +1529,10 @@ function open(raw, css, js){
   try { pristine = new DOMParser().parseFromString(doc, 'text/html'); }
   catch(err){ pristine = null; }
   lastDoc = doc;
+  /* Draf lama dibuang begitu halaman baru dibuka; draf untuk halaman baru
+     ditulis sendiri beberapa saat kemudian oleh simpanDraf(). */
+  try { localStorage.removeItem(DRAF); } catch(err){}
+  E.draftBar.hidden = true;
   E.frame.srcdoc = doc;
   E.startView.hidden = true;
   E.canvas.hidden = false; E.backBtn.hidden = false;
@@ -2639,7 +2650,7 @@ E.boxSel.addEventListener('mousedown', function(e){
   var h = e.target.closest('[data-hdl]'); if (!h || !sel) return;
   e.preventDefault(); snap();
   var r = sel.getBoundingClientRect();
-  resize = { dir:h.dataset.hdl, x:e.clientX, y:e.clientY, w:r.width, h:r.height };
+  resize = { dir:h.dataset.hdl, x:e.clientX, y:e.clientY, w:r.width, h:r.height, minW:lebarMinimal(sel) };
   E.shield.hidden = false; E.shield.classList.add('rz');
   document.addEventListener('mousemove', rzMoveOuter, true);
   document.addEventListener('mouseup', rzUp, true);
@@ -2648,6 +2659,23 @@ E.boxSel.addEventListener('mousedown', function(e){
     fd.addEventListener('mouseup', rzUp, true);
   }
 });
+/* Sebuah kotak teks tidak boleh dipersempit di bawah kata terpanjangnya. Kalau
+   dipaksa, hurufnya menumpuk ke bawah satu-dua per baris dan teksnya terlihat
+   berdiri tegak — itu yang terjadi waktu batas bawahnya masih 16 px: paragraf
+   540 px bisa diciutkan jadi 16 px, tinggi 512 px, sekitar dua huruf per baris.
+   Lebar terkecil karena itu diambil dari `min-content` elemennya sendiri, jadi
+   tiap elemen punya batasnya masing-masing dan tata letak aslinya tidak diubah.
+   Elemen tanpa teks (gambar, jarak) tetap memakai batas lama 16 px. */
+function lebarMinimal(el){
+  try {
+    if (!el.textContent || !el.textContent.trim()) return 16;
+    var simpan = el.style.width;
+    el.style.width = 'min-content';
+    var w = Math.ceil(el.getBoundingClientRect().width);
+    if (simpan) el.style.width = simpan; else el.style.removeProperty('width');
+    return Math.max(16, w);
+  } catch(err){ return 16; }
+}
 function rzMoveOuter(e){ rzMove(e.clientX, e.clientY); }
 function rzMoveInner(e){
   var r = E.frame.getBoundingClientRect();
@@ -2656,7 +2684,7 @@ function rzMoveInner(e){
 function rzMove(cx, cy){
   if (!resize || !sel) return;
   markEdited(sel);
-  if (resize.dir==='e' || resize.dir==='se') sel.style.width = Math.max(16, Math.round(resize.w + (cx-resize.x)/scale)) + 'px';
+  if (resize.dir==='e' || resize.dir==='se') sel.style.width = Math.max(resize.minW || 16, Math.round(resize.w + (cx-resize.x)/scale)) + 'px';
   if (resize.dir==='s' || resize.dir==='se') sel.style.height = Math.max(16, Math.round(resize.h + (cy-resize.y)/scale)) + 'px';
   redraw();
 }
