@@ -31,11 +31,14 @@ Editor ini **tidak melakukan itu**. Halaman dirender apa adanya di dalam iframe,
 - **Kunci elemen** supaya tidak tergeser atau terhapus tidak sengaja saat menyeret yang lain
 - **Ubah warna tema halaman**: warna merek yang dipakai berulang lewat variabel CSS bisa diubah sekali untuk semua tempat
 - **Pasang video** YouTube atau Vimeo — tempel alamat biasa, diubah sendiri ke bentuk sematan
+- **Warnai sebagian teks**: sorot beberapa kata di kanvas lalu beri warna sendiri, sisanya tidak tersentuh
+- **Hitung mundur**: angka yang ditulis ulang oleh skrip halaman dikenali dan dikatakan (mengetik di situ percuma — sedetik kemudian tertimpa). Yang bisa diubah adalah tanggal tujuannya, dan kalau tanggalnya sudah lewat itu ditandai merah
 - Undo/redo (Ctrl+Z / Ctrl+Shift+Z), dan **draf tersimpan otomatis di peramban** sehingga tab yang tertutup tidak menghilangkan pekerjaan
 
 **Melihat**
 - Pratinjau **ukuran layar asli** lewat tiga tombol ikon: Desktop 1440px, Tablet 820×1180, HP 390×844 — atau isi sendiri lebar dan tingginya di kotak sebelahnya. Tinggi yang dikosongkan mengikuti tinggi kanvas. Zoom menyesuaikan otomatis
 - Kanvas rata tepi saat lebar penuh, dan berbingkai saat pratinjau lebih sempit
+- Saat menyeret, muncul **bayangan seukuran isinya** di tempat jatuh — bukan cuma garis tipis — jadi terlihat seberapa besar section barunya nanti
 - **Rangka semua komponen** (seperti *view components* di GrapesJS), dengan label nama komponen saat kursor menyentuh elemen
 - **Panel lapisan** berisi struktur halaman. Arahkan kursor ke satu baris untuk melihat letaknya disorot di kanvas
 - **Pratinjau**: semua alat bantu disingkirkan dan halaman jadi bisa dipakai betulan — menu HP membuka, tombol buka-tutup bekerja, animasi masuk jalan. Link yang berpindah halaman tetap ditahan supaya pratinjau tidak melompat keluar. Tekan Esc untuk kembali menyunting

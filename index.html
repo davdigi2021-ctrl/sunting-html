@@ -441,6 +441,29 @@ body.preview .device{border-radius:0;box-shadow:none;}
 .hdl-s{bottom:-5px;left:calc(50% - 5px);cursor:ns-resize;}
 .hdl-se{right:-5px;bottom:-5px;cursor:nwse-resize;}
 .ins{position:absolute;height:2.5px;background:var(--accent);border-radius:2px;pointer-events:none;}
+/* Bayangan tempat jatuh: garis tipis saja tidak memberi gambaran seberapa besar
+   isinya nanti, apalagi untuk section. Kotak ini memakai ukuran sebenarnya dan
+   bergeser halus supaya terasa seperti isi halaman membuka ruang. */
+.ghost{
+  position:absolute;pointer-events:none;z-index:2;
+  border:2px dashed var(--accent);
+  background:var(--accent-soft);
+  border-radius:10px;
+  box-shadow:0 8px 24px -10px rgba(0,113,227,.5);
+  transition:top .16s cubic-bezier(.22,1,.36,1), left .16s cubic-bezier(.22,1,.36,1),
+             width .16s cubic-bezier(.22,1,.36,1), height .16s cubic-bezier(.22,1,.36,1);
+}
+.ghost[hidden]{display:none;}
+.err-note{color:var(--bad);}
+.cd-row{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+.cd-row:last-child{margin-bottom:0;}
+
+.ghost-tag{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:var(--accent);color:#fff;border-radius:999px;
+  padding:4px 12px;font-size:11.5px;font-weight:600;white-space:nowrap;
+  box-shadow:0 4px 12px rgba(0,0,0,.18);
+}
 .ins[hidden]{display:none;}
 .ins::before{
   content:'';position:absolute;left:-4px;top:-3px;width:9px;height:9px;
@@ -875,6 +898,15 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
             <div class="card" id="cText" hidden>
               <div class="card-h"><span class="card-t">Teks</span></div>
               <textarea id="pText" class="inp" rows="2"></textarea>
+              <p class="note err-note" id="textScriptNote" hidden></p>
+              <button class="btn btn-plain btn-sm btn-full" id="partColorBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-drop"/></svg>Warnai sebagian teks</button>
+              <p class="note">Klik dua kali di kanvas, sorot bagian yang mau diwarnai, lalu tekan tombol ini.</p>
+            </div>
+
+            <div class="card" id="cCountdown" hidden>
+              <div class="card-h"><span class="card-t">Hitung mundur</span></div>
+              <p class="note">Angkanya dihasilkan oleh skrip halaman, jadi tidak bisa diketik langsung. Yang diubah adalah tanggal tujuannya.</p>
+              <div id="cdList"></div>
             </div>
 
             <div class="card" id="cLink" hidden>
@@ -1072,6 +1104,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
     <span class="hdl hdl-se" data-hdl="se"></span>
   </div>
   <div class="ins" id="insLine" hidden></div>
+  <div class="ghost" id="ghost" hidden><span class="ghost-tag" id="ghostTag"></span></div>
   <div class="qbar" id="qbar" hidden>
     <button class="qb" data-act="parent" type="button" title="Pilih elemen induk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-up"/></svg></button>
     <button class="qb" id="qbMove" type="button" title="Seret untuk memindahkan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-move"/></svg></button>
@@ -1185,7 +1218,8 @@ var E = {};
  'codeModal','codeOut','codeTitle','codeCopy','iconModal','iconGrid','iconSvg','iconApply',
  'swapBtn','swapModal','swapFrom','swapTo','swapText','swapCount','swapList','swapApply','linkSwapAll',
  'imgUrl','imgUrlApply','cVideo','pVideo','pVideoApply',
- 'draftBar','draftTitle','draftWhen','draftOpen','draftDrop','cTheme','themeList','lockBtn','lockLabel'
+ 'draftBar','draftTitle','draftWhen','draftOpen','draftDrop','cTheme','themeList','lockBtn','lockLabel',
+ 'ghost','ghostTag','textScriptNote','partColorBtn','cCountdown','cdList'
 ].forEach(function(id){ E[id] = $(id); });
 
 /* ---------------- keadaan ---------------- */
@@ -1267,6 +1301,15 @@ function skip(el){
   if (el.ownerSVGElement) return true;
   var t = el.tagName;
   return t==='HTML'||t==='BODY'||t==='HEAD'||t==='SCRIPT'||t==='STYLE'||t==='LINK'||t==='META'||t==='TITLE';
+}
+/* Kursor bisa mendarat di bagian yang bukan komponen — paling sering isi dalam
+   <svg>. Daripada menganggap tidak ada sasaran (yang membuat garis sisip dan
+   sorotan hilang begitu kursor lewat di atas ikon), naik ke komponen terdekat
+   di atasnya. */
+function komponen(el){
+  var n = el;
+  while (n && n.nodeType === 1 && skip(n)) n = n.parentElement;
+  return (n && n.nodeType === 1 && !skip(n)) ? n : null;
 }
 function editing(el){ return el && el.getAttribute && el.getAttribute('contenteditable')==='true'; }
 /* Nama yang bisa dibaca lebih dulu, penanda teknis menyusul: "Wadah .container",
@@ -1354,7 +1397,7 @@ E.backBtn.addEventListener('click', function(){
   E.canvas.hidden = true; E.backBtn.hidden = true; E.ovl.hidden = true;
   hint('');
   E.devSeg.hidden = true; E.widthBox.hidden = true; E.zoomGroup.hidden = true;
-  E.startView.hidden = false; E.cTheme.hidden = true; tampilkanDraf();
+  E.startView.hidden = false; E.cTheme.hidden = true; E.cCountdown.hidden = true; tampilkanDraf();
   E.dlBtn.disabled = E.copyBtn.disabled = E.codeBtn.disabled = E.swapBtn.disabled = true;
   E.layersTree.innerHTML = ''; E.issueList.innerHTML = '';
   E.scanPill.textContent = 'Belum diperiksa'; E.scanPill.className = 'pill';
@@ -1442,7 +1485,7 @@ E.frame.addEventListener('load', function(){
   ready = true;
   E.dlBtn.disabled = E.copyBtn.disabled = E.codeBtn.disabled = E.swapBtn.disabled = false;
   E.ovl.hidden = false;
-  layout(); outlineBuild(); buildLayers(); deselect(); bangunTema();
+  layout(); outlineBuild(); buildLayers(); deselect(); bangunTema(); bangunCountdown();
   runScan(true); simpanDraf();
   hint('Klik elemen untuk memilih. Klik dua kali untuk mengubah teksnya.');
 });
@@ -1799,8 +1842,8 @@ function bind(){
 }
 function onMove(e){
   if (drag || resize || previewOn) return;
-  var t = e.target;
-  setHover(skip(t) || t===sel ? null : t);
+  var t = komponen(e.target);
+  setHover(!t || t===sel ? null : t);
 }
 function onClick(e){
   /* Saat pratinjau, halaman dibiarkan bekerja sendiri. Yang ditahan hanya link
@@ -1820,13 +1863,13 @@ function onClick(e){
   if (editing(e.target)) return;
   e.preventDefault(); e.stopPropagation();
   flushEdit();
-  var t = e.target;
-  if (skip(t)){ deselect(); return; }
+  var t = komponen(e.target);
+  if (!t){ deselect(); return; }
   select(t);
 }
 function onDbl(e){
   if (previewOn) return;
-  var t = e.target; if (skip(t)) return;
+  var t = komponen(e.target); if (!t) return;
   e.preventDefault(); select(t); startEdit();
 }
 
@@ -1844,7 +1887,7 @@ function select(el){
 function deselect(){
   flushEdit();
   sel = null;
-  E.boxSel.hidden = true; E.qbar.hidden = true; E.insLine.hidden = true;
+  E.boxSel.hidden = true; E.qbar.hidden = true; E.insLine.hidden = true; sembunyiBayangan();
   setHover(null); setDrop(null); setPeek(null);
   E.propsEmpty.hidden = false; E.propsBody.hidden = true;
   markLayer(null);
@@ -1976,6 +2019,7 @@ function fillProps(){
 
   var pure = sel.children.length === 0;
   E.cText.hidden = !pure;
+  cekTeksSkrip(pure ? sel : null);
   if (pure){
     var raw = sel.textContent, tr = raw.trim();
     E.pText.value = tr;
@@ -2406,15 +2450,31 @@ function startDrag(el){
   }
   hint('Lepaskan di garis biru untuk menaruh elemen di sana. Tekan Esc untuk batal.');
 }
+/* Perkiraan tinggi tiap blok baru, supaya bayangannya sebesar yang akan jadi.
+   Angkanya diambil dari tinggi sebenarnya blok-blok ini setelah dipasang. */
+var TINGGI_BLOK = { section:150, heading:52, text:62, button:48, image:190,
+                    video:210, columns:150, columns3:150, divider:22, spacer:44 };
+function tampilBayangan(target, before, tinggi, lebar, label){
+  var r = target.getBoundingClientRect();
+  var g = E.ghost;
+  g.hidden = false;
+  g.style.left  = ((lebar != null ? r.left : r.left) * scale) + 'px';
+  g.style.width = ((lebar != null ? lebar : r.width) * scale) + 'px';
+  g.style.height = (tinggi * scale) + 'px';
+  g.style.top = ((before ? r.top : r.bottom) * scale) - (tinggi * scale) / 2 + 'px';
+  E.ghostTag.textContent = label;
+}
+function sembunyiBayangan(){ E.ghost.hidden = true; }
+
 function dragMoveOuter(e){ dragMove(pt(e)); }
 function dragMoveInner(e){ dragMove({ x:e.clientX, y:e.clientY }); }
 function dragEndOuter(e){ dragMove(pt(e)); dragEnd(false); }
 function dragEndInner(e){ dragMove({ x:e.clientX, y:e.clientY }); dragEnd(false); }
 function dragMove(p){
   if (!drag) return;
-  var t = fd.elementFromPoint(p.x, p.y);
-  if (!t || skip(t) || t===drag.el || drag.el.contains(t)){
-    E.insLine.hidden = true; drag.target = null; return;
+  var t = komponen(fd.elementFromPoint(p.x, p.y));
+  if (!t || t===drag.el || drag.el.contains(t)){
+    E.insLine.hidden = true; sembunyiBayangan(); drag.target = null; return;
   }
   var r = t.getBoundingClientRect();
   var before = (p.y - r.top) < r.height/2;
@@ -2423,6 +2483,8 @@ function dragMove(p){
   E.insLine.style.left = (r.left*scale) + 'px';
   E.insLine.style.width = (r.width*scale) + 'px';
   E.insLine.style.top = ((before ? r.top : r.bottom)*scale - 1) + 'px';
+  var dr = drag.el.getBoundingClientRect();
+  tampilBayangan(t, before, Math.max(26, dr.height), null, label(drag.el));
 }
 function dragEnd(cancel){
   if (!drag) return;
@@ -2433,7 +2495,7 @@ function dragEnd(cancel){
     fd.removeEventListener('mousemove', dragMoveInner, true);
     fd.removeEventListener('mouseup', dragEndInner, true);
   }
-  E.shield.hidden = true; E.insLine.hidden = true;
+  E.shield.hidden = true; E.insLine.hidden = true; sembunyiBayangan();
   d.el.style.removeProperty('opacity');
   if (!d.el.getAttribute('style')) d.el.removeAttribute('style');
   if (!cancel && d.target && d.target.parentNode){
@@ -2489,8 +2551,7 @@ function isFile(e){
 function onFileOver(e){
   if (!isFile(e)) return;
   e.preventDefault(); e.dataTransfer.dropEffect = 'copy';
-  var t = fd.elementFromPoint(e.clientX, e.clientY);
-  setDrop(skip(t) ? null : t);
+  setDrop(komponen(fd.elementFromPoint(e.clientX, e.clientY)));
 }
 function onFileDrop(e){
   if (!isFile(e)) return;
@@ -2800,8 +2861,8 @@ function palMoveOuter(e){ palMove(pt(e)); }
 function palMoveInner(e){ palMove({ x:e.clientX, y:e.clientY }); }
 function palMove(p){
   if (!palDrag || !fd) return;
-  var t = fd.elementFromPoint(p.x, p.y);
-  if (!t || skip(t)){ E.insLine.hidden = true; palDrag.target = null; return; }
+  var t = komponen(fd.elementFromPoint(p.x, p.y));
+  if (!t){ E.insLine.hidden = true; sembunyiBayangan(); palDrag.target = null; return; }
   var r = t.getBoundingClientRect();
   var before = (p.y - r.top) < r.height/2;
   palDrag.target = t; palDrag.before = before;
@@ -2809,6 +2870,12 @@ function palMove(p){
   E.insLine.style.left = (r.left*scale) + 'px';
   E.insLine.style.width = (r.width*scale) + 'px';
   E.insLine.style.top = ((before ? r.top : r.bottom)*scale - 1) + 'px';
+  tampilBayangan(t, before, TINGGI_BLOK[palDrag.kind] || 80, null, namaBlok(palDrag.kind));
+}
+function namaBlok(k){
+  var n = { section:'Section', heading:'Judul', text:'Paragraf', button:'Tombol', image:'Gambar',
+            video:'Video', columns:'2 Kolom', columns3:'3 Kolom', divider:'Garis', spacer:'Jarak' };
+  return (n[k] || 'Elemen') + ' baru di sini';
 }
 function palEndOuter(e){ palMove(pt(e)); palEnd(false); }
 function palEndInner(e){ palMove({ x:e.clientX, y:e.clientY }); palEnd(false); }
@@ -2822,7 +2889,7 @@ function palEnd(cancel){
     fd.removeEventListener('mouseup', palEndInner, true);
   }
   d.btn.classList.remove('dragging');
-  E.shield.hidden = true; E.insLine.hidden = true;
+  E.shield.hidden = true; E.insLine.hidden = true; sembunyiBayangan();
   palJustDragged = true;
   setTimeout(function(){ palJustDragged = false; }, 80);
   if (cancel) toast('Dibatalkan.');
@@ -3098,6 +3165,121 @@ E.fixAllBtn.addEventListener('click', function(){
   toast(total + ' masalah diperbaiki.');
   buildLayers(); if (sel) fillProps();
 });
+
+/* ---------------- warna sebagian teks ----------------
+   Sorotan hilang begitu fokus pindah ke panel, jadi jangkauannya direkam dulu
+   saat tombol ditekan, baru dipakai setelah warnanya dipilih. Bagian yang
+   disorot dibungkus <span style="color:..."> — cara paling sederhana yang tidak
+   mengubah apa pun di luar sorotan itu. */
+var sorotanTersimpan = null;
+function ambilSorotan(){
+  if (!fd) return null;
+  var s = fd.defaultView.getSelection();
+  if (!s || !s.rangeCount || s.isCollapsed) return null;
+  var r = s.getRangeAt(0);
+  if (!sel || !sel.contains(r.commonAncestorContainer)) return null;
+  return r.cloneRange();
+}
+function warnaiSorotan(hexBaru){
+  if (!sorotanTersimpan) return;
+  snap();
+  var span = fd.createElement('span');
+  span.style.color = hexBaru;
+  try {
+    span.appendChild(sorotanTersimpan.extractContents());
+    sorotanTersimpan.insertNode(span);
+  } catch(err){ toast('Bagian itu tidak bisa diwarnai terpisah.', true); return; }
+  markEdited(sel);
+  sorotanTersimpan = null;
+  buildLayers(); redraw(); outlineRebuild();
+  toast('Bagian yang disorot diwarnai.');
+}
+E.partColorBtn.addEventListener('click', function(e){
+  e.stopPropagation();
+  if (!sel){ toast('Pilih elemennya dulu.', true); return; }
+  var r = ambilSorotan();
+  if (!r){
+    toast('Sorot dulu bagian teks yang mau diwarnai — klik dua kali di kanvas, lalu blok hurufnya.', true);
+    return;
+  }
+  sorotanTersimpan = r;
+  openColorPop(E.partColorBtn, '#e5484d', warnaiSorotan);
+});
+
+/* ---------------- teks yang ditulis ulang oleh skrip halaman ----------------
+   Halaman jualan sering punya hitung mundur yang menulis ulang angkanya tiap
+   detik. Mengetik di situ percuma: sedetik kemudian tertimpa lagi. Daripada
+   diam-diam gagal, keadaannya dikenali lalu dikatakan, dan yang ditawarkan
+   adalah mengubah tanggal tujuannya — sumber angka itu sebenarnya. */
+var cekSkripTimer = null, cekSkripAmat = null;
+function cekTeksSkrip(el){
+  clearTimeout(cekSkripTimer);
+  if (cekSkripAmat){ cekSkripAmat.disconnect(); cekSkripAmat = null; }
+  E.textScriptNote.hidden = true;
+  if (!el || typeof MutationObserver === 'undefined') return;
+  /* Membandingkan isi teks saja tidak cukup: hitung mundur yang tanggalnya
+     sudah lewat menulis "00" berulang-ulang — nilainya sama, tapi tetap
+     menimpa ketikan. Yang dipantau karena itu penulisannya, bukan hasilnya. */
+  var kena = false;
+  cekSkripAmat = new MutationObserver(function(){ if (!editing(el)) kena = true; });
+  cekSkripAmat.observe(el, { childList:true, characterData:true, subtree:true });
+  cekSkripTimer = setTimeout(function(){
+    if (cekSkripAmat){ cekSkripAmat.disconnect(); cekSkripAmat = null; }
+    if (!kena || !fd || !fd.contains(el) || el !== sel) return;
+    E.textScriptNote.hidden = false;
+    E.textScriptNote.textContent = 'Teks ini ditulis ulang terus oleh skrip halaman (biasanya hitung mundur), jadi ketikan di sini akan tertimpa. Ubah tanggalnya di kartu "Hitung mundur" di bawah.';
+  }, 1300);
+}
+
+/* Tanggal tujuan hitung mundur hidup di dalam <script>, dan skrip yang sudah
+   jalan tidak bisa diubah begitu saja — halamannya harus dimuat ulang. Jadi
+   perubahannya diterapkan ke kode hasil ekspor lalu dibuka kembali. */
+function cariTanggalSkrip(){
+  var hasil = [];
+  if (!fd) return hasil;
+  var sk = fd.querySelectorAll('script');
+  for (var i=0;i<sk.length;i++){
+    var isi = sk[i].textContent || '';
+    var re = /new\s+Date\(\s*['"]([0-9]{4}-[0-9]{2}-[0-9]{2}[^'"]*)['"]\s*\)/g, m;
+    while ((m = re.exec(isi))) hasil.push({ penuh:m[0], tanggal:m[1] });
+  }
+  return hasil;
+}
+function bangunCountdown(){
+  E.cdList.innerHTML = '';
+  var daftar = cariTanggalSkrip();
+  E.cCountdown.hidden = daftar.length === 0;
+  if (!daftar.length) return;
+  daftar.forEach(function(d){
+    var baris = document.createElement('div'); baris.className = 'cd-row';
+    var lbl = document.createElement('label'); lbl.className = 'lbl';
+    var lewat = new Date(d.tanggal).getTime() < Date.now();
+    lbl.textContent = 'Tanggal tujuan' + (lewat ? ' — sudah lewat, hitung mundur berhenti di 00' : '');
+    if (lewat) lbl.style.color = 'var(--bad)';
+    var bar = document.createElement('div'); bar.className = 'row-2';
+    var inp = document.createElement('input');
+    inp.type = 'datetime-local'; inp.className = 'inp mono';
+    inp.value = (d.tanggal.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/) || [d.tanggal.slice(0,10) + 'T00:00'])[0];
+    var btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'btn btn-plain btn-sm'; btn.textContent = 'Pasang';
+    btn.addEventListener('click', function(){ pasangTanggal(d, inp.value); });
+    bar.appendChild(inp); bar.appendChild(btn);
+    baris.appendChild(lbl); baris.appendChild(bar);
+    E.cdList.appendChild(baris);
+  });
+}
+function pasangTanggal(d, nilai){
+  if (!nilai){ toast('Isi dulu tanggalnya.', true); return; }
+  var zona = (d.tanggal.match(/(Z|[+-]\d{2}:\d{2})$/) || [''])[0];
+  var detik = /T\d{2}:\d{2}:\d{2}/.test(d.tanggal) ? ':00' : '';
+  var baru = nilai + detik + zona;
+  var html = exportHtml();
+  var ganti = d.penuh.replace(d.tanggal, baru);
+  if (html.indexOf(d.penuh) === -1){ toast('Tanggal itu tidak ditemukan lagi di kode.', true); return; }
+  html = html.split(d.penuh).join(ganti);
+  toast('Tanggal diganti ke ' + baru + '. Halaman dimuat ulang supaya hitung mundurnya ikut berubah.');
+  open(html, '', '');
+}
 
 /* ---------------- kunci elemen ----------------
    Header dan tombol melayang gampang tergeser tidak sengaja saat menyeret
