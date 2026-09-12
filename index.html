@@ -464,7 +464,26 @@ body.preview .device{border-radius:0;box-shadow:none;}
   padding:4px 12px;font-size:11.5px;font-weight:600;white-space:nowrap;
   box-shadow:0 4px 12px rgba(0,0,0,.18);
 }
+.memuat{
+  position:fixed;z-index:400;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:10px;
+  background:var(--bg);color:var(--ink-2);
+}
+.memuat[hidden]{display:none;}
+.memuat-putar{
+  width:30px;height:30px;border-radius:50%;
+  border:2.5px solid var(--line-2);border-top-color:var(--accent);
+  animation:memuat-putar .8s linear infinite;
+}
+@keyframes memuat-putar{to{transform:rotate(360deg);}}
+.memuat-teks{font-size:13px;font-weight:600;color:var(--ink);}
+.memuat-sub{font-size:12px;color:var(--ink-3);}
+@media (prefers-reduced-motion:reduce){ .memuat-putar{animation-duration:2.4s;} }
+
 .ins[hidden]{display:none;}
+/* Garis tegak dipakai kalau induknya menyusun anak-anaknya ke samping. */
+.ins.tegak{width:2.5px;}
+.ins.tegak::before{left:-3px;top:-4px;}
 .ins::before{
   content:'';position:absolute;left:-4px;top:-3px;width:9px;height:9px;
   border-radius:50%;background:var(--accent);
@@ -1091,6 +1110,15 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
   </aside>
 </div>
 
+<!-- Penanda memuat. Kanvas ditampilkan begitu tombol ditekan, tapi isinya baru
+     ada setelah iframe selesai memuat — di halaman berat jedanya sampai 1,5
+     detik, dan sebelumnya layar benar-benar kosong tanpa keterangan apa pun. -->
+<div class="memuat" id="memuat" hidden>
+  <span class="memuat-putar" aria-hidden="true"></span>
+  <span class="memuat-teks">Memuat halaman…</span>
+  <span class="memuat-sub">Gambar dan font besar butuh waktu sebentar</span>
+</div>
+
 <!-- Hamparan kanvas -->
 <div class="ovl" id="ovl" hidden>
   <canvas class="ovl-cv" id="outlineCv" hidden></canvas>
@@ -1219,7 +1247,7 @@ var E = {};
  'swapBtn','swapModal','swapFrom','swapTo','swapText','swapCount','swapList','swapApply','linkSwapAll',
  'imgUrl','imgUrlApply','cVideo','pVideo','pVideoApply',
  'draftBar','draftTitle','draftWhen','draftOpen','draftDrop','cTheme','themeList','lockBtn','lockLabel',
- 'ghost','ghostTag','textScriptNote','partColorBtn','cCountdown','cdList'
+ 'ghost','ghostTag','textScriptNote','partColorBtn','cCountdown','cdList','memuat'
 ].forEach(function(id){ E[id] = $(id); });
 
 /* ---------------- keadaan ---------------- */
@@ -1311,6 +1339,59 @@ function komponen(el){
   while (n && n.nodeType === 1 && skip(n)) n = n.parentElement;
   return (n && n.nodeType === 1 && !skip(n)) ? n : null;
 }
+/* Elemen yang isinya bukan tempat menaruh apa pun. Tombol, link, dan isian
+   memang punya anak (ikon, span), tapi menyisipkan section di antara anak-anak
+   itu mengubur elemennya di dalam tombol — bukan menaruhnya di halaman. Untuk
+   MEMILIH, isi tombol tetap boleh disentuh; yang dibatasi hanya tempat JATUH. */
+var ATOMIK = { BUTTON:1, A:1, INPUT:1, SELECT:1, TEXTAREA:1, LABEL:1, SVG:1 };
+function sasaranJatuh(el){
+  var n = komponen(el);
+  if (!n) return null;
+  var atas = n, p = n.parentElement;
+  while (p && p.nodeType === 1 && !skip(p)){
+    if (ATOMIK[p.tagName]) atas = p;
+    p = p.parentElement;
+  }
+  return atas;
+}
+
+/* Sisipan selalu menjadi SAUDARA, bukan anak. Kalau induknya menyusun anak-anak
+   secara mendatar, saudara berikutnya muncul di SAMPING — bukan di bawah. Garis
+   mendatar di tepi bawah karena itu menjanjikan hal yang tidak akan terjadi. */
+function arahMendatar(el){
+  if (!fd || !el || !el.parentElement) return false;
+  var win = fd.defaultView, induk = el.parentElement;
+  var ci = win.getComputedStyle(induk), d = ci.display;
+  if ((d === 'flex' || d === 'inline-flex') && ci.flexDirection.indexOf('column') !== 0) return true;
+  var sib = el.nextElementSibling || el.previousElementSibling;
+  if (sib){
+    var a = el.getBoundingClientRect(), b = sib.getBoundingClientRect();
+    var tinggiKecil = Math.min(a.height, b.height);
+    if (a.height > 1 && b.height > 1 && Math.abs(a.top - b.top) < tinggiKecil * 0.5
+        && (b.left >= a.right - 2 || b.right <= a.left + 2)) return true;
+  }
+  var ce = win.getComputedStyle(el).display;
+  return ce === 'inline' || ce === 'inline-block' || ce === 'inline-flex';
+}
+
+/* Garis sisip mengikuti arah susunan: mendatar untuk tumpukan ke bawah, tegak
+   untuk susunan ke samping. */
+function garisSisip(r, before, mendatar){
+  var L = E.insLine;
+  L.hidden = false;
+  L.classList.toggle('tegak', !!mendatar);
+  if (mendatar){
+    L.style.left = ((before ? r.left : r.right) * scale - 1) + 'px';
+    L.style.top = (r.top * scale) + 'px';
+    L.style.height = (r.height * scale) + 'px';
+    L.style.width = '';
+  } else {
+    L.style.left = (r.left * scale) + 'px';
+    L.style.top = ((before ? r.top : r.bottom) * scale - 1) + 'px';
+    L.style.width = (r.width * scale) + 'px';
+    L.style.height = '';
+  }
+}
 function editing(el){ return el && el.getAttribute && el.getAttribute('contenteditable')==='true'; }
 /* Nama yang bisa dibaca lebih dulu, penanda teknis menyusul: "Wadah .container",
    bukan "div.container". Penandanya tetap ditampilkan karena itu yang membedakan
@@ -1394,7 +1475,7 @@ E.backBtn.addEventListener('click', function(){
   ready = false; fd = null; pristine = null;
   deselect(); undoS.length = 0; redoS.length = 0; histBtns();
   E.frame.removeAttribute('srcdoc');
-  E.canvas.hidden = true; E.backBtn.hidden = true; E.ovl.hidden = true;
+  E.canvas.hidden = true; E.backBtn.hidden = true; E.ovl.hidden = true; tampilMemuat(false);
   hint('');
   E.devSeg.hidden = true; E.widthBox.hidden = true; E.zoomGroup.hidden = true;
   E.startView.hidden = false; E.cTheme.hidden = true; E.cCountdown.hidden = true; tampilkanDraf();
@@ -1445,6 +1526,8 @@ function open(raw, css, js){
   E.startView.hidden = true;
   E.canvas.hidden = false; E.backBtn.hidden = false;
   E.devSeg.hidden = false; E.widthBox.hidden = false; E.zoomGroup.hidden = false;
+  // dipanggil setelah kanvas ditampilkan, kalau tidak ukurannya masih nol
+  tampilMemuat(true);
 }
 
 /* Kembalikan pratinjau ke keadaan terakhir yang tersimpan. Suntingan yang belum
@@ -1453,6 +1536,7 @@ function open(raw, css, js){
    meninggalkan editor yang tombolnya semua diam. */
 function frameLost(){
   ready = false;
+  tampilMemuat(false);
   deselect();
   E.ovl.hidden = true;
   if (recovering || !lastDoc){
@@ -1488,7 +1572,21 @@ E.frame.addEventListener('load', function(){
   layout(); outlineBuild(); buildLayers(); deselect(); bangunTema(); bangunCountdown();
   runScan(true); simpanDraf();
   hint('Klik elemen untuk memilih. Klik dua kali untuk mengubah teksnya.');
+  tampilMemuat(false);
 });
+
+/* Penanda memuat menutupi kanvas, jadi ukurannya mengikuti kanvas. */
+function tampilMemuat(on){
+  if (!E.memuat) return;
+  if (on){
+    var r = E.canvas.getBoundingClientRect();
+    E.memuat.style.left = r.left + 'px';
+    E.memuat.style.top = r.top + 'px';
+    E.memuat.style.width = r.width + 'px';
+    E.memuat.style.height = r.height + 'px';
+  }
+  E.memuat.hidden = !on;
+}
 
 /* Catat atribut asli setiap elemen. Dipakai saat ekspor supaya elemen yang tidak
    kamu sentuh keluar persis seperti di kode sumber. */
@@ -1648,7 +1746,11 @@ function outlineBuild(){
        yang menggantung di sekitar isi yang belum terlihat cuma membingungkan.
        checkVisibility ikut memperhitungkan induk, jadi satu bagian yang masih
        tersembunyi tidak perlu ditelusuri anak-anaknya satu per satu. */
-    if (el.checkVisibility && !el.checkVisibility({ opacityProperty:true, visibilityProperty:true })) continue;
+    /* Hanya yang benar-benar disembunyikan yang dilewati. `opacity:0` TIDAK
+       ikut: halaman hasil AI memakainya untuk pola "muncul saat digulir", dan
+       melewatkannya membuat sebagian besar isi halaman tidak punya kotak sama
+       sekali begitu digulir ke bagian yang baru muncul. */
+    if (el.checkVisibility && !el.checkVisibility({ visibilityProperty:true })) continue;
     var pos = win.getComputedStyle(el).position;
     var ikut = pos === 'fixed' || pos === 'sticky';
     if (!ikut){
@@ -2450,18 +2552,48 @@ function startDrag(el){
   }
   hint('Lepaskan di garis biru untuk menaruh elemen di sana. Tekan Esc untuk batal.');
 }
-/* Perkiraan tinggi tiap blok baru, supaya bayangannya sebesar yang akan jadi.
-   Angkanya diambil dari tinggi sebenarnya blok-blok ini setelah dipasang. */
-var TINGGI_BLOK = { section:150, heading:52, text:62, button:48, image:190,
-                    video:210, columns:150, columns3:150, divider:22, spacer:44 };
-function tampilBayangan(target, before, tinggi, lebar, label){
+/* Ukuran blok baru diukur betulan, bukan ditebak. Blok dipasang sebentar dalam
+   keadaan tak terlihat di tempat yang sama dengan tujuan jatuhnya, diukur, lalu
+   dibuang lagi — sekali saja di awal seretan, bukan tiap gerakan kursor.
+   Tebakan angka mati membuat bayangan meleset jauh: section ditebak 150 px,
+   aslinya bisa 309 px. */
+function ukurBlok(kind, dekat){
+  var node = null;
+  try {
+    var box = fd.createElement('div');
+    box.innerHTML = BLOCK[kind] || '';
+    node = box.firstElementChild;
+    if (!node) return { tinggi:80, lebar:0 };
+    node.style.visibility = 'hidden';
+    node.style.position = 'static';
+    var induk = (dekat && dekat.parentNode) ? dekat.parentNode : fd.body;
+    induk.appendChild(node);
+    var r = node.getBoundingClientRect();
+    return { tinggi: Math.max(20, Math.round(r.height)), lebar: Math.round(r.width) };
+  } catch(err){
+    return { tinggi:80, lebar:0 };
+  } finally {
+    if (node && node.parentNode) node.parentNode.removeChild(node);
+  }
+}
+/* Bayangan duduk PERSIS di tempat blok akan mendarat, bukan menumpuk batasnya.
+   Dulu dipusatkan di garis batas (top = tepi - tinggi/2), jadi separuhnya
+   menimpa elemen sasaran dan terlihat seperti akan masuk ke dalamnya. */
+function tampilBayangan(target, before, mendatar, tinggi, lebar, label){
   var r = target.getBoundingClientRect();
   var g = E.ghost;
   g.hidden = false;
-  g.style.left  = ((lebar != null ? r.left : r.left) * scale) + 'px';
-  g.style.width = ((lebar != null ? lebar : r.width) * scale) + 'px';
-  g.style.height = (tinggi * scale) + 'px';
-  g.style.top = ((before ? r.top : r.bottom) * scale) - (tinggi * scale) / 2 + 'px';
+  if (mendatar){
+    g.style.top = (r.top * scale) + 'px';
+    g.style.height = (r.height * scale) + 'px';
+    g.style.width = (lebar * scale) + 'px';
+    g.style.left = ((before ? r.left - lebar : r.right) * scale) + 'px';
+  } else {
+    g.style.left = (r.left * scale) + 'px';
+    g.style.width = (r.width * scale) + 'px';
+    g.style.height = (tinggi * scale) + 'px';
+    g.style.top = ((before ? r.top - tinggi : r.bottom) * scale) + 'px';
+  }
   E.ghostTag.textContent = label;
 }
 function sembunyiBayangan(){ E.ghost.hidden = true; }
@@ -2472,19 +2604,17 @@ function dragEndOuter(e){ dragMove(pt(e)); dragEnd(false); }
 function dragEndInner(e){ dragMove({ x:e.clientX, y:e.clientY }); dragEnd(false); }
 function dragMove(p){
   if (!drag) return;
-  var t = komponen(fd.elementFromPoint(p.x, p.y));
+  var t = sasaranJatuh(fd.elementFromPoint(p.x, p.y));
   if (!t || t===drag.el || drag.el.contains(t)){
     E.insLine.hidden = true; sembunyiBayangan(); drag.target = null; return;
   }
   var r = t.getBoundingClientRect();
-  var before = (p.y - r.top) < r.height/2;
+  var mendatar = arahMendatar(t);
+  var before = mendatar ? (p.x - r.left) < r.width/2 : (p.y - r.top) < r.height/2;
   drag.target = t; drag.before = before;
-  E.insLine.hidden = false;
-  E.insLine.style.left = (r.left*scale) + 'px';
-  E.insLine.style.width = (r.width*scale) + 'px';
-  E.insLine.style.top = ((before ? r.top : r.bottom)*scale - 1) + 'px';
+  garisSisip(r, before, mendatar);
   var dr = drag.el.getBoundingClientRect();
-  tampilBayangan(t, before, Math.max(26, dr.height), null, label(drag.el));
+  tampilBayangan(t, before, mendatar, Math.max(26, dr.height), Math.max(26, dr.width), label(drag.el));
 }
 function dragEnd(cancel){
   if (!drag) return;
@@ -2846,7 +2976,8 @@ function palPendClear(){
 }
 function palStart(kind, btn){
   if (palDrag) return;
-  palDrag = { kind:kind, btn:btn, target:null, before:true };
+  var uk = ukurBlok(kind, null);
+  palDrag = { kind:kind, btn:btn, target:null, before:true, tinggi:uk.tinggi, lebar:uk.lebar };
   btn.classList.add('dragging');
   E.shield.hidden = false; E.shield.classList.remove('rz');
   document.addEventListener('mousemove', palMoveOuter, true);
@@ -2861,16 +2992,22 @@ function palMoveOuter(e){ palMove(pt(e)); }
 function palMoveInner(e){ palMove({ x:e.clientX, y:e.clientY }); }
 function palMove(p){
   if (!palDrag || !fd) return;
-  var t = komponen(fd.elementFromPoint(p.x, p.y));
+  var t = sasaranJatuh(fd.elementFromPoint(p.x, p.y));
   if (!t){ E.insLine.hidden = true; sembunyiBayangan(); palDrag.target = null; return; }
   var r = t.getBoundingClientRect();
-  var before = (p.y - r.top) < r.height/2;
+  var mendatar = arahMendatar(t);
+  var before = mendatar ? (p.x - r.left) < r.width/2 : (p.y - r.top) < r.height/2;
+  /* Lebar wadah tujuan menentukan berapa baris teksnya membungkus, jadi tinggi
+     blok diukur ulang di dalam wadah itu sendiri — sekali per sasaran baru,
+     bukan tiap gerakan kursor. Diukur di <body> saja hasilnya masih meleset
+     puluhan piksel karena lebarnya beda. */
+  if (palDrag.target !== t){
+    var uk = ukurBlok(palDrag.kind, t);
+    palDrag.tinggi = uk.tinggi; palDrag.lebar = uk.lebar;
+  }
   palDrag.target = t; palDrag.before = before;
-  E.insLine.hidden = false;
-  E.insLine.style.left = (r.left*scale) + 'px';
-  E.insLine.style.width = (r.width*scale) + 'px';
-  E.insLine.style.top = ((before ? r.top : r.bottom)*scale - 1) + 'px';
-  tampilBayangan(t, before, TINGGI_BLOK[palDrag.kind] || 80, null, namaBlok(palDrag.kind));
+  garisSisip(r, before, mendatar);
+  tampilBayangan(t, before, mendatar, palDrag.tinggi || 80, palDrag.lebar || r.width, namaBlok(palDrag.kind));
 }
 function namaBlok(k){
   var n = { section:'Section', heading:'Judul', text:'Paragraf', button:'Tombol', image:'Gambar',
