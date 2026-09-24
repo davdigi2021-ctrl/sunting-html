@@ -215,12 +215,43 @@ button,input,select,textarea{font:inherit;color:inherit;}
 .toast.bad{background:var(--bad);color:#fff;}
 
 /* ---------- Kerangka aplikasi ---------- */
-.app{flex:1;display:grid;grid-template-columns:1fr 272px;min-height:0;}
+/* Panel di kiri seperti Elementor. Urutan di HTML tetap (panggung dulu),
+   yang dipindah hanya letaknya lewat `order`. */
+.app{flex:1;display:grid;grid-template-columns:280px minmax(0,1fr);min-height:0;}
 .pane{background:var(--surface);display:flex;flex-direction:column;min-height:0;}
 .pane-l{border-right:1px solid var(--line);}
-.pane-r{border-left:1px solid var(--line);}
-.pane-tabs{display:flex;padding:8px;gap:4px;border-bottom:1px solid var(--line);flex:0 0 auto;}
+.pane-r{order:-1;border-right:1px solid var(--line);}
+/* Kepala panel: menyebut apa yang sedang diatur, dengan tombol kembali. */
+.pane-head{
+  flex:0 0 auto;display:flex;align-items:center;gap:6px;
+  padding:11px 12px 10px;border-bottom:1px solid var(--line);min-height:56px;
+}
+.pane-back{flex:0 0 auto;margin-left:-4px;}
+.pane-back[hidden]{display:none;}
+.pane-judul{display:flex;flex-direction:column;gap:1px;min-width:0;}
+.pane-judul strong{font-size:14px;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pane-judul span{font-size:11.5px;color:var(--ink-2);line-height:1.4;}
+.pane-judul span:empty{display:none;}
+/* Isi · Gaya · Lanjutan */
+.subtabs{flex:0 0 auto;display:flex;gap:2px;padding:6px 10px 0;border-bottom:1px solid var(--line);}
+.subtabs[hidden]{display:none;}
+.subtab{
+  flex:1;border:0;background:transparent;color:var(--ink-2);cursor:pointer;
+  padding:8px 4px 9px;font-size:13px;font-weight:500;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+  transition:color var(--t),border-color var(--t);
+}
+.subtab:hover{color:var(--ink);}
+.subtab.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:600;}
+.subtab:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:6px;}
+#propsBody[data-grup="isi"] [data-grup]:not([data-grup="isi"]),
+#propsBody[data-grup="gaya"] [data-grup]:not([data-grup="gaya"]),
+#propsBody[data-grup="lanjut"] [data-grup]:not([data-grup="lanjut"]){display:none;}
+.isi-kosong{padding:6px 2px;}
+/* Navigasi panel di bawah, seperti kaki panel Elementor. */
+.pane-tabs{order:5;display:flex;padding:6px 8px;gap:4px;border-top:1px solid var(--line);flex:0 0 auto;}
 .tab-wrap{position:relative;flex:1;display:flex;}
+.tab-wrap[hidden]{display:none;}
 .tab{
   flex:1;border:0;background:transparent;color:var(--ink-2);cursor:pointer;
   padding:8px 4px;font-size:11px;font-weight:500;letter-spacing:.01em;
@@ -256,12 +287,14 @@ button,input,select,textarea{font:inherit;color:inherit;}
   font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
   color:var(--ink-3);margin:2px 0 -4px;
 }
-.blocks{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+/* Tiga kolom ringkas seperti panel widget Elementor: kesepuluh elemen muat
+   dalam satu layar laptop tanpa perlu digulir. */
+.blocks{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
 .block{
-  border:1px solid var(--line);background:var(--surface);border-radius:var(--r);
-  padding:11px 6px 10px;cursor:grab;color:var(--ink);
-  display:flex;flex-direction:column;align-items:center;gap:8px;
-  font-size:12px;font-weight:500;
+  border:1px solid var(--line);background:var(--surface);border-radius:var(--r-sm);
+  padding:10px 4px 9px;cursor:grab;color:var(--ink);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  font-size:11.5px;font-weight:500;text-align:center;line-height:1.25;
   transition:border-color var(--t),background var(--t),transform .12s ease,box-shadow var(--t);
 }
 .block-ico{
@@ -440,8 +473,8 @@ body.preview .device{border-radius:0;box-shadow:none;}
 .step.done .step-n{background:var(--ok-soft);color:var(--ok);}
 .step-line{width:18px;height:1px;background:var(--line-2);flex:0 0 auto;}
 /* Di layar sempit angkanya saja sudah cukup menjelaskan urutan. Batasnya 880px,
-   bukan lebar bar itu sendiri: panggung selalu 272px lebih sempit dari jendela
-   karena panel kanan, jadi tulisannya harus lepas sebelum benar-benar mentok. */
+   bukan lebar bar itu sendiri: panggung selalu 280px lebih sempit dari jendela
+   karena panel samping, jadi tulisannya harus lepas sebelum benar-benar mentok. */
 @media (max-width:880px){
   .step-txt{display:none;}
   .step{padding:4px;}
@@ -818,16 +851,20 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
 .url-row .inp{flex:1;min-width:0;}
 
 /* ---------- Responsif ---------- */
+/* Panel ada di kolom PERTAMA sejak dipindah ke kiri — kolom lebar tetapnya
+   harus ditulis lebih dulu, kalau tidak panelnya yang dapat 1fr. */
 @media (max-width:1180px){
-  .app{grid-template-columns:1fr 252px;}
+  .app{grid-template-columns:252px minmax(0,1fr);}
 }
 @media (max-width:820px){
   .brand-name{display:none;}
   .topbar{gap:8px;padding:0 8px;}
 }
+/* Di layar yang terlalu sempit untuk dua kolom, kanvas di atas dan panel di
+   bawahnya: yang disunting tetap jadi hal pertama yang terlihat. */
 @media (max-width:920px){
-  .app{grid-template-columns:1fr;grid-template-rows:1fr auto;}
-  .pane-r{border-left:0;border-top:1px solid var(--line);max-height:46vh;}
+  .app{grid-template-columns:minmax(0,1fr);grid-template-rows:1fr auto;}
+  .pane-r{order:0;border-right:0;border-top:1px solid var(--line);max-height:46vh;}
   .start-extra{grid-template-columns:1fr;}
 }
 </style>
@@ -864,6 +901,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
     <g id="i-trash"><path d="M19.5 5.5L18.8803 15.5251C18.7219 18.0864 18.6428 19.3671 18.0008 20.2879C17.6833 20.7431 17.2747 21.1273 16.8007 21.416C15.8421 22 14.559 22 11.9927 22C9.42312 22 8.1383 22 7.17905 21.4149C6.7048 21.1257 6.296 20.7408 5.97868 20.2848C5.33688 19.3626 5.25945 18.0801 5.10461 15.5152L4.5 5.5" stroke-width="1.5" stroke-linecap="round"/> <path d="M3 5.5H21M16.0557 5.5L15.3731 4.09173C14.9196 3.15626 14.6928 2.68852 14.3017 2.39681C14.215 2.3321 14.1231 2.27454 14.027 2.2247C13.5939 2 13.0741 2 12.0345 2C10.9688 2 10.436 2 9.99568 2.23412C9.8981 2.28601 9.80498 2.3459 9.71729 2.41317C9.32164 2.7167 9.10063 3.20155 8.65861 4.17126L8.05292 5.5" stroke-width="1.5" stroke-linecap="round"/> <path d="M9.5 16.5L9.5 10.5" stroke-width="1.5" stroke-linecap="round"/> <path d="M14.5 16.5L14.5 10.5" stroke-width="1.5" stroke-linecap="round"/></g>
     <g id="i-dup"><path d="M9 15C9 12.1716 9 10.7574 9.87868 9.87868C10.7574 9 12.1716 9 15 9L16 9C18.8284 9 20.2426 9 21.1213 9.87868C22 10.7574 22 12.1716 22 15V16C22 18.8284 22 20.2426 21.1213 21.1213C20.2426 22 18.8284 22 16 22H15C12.1716 22 10.7574 22 9.87868 21.1213C9 20.2426 9 18.8284 9 16L9 15Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> <path d="M16.9999 9C16.9975 6.04291 16.9528 4.51121 16.092 3.46243C15.9258 3.25989 15.7401 3.07418 15.5376 2.90796C14.4312 2 12.7875 2 9.5 2C6.21252 2 4.56878 2 3.46243 2.90796C3.25989 3.07417 3.07418 3.25989 2.90796 3.46243C2 4.56878 2 6.21252 2 9.5C2 12.7875 2 14.4312 2.90796 15.5376C3.07417 15.7401 3.25989 15.9258 3.46243 16.092C4.51121 16.9528 6.04291 16.9975 9 16.9999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>
     <g id="i-up"><path d="M17.9998 15C17.9998 15 13.5809 9.00001 11.9998 9C10.4187 8.99999 5.99985 15 5.99985 15" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-left"><path d="M14.9998 18C14.9998 18 9.00001 13.5811 9 11.9999C8.99999 10.4188 15 5.99985 15 5.99985" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>
     <g id="i-dn"><path d="M18 9.00005C18 9.00005 13.5811 15 12 15C10.4188 15 6 9 6 9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>
     <g id="i-x"><path d="M19.0005 4.99988L5.00049 18.9999M5.00049 4.99988L19.0005 18.9999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>
     <g id="i-zin"><path d="M17 17L21 21" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> <path d="M19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C15.4183 19 19 15.4183 19 11Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> <path d="M7.5 11L14.5 11M11 7.5V14.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>
@@ -1001,33 +1039,57 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
   </main>
 
   <!-- ============ Panel samping ============ -->
+  <!-- Panel seperti Elementor: di kiri, dan isinya mengikuti apa yang sedang
+       dikerjakan. Tidak ada yang dipilih = daftar elemen untuk diseret ke
+       halaman. Ada yang dipilih = pengaturan elemen itu, dibagi tiga seperti
+       Elementor (Isi, Gaya, Lanjutan). Dulu semuanya jadi satu gulungan
+       panjang berisi sembilan kartu, dan itu yang membuat orang bingung harus
+       mencari di mana. -->
   <aside class="pane pane-r">
+    <div class="pane-head">
+      <button class="ibtn pane-back" id="paneBack" type="button" hidden title="Kembali ke daftar elemen" aria-label="Kembali ke daftar elemen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-left"/></svg></button>
+      <div class="pane-judul">
+        <strong id="paneTitle">Tambah elemen</strong>
+        <span id="paneSub">Seret ke halaman, atau klik untuk menaruhnya di bawah yang dipilih</span>
+      </div>
+    </div>
+    <div class="subtabs" id="subTabs" role="tablist" hidden>
+      <button class="subtab on" data-grup="isi" type="button" role="tab" title="Tulisan, link, gambar, video, atau ikon di dalam elemen ini">Isi</button>
+      <button class="subtab" data-grup="gaya" type="button" role="tab" title="Jenis huruf, ukuran huruf, dan warna">Gaya</button>
+      <button class="subtab" data-grup="lanjut" type="button" role="tab" title="Lebar, tinggi, jarak, letak, dan tindakan seperti hapus atau gandakan">Lanjutan</button>
+    </div>
     <nav class="pane-tabs" role="tablist">
       <!-- "Properti" dan "Lapisan" adalah istilah program, bukan bahasa sehari-hari.
            Namanya diganti jadi kata kerja yang menyebut isinya, dan tiap tab
-           menjelaskan dirinya sendiri saat kursor menyentuhnya. -->
-      <div class="tab-wrap"><button class="tab on" data-tab="props" type="button" role="tab" title="Atur elemen yang sedang dipilih — teks, link, ukuran, huruf, dan warnanya"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-sliders"/></svg> Atur</button></div>
-      <div class="tab-wrap"><button class="tab" data-tab="blocks" type="button" role="tab" title="Tambah bagian baru ke halaman — judul, tombol, gambar, video, kolom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-blocks"/></svg> Tambah</button></div>
+           menjelaskan dirinya sendiri saat kursor menyentuhnya. Tab Atur hanya
+           muncul selama ada elemen yang dipilih — tanpa pilihan, isinya kosong. -->
+      <div class="tab-wrap" id="tabAturWrap" hidden><button class="tab" data-tab="props" type="button" role="tab" title="Atur elemen yang sedang dipilih — teks, link, ukuran, huruf, dan warnanya"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-sliders"/></svg> Atur</button></div>
+      <div class="tab-wrap"><button class="tab on" data-tab="blocks" type="button" role="tab" title="Tambah bagian baru ke halaman — judul, tombol, gambar, video, kolom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-blocks"/></svg> Tambah</button></div>
       <div class="tab-wrap"><button class="tab" data-tab="layers" type="button" role="tab" title="Peta seluruh isi halaman dari luar ke dalam — untuk memilih bagian yang susah diklik"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><use href="#i-layers"/></svg> Struktur</button></div>
       <div class="tab-wrap">
         <button class="tab" data-tab="scan" type="button" role="tab" title="Cari masalah di halaman — link kosong, gambar tanpa keterangan, tombol tanpa tujuan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-shield"/></svg> Periksa</button>
         <span class="badge" id="scanBadge" hidden>0</span>
       </div>
     </nav>
-    <div class="tab-panel" id="tabProps">
+    <div class="tab-panel" id="tabProps" hidden>
           <div class="empty" id="propsEmpty">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-sliders"/></svg>
             <span>Belum ada yang dipilih.<br>Klik elemen mana pun di kanvas untuk mengatur teks, link, ukuran, font, dan warnanya.</span>
           </div>
 
           <div id="propsBody" hidden>
-            <div class="card">
+            <div class="isi-kosong" id="isiKosong" data-grup="isi" hidden>
+              <p class="note" id="isiKosongTeks"></p>
+              <button class="btn btn-plain btn-sm btn-full" id="isiKetikBtn" data-act="text" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-pen"/></svg>Ubah tulisan langsung di halaman</button>
+            </div>
+
+            <div class="card" data-grup="lanjut">
               <div class="card-h"><span class="card-t">Letak elemen</span></div>
               <div class="crumbs" id="crumbs"></div>
               <p class="note" id="crumbNote">Arahkan kursor ke salah satu kotak di atas untuk melihat bagiannya disorot di kanvas.</p>
             </div>
 
-            <div class="card" id="cText" hidden>
+            <div class="card" id="cText" data-grup="isi" hidden>
               <div class="card-h"><span class="card-t">Teks</span></div>
               <textarea id="pText" class="inp" rows="2"></textarea>
               <p class="note err-note" id="textScriptNote" hidden></p>
@@ -1035,13 +1097,8 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
               <p class="note">Klik dua kali di kanvas, sorot bagian yang mau diwarnai, lalu tekan tombol ini.</p>
             </div>
 
-            <div class="card" id="cCountdown" hidden>
-              <div class="card-h"><span class="card-t">Hitung mundur</span></div>
-              <p class="note">Angkanya dihasilkan oleh skrip halaman, jadi tidak bisa diketik langsung. Yang diubah adalah tanggal tujuannya.</p>
-              <div id="cdList"></div>
-            </div>
 
-            <div class="card" id="cLink" hidden>
+            <div class="card" id="cLink" data-grup="isi" hidden>
               <div class="card-h"><span class="card-t">Link tujuan</span></div>
               <input id="pHref" class="inp mono" type="text" placeholder="https://wa.me/62812...">
               <div class="err" id="linkErr" hidden></div>
@@ -1050,7 +1107,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
               <label class="check"><input type="checkbox" id="pBlank"> Buka di tab baru</label>
             </div>
 
-            <div class="card" id="cVideo" hidden>
+            <div class="card" id="cVideo" data-grup="isi" hidden>
               <div class="card-h"><span class="card-t">Video</span></div>
               <label class="lbl" for="pVideo">Alamat video</label>
               <div class="row-2">
@@ -1060,7 +1117,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
               <p class="note">Tempel link YouTube atau Vimeo biasa — alamatnya diubah sendiri ke bentuk yang bisa disematkan.</p>
             </div>
 
-            <div class="card" id="cImg" hidden>
+            <div class="card" id="cImg" data-grup="isi" hidden>
               <div class="card-h"><span class="card-t">Gambar</span></div>
               <button class="btn btn-plain btn-sm btn-full" id="imgPick" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-image"/></svg>Pilih gambar dari komputer</button>
               <label class="lbl" for="imgUrl">atau tempel alamat gambar</label>
@@ -1073,13 +1130,13 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
               <input id="pAlt" class="inp" type="text" placeholder="misalnya: foto rumah tampak depan">
             </div>
 
-            <div class="card" id="cIcon" hidden>
+            <div class="card" id="cIcon" data-grup="isi" hidden>
               <div class="card-h"><span class="card-t">Ikon</span></div>
               <button class="btn btn-plain btn-sm btn-full" id="iconPick" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-star"/></svg>Ganti ikon</button>
               <p class="note">Bisa pilih dari daftar siap pakai, atau tempel kode SVG sendiri.</p>
             </div>
 
-            <div class="card">
+            <div class="card" data-grup="gaya">
               <div class="card-h"><span class="card-t">Tulisan</span></div>
               <label class="lbl" for="pFont">Jenis huruf</label>
               <select id="pFont" class="inp">
@@ -1122,7 +1179,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
               </div>
             </div>
 
-            <div class="card">
+            <div class="card" data-grup="lanjut">
               <div class="card-h"><span class="card-t">Ukuran &amp; jarak</span></div>
               <div class="row">
                 <label>Lebar<input id="pW" class="inp mono" type="text" placeholder="auto"></label>
@@ -1134,7 +1191,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
               </div>
             </div>
 
-            <div class="card">
+            <div class="card" data-grup="gaya">
               <div class="card-h"><span class="card-t">Warna</span></div>
               <div class="stack">
                 <label>Tulisan
@@ -1158,7 +1215,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
               </div>
             </div>
 
-            <div class="card">
+            <div class="card" data-grup="lanjut">
               <div class="card-h"><span class="card-t">Tindakan</span></div>
               <div class="grid2">
                 <button class="act" data-act="up" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-up"/></svg>Naik</button>
@@ -1172,17 +1229,9 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
             </div>
           </div>
 
-          <!-- Di luar #propsBody supaya tetap terlihat walau belum ada yang dipilih:
-               ini pengaturan tingkat halaman, bukan tingkat elemen. -->
-          <div class="card" id="cTheme" hidden>
-            <div class="card-h"><span class="card-t">Warna tema halaman</span></div>
-            <p class="note">Halaman ini memakai beberapa warna berulang. Mengubahnya di sini mengubah semua tempat yang memakainya.</p>
-            <div class="theme-list" id="themeList"></div>
-          </div>
         </div>
 
-    <div class="tab-panel" id="tabBlocks" hidden>
-          <p class="sec-title">Tambah elemen</p>
+    <div class="tab-panel" id="tabBlocks">
           <p class="block-cat">Dasar</p>
           <div class="blocks">
             <button class="block" data-block="section" type="button"><span class="block-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-section"/></svg></span>Section</button>
@@ -1200,6 +1249,22 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
             <button class="block" data-block="spacer" type="button"><span class="block-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-space"/></svg></span>Jarak</button>
           </div>
           <p class="note">Seret kartu ke kanvas untuk menaruhnya di posisi tertentu, atau klik saja untuk menambahkannya tepat di bawah elemen yang sedang dipilih.</p>
+
+          <!-- Pengaturan tingkat halaman, jadi tempatnya di sini — terlihat saat
+               tidak ada elemen yang dipilih, seperti "Pengaturan situs" Elementor.
+               Hitung mundur dulu ada di panel elemen dan ikut muncul di SETIAP
+               elemen yang dipilih, padahal tanggalnya milik seluruh halaman. -->
+          <p class="block-cat" id="aturHalamanJudul" hidden>Pengaturan halaman</p>
+          <div class="card" id="cCountdown" hidden>
+            <div class="card-h"><span class="card-t">Hitung mundur</span></div>
+            <p class="note">Angkanya dihasilkan oleh skrip halaman, jadi tidak bisa diketik langsung. Yang diubah adalah tanggal tujuannya.</p>
+            <div id="cdList"></div>
+          </div>
+          <div class="card" id="cTheme" hidden>
+            <div class="card-h"><span class="card-t">Warna tema halaman</span></div>
+            <p class="note">Halaman ini memakai beberapa warna berulang. Mengubahnya di sini mengubah semua tempat yang memakainya.</p>
+            <div class="theme-list" id="themeList"></div>
+          </div>
         </div>
 
     <div class="tab-panel" id="tabLayers" hidden>
@@ -1377,7 +1442,8 @@ var E = {};
  'imgUrl','imgUrlApply','cVideo','pVideo','pVideoApply',
  'draftBar','draftTitle','draftWhen','draftOpen','draftDrop','cTheme','themeList','lockBtn','lockLabel',
  'ghost','ghostTag','textScriptNote','partColorBtn','cCountdown','cdList','memuat',
- 'stepBar','step1','step2','step3','tour','tourT','tourD','tourDots','tourSkip','tourNext','seretChip'
+ 'stepBar','step1','step2','step3','tour','tourT','tourD','tourDots','tourSkip','tourNext','seretChip',
+ 'paneBack','paneTitle','paneSub','subTabs','isiKosong','isiKosongTeks','isiKetikBtn','tabAturWrap','aturHalamanJudul'
 ].forEach(function(id){ E[id] = $(id); });
 
 /* ---------------- keadaan ---------------- */
@@ -1474,7 +1540,7 @@ function setStep(n){
 var SAMBUT = 'sunting-html-sambutan';
 var TUR = [
   { t:'Klik apa saja untuk memilihnya',
-    d:'Arahkan kursor ke halaman; garis birunya menunjukkan bagian mana yang akan terpilih. Klik sekali, lalu pengaturannya muncul di panel kanan.' },
+    d:'Arahkan kursor ke halaman; garis birunya menunjukkan bagian mana yang akan terpilih. Klik sekali, lalu pengaturannya muncul di panel kiri — dibagi jadi Isi, Gaya, dan Lanjutan.' },
   { t:'Klik dua kali untuk mengubah tulisan',
     d:'Ketik langsung di halaman seperti di aplikasi tulis biasa, lalu klik di luar kalau sudah selesai.' },
   { t:'Kalau salah, tekan Ctrl+Z',
@@ -1706,7 +1772,7 @@ E.backBtn.addEventListener('click', function(){
   E.canvas.hidden = true; E.backBtn.hidden = true; E.ovl.hidden = true; tampilMemuat(false);
   hint('');
   E.devSeg.hidden = true; E.widthBox.hidden = true; E.zoomGroup.hidden = true;
-  E.startView.hidden = false; E.cTheme.hidden = true; E.cCountdown.hidden = true; tampilkanDraf();
+  E.startView.hidden = false; E.cTheme.hidden = true; E.cCountdown.hidden = true; aturJudulHalaman(); tampilkanDraf();
   turTutup(false); setStep(1);
   E.dlBtn.disabled = E.copyBtn.disabled = E.codeBtn.disabled = E.swapBtn.disabled = true;
   E.layersTree.innerHTML = ''; E.issueList.innerHTML = '';
@@ -1812,7 +1878,7 @@ E.frame.addEventListener('load', function(){
   ready = true;
   E.dlBtn.disabled = E.copyBtn.disabled = E.codeBtn.disabled = E.swapBtn.disabled = false;
   E.ovl.hidden = false;
-  layout(); outlineBuild(); buildLayers(); deselect(); bangunTema(); bangunCountdown();
+  layout(); outlineBuild(); buildLayers(); deselect(); bangunTema(); bangunCountdown(); aturJudulHalaman();
   runScan(true); simpanDraf();
   hint('Klik elemen untuk memilih. Klik dua kali untuk mengubah teksnya.');
   tampilMemuat(false);
@@ -2259,6 +2325,7 @@ function select(el){
   E.selTag.textContent = label(el);
   redraw(); fillProps();
   E.propsEmpty.hidden = true; E.propsBody.hidden = false;
+  E.tabAturWrap.hidden = false;
   markLayer(el); goTab('props');
   hint('Terpilih: ' + label(el) + '. Seret untuk memindahkan, tarik bulatan biru untuk mengubah ukuran.');
 }
@@ -2269,6 +2336,7 @@ function deselect(){
   setHover(null); setDrop(null); setPeek(null);
   E.propsEmpty.hidden = false; E.propsBody.hidden = true;
   markLayer(null);
+  if (tabAktif() === 'props') goTab('blocks'); else aturKepala();
   if (ready) hint('Klik elemen untuk memilih. Klik dua kali untuk mengubah teksnya.');
 }
 function setHover(el){
@@ -2327,7 +2395,7 @@ function actDup(){
 }
 function actDel(){
   if (!sel || !sel.parentNode) return;
-  if (terkunci(sel)){ toast('Bagian ini dikunci. Buka kuncinya dulu lewat tombol Kunci di panel kanan.', true); return; }
+  if (terkunci(sel)){ toast('Bagian ini dikunci. Buka kuncinya dulu lewat tombol Kunci di tab Lanjutan.', true); return; }
   snap(); var el = sel; deselect(); el.remove(); buildLayers(); toast('Elemen dihapus.');
 }
 function act(a){
@@ -2375,6 +2443,38 @@ function setStyle(prop, val){
   else sel.style[prop] = val;
   redraw();
 }
+/* Kapan kartu Teks, Video, dan Ikon muncul. Dulu aturannya "ada di mana saja
+   di dalamnya", jadi memilih satu section penuh memunculkan "Ganti ikon" untuk
+   ikon kecil entah di mana, dan memilih gambar memunculkan kotak Teks kosong
+   (gambar tidak punya anak, jadi dianggap "teks murni"). Sekarang kartu hanya
+   muncul untuk elemen yang memang itu, atau pembungkus kecilnya — tombol
+   berikon, kotak video. */
+var BUKAN_TEKS = { IMG:1, INPUT:1, TEXTAREA:1, SELECT:1, HR:1, BR:1, IFRAME:1, VIDEO:1, AUDIO:1,
+                   CANVAS:1, PICTURE:1, SOURCE:1, EMBED:1, OBJECT:1, svg:1, SVG:1 };
+function teksMurni(el){ return el.children.length === 0 && !BUKAN_TEKS[el.tagName]; }
+function bingkaiDari(el){
+  if (el.tagName === 'IFRAME') return el;
+  var fr = el.querySelectorAll ? el.querySelectorAll('iframe') : [];
+  return (fr.length === 1 && el.children.length <= 2) ? fr[0] : null;
+}
+function ikonDari(el){
+  if (el.tagName.toLowerCase() === 'svg') return el;
+  var sv = el.querySelectorAll ? el.querySelectorAll('svg') : [];
+  return (sv.length === 1 && (el.textContent || '').trim().length <= 80) ? sv[0] : null;
+}
+/* Tulisan yang sebagian kata-katanya bergaya lain (miring, tebal, berwarna)
+   tidak bisa diubah lewat kotak teks tanpa menghapus gayanya. Yang aman
+   adalah mengetik langsung di halaman — jadi tab Isi menawarkan itu. */
+function teksCampuran(el){
+  if (!(el.textContent || '').trim() || BUKAN_TEKS[el.tagName]) return false;
+  var win = fd.defaultView;
+  for (var i = 0; i < el.children.length; i++){
+    var c = el.children[i];
+    if (c.tagName === 'BR') continue;
+    if (win.getComputedStyle(c).display.indexOf('inline') !== 0) return false;
+  }
+  return true;
+}
 function fillProps(){
   if (!sel) return;
   // breadcrumb
@@ -2395,7 +2495,7 @@ function fillProps(){
     E.crumbs.appendChild(b);
   });
 
-  var pure = sel.children.length === 0;
+  var pure = teksMurni(sel);
   E.cText.hidden = !pure;
   cekTeksSkrip(pure ? sel : null);
   if (pure){
@@ -2424,7 +2524,7 @@ function fillProps(){
   E.cImg.hidden = !img;
   if (img) E.pAlt.value = sel.getAttribute('alt') || '';
 
-  var bingkai = sel.tagName==='IFRAME' ? sel : (sel.querySelector && sel.querySelector('iframe'));
+  var bingkai = bingkaiDari(sel);
   E.cVideo.hidden = !bingkai;
   if (bingkai){
     var vs = bingkai.getAttribute('src') || '';
@@ -2439,8 +2539,14 @@ function fillProps(){
   var tombolReset = E.propsBody.querySelector('[data-act="reset"]');
   if (tombolReset) tombolReset.hidden = !bisaReset(sel);
 
-  var svg = sel.tagName.toLowerCase()==='svg' ? sel : sel.querySelector && sel.querySelector('svg');
+  var svg = ikonDari(sel);
   E.cIcon.hidden = !svg;
+
+  var campur = !pure && teksCampuran(sel);
+  E.isiKetikBtn.hidden = !campur;
+  E.isiKosongTeks.textContent = campur
+    ? 'Sebagian tulisan ini bergaya lain — misalnya ada kata yang miring atau berwarna. Supaya gayanya tidak hilang, tulisannya diubah langsung di halaman.'
+    : 'Bagian ini berisi elemen lain. Klik tulisan, gambar, atau tombol di dalamnya untuk mengubah isinya, atau buka Gaya untuk warna latarnya.';
 
   var fam = sel.style.fontFamily || '';
   var known = Array.prototype.map.call(E.pFont.options, function(o){ return o.value; });
@@ -2458,6 +2564,7 @@ function fillProps(){
   E.pMar.value = sel.style.margin || ''; E.pMar.placeholder = css(sel,'margin');
   setSwatch(E.pColorChip, E.pColorVal, hex(css(sel,'color')) || '#000000');
   setSwatch(E.pBgChip, E.pBgVal, hex(css(sel,'backgroundColor')) || '#ffffff');
+  aturSubtab(false);
 }
 
 E.pText.addEventListener('focus', snap);
@@ -3175,11 +3282,66 @@ document.querySelectorAll('.tab[data-tab]').forEach(function(t){
     document.querySelectorAll('.tab[data-tab]').forEach(function(x){ x.classList.toggle('on', x===t); });
     Object.keys(TABS).forEach(function(k){ TABS[k].hidden = k !== t.dataset.tab; });
     if (t.dataset.tab === 'layers') buildLayers();
+    aturKepala();
   });
 });
 function goTab(name){
   var t = document.querySelector('.tab[data-tab="' + name + '"]');
   if (t) t.click();
+}
+function tabAktif(){
+  for (var k in TABS) if (!TABS[k].hidden) return k;
+  return 'blocks';
+}
+
+/* Kepala panel selalu menyebut apa yang sedang dikerjakan — cara Elementor
+   memberi tahu "kamu sedang mengubah Judul" — dan tombol kembali membawa ke
+   daftar elemen, sama seperti menekan Esc. */
+var KEPALA = {
+  blocks: ['Tambah elemen', 'Seret ke halaman, atau klik untuk menaruhnya di bawah yang dipilih'],
+  layers: ['Struktur halaman', 'Semua bagian halaman, dari luar ke dalam'],
+  scan:   ['Periksa halaman', 'Hal-hal yang bisa membuat halaman bermasalah'],
+  props:  ['Pengaturan elemen', 'Klik elemen mana pun di halaman untuk mengaturnya']
+};
+function aturKepala(){
+  var k = tabAktif(), atur = k === 'props' && !!sel;
+  E.paneBack.hidden = !atur;
+  E.subTabs.hidden = !atur;
+  E.tabAturWrap.hidden = !sel;
+  if (atur){
+    E.paneTitle.textContent = 'Ubah ' + niceName(sel).toLowerCase();
+    E.paneSub.textContent = '';
+  } else {
+    var t = KEPALA[k] || KEPALA.blocks;
+    E.paneTitle.textContent = t[0]; E.paneSub.textContent = t[1];
+  }
+}
+E.paneBack.addEventListener('click', function(){ deselect(); });
+
+/* Isi · Gaya · Lanjutan. Pilihan terakhir diingat selama sesi: orang yang
+   sedang mengganti warna satu per satu tidak mau dilempar balik ke Isi
+   setiap kali memilih elemen berikutnya. Tapi kalau pilihannya Isi dan
+   elemen itu tidak punya isi yang bisa diubah langsung — sebuah section,
+   misalnya — Gaya yang dibuka, tanpa mengubah pilihan tersimpannya. */
+var grupPilihan = 'isi';
+var KARTU_ISI = ['cText', 'cLink', 'cVideo', 'cImg', 'cIcon'];
+function aturSubtab(dariKlik){
+  var adaKartu = KARTU_ISI.some(function(id){ return !E[id].hidden; });
+  var g = grupPilihan;
+  if (!dariKlik && g === 'isi' && !adaKartu && E.isiKetikBtn.hidden) g = 'gaya';
+  E.isiKosong.hidden = adaKartu;
+  E.propsBody.setAttribute('data-grup', g);
+  Array.prototype.forEach.call(E.subTabs.querySelectorAll('.subtab'), function(b){
+    b.classList.toggle('on', b.dataset.grup === g);
+    b.setAttribute('aria-selected', b.dataset.grup === g ? 'true' : 'false');
+  });
+  E.tabProps.scrollTop = 0;
+}
+Array.prototype.forEach.call(E.subTabs.querySelectorAll('.subtab'), function(b){
+  b.addEventListener('click', function(){ grupPilihan = b.dataset.grup; aturSubtab(true); });
+});
+function aturJudulHalaman(){
+  E.aturHalamanJudul.hidden = E.cTheme.hidden && E.cCountdown.hidden;
 }
 
 /* ---------------- lapisan ---------------- */
@@ -3634,7 +3796,7 @@ function runScan(quiet){
   }
   if (bad.length){
     issues.push({ el:bad[0], sev:'bad', title:'Gambar tidak akan tampil',
-      desc:bad.length + ' gambar memakai alamat file lokal. Kalau file HTML dipindah, gambarnya hilang. Pilih ulang gambarnya lewat panel kanan supaya ikut tersimpan di dalam file.',
+      desc:bad.length + ' gambar memakai alamat file lokal. Kalau file HTML dipindah, gambarnya hilang. Pilih ulang gambarnya lewat tab Isi di panel kiri supaya ikut tersimpan di dalam file.',
       code:bad[0].getAttribute('src') });
   }
 
@@ -3721,14 +3883,17 @@ function runScan(quiet){
     }
   });
 
-  // 10. dasar halaman
-  if (!fd.documentElement.getAttribute('lang')){
+  // 10. dasar halaman. Potongan (widget Elementor) dilewati: bahasa, pengaturan
+  // HP, dan judul milik halaman tempat ia ditempel, dan perbaikannya menulis ke
+  // <html>/<head> yang tidak ikut terunduh — tombolnya akan terlihat berhasil
+  // padahal hasilnya tidak berubah.
+  if (!potongan && !fd.documentElement.getAttribute('lang')){
     issues.push({ sev:'info', title:'Bahasa halaman belum diisi',
       desc:'Menambahkan lang="id" membantu mesin pencari dan fitur terjemahan.',
       fixLabel:'Set ke bahasa Indonesia',
       fix:function(){ markEdited(fd.documentElement); fd.documentElement.setAttribute('lang','id'); } });
   }
-  if (!fd.querySelector('meta[name="viewport"]')){
+  if (!potongan && !fd.querySelector('meta[name="viewport"]')){
     issues.push({ sev:'bad', title:'Belum ada pengaturan tampilan HP',
       desc:'Tanpa meta viewport, halaman akan tampil mengecil dan sulit dibaca di ponsel.',
       fixLabel:'Tambahkan sekarang',
@@ -3739,7 +3904,7 @@ function runScan(quiet){
         fd.head.appendChild(m);
       } });
   }
-  if (!fd.title || !fd.title.trim()){
+  if (!potongan && (!fd.title || !fd.title.trim())){
     issues.push({ sev:'warn', title:'Judul halaman kosong',
       desc:'Judul dipakai sebagai teks di tab browser dan di hasil pencarian Google.',
       fixLabel:'Ambil dari judul utama',
@@ -3926,7 +4091,7 @@ function cekTeksSkrip(el){
     if (cekSkripAmat){ cekSkripAmat.disconnect(); cekSkripAmat = null; }
     if (!kena || !fd || !fd.contains(el) || el !== sel) return;
     E.textScriptNote.hidden = false;
-    E.textScriptNote.textContent = 'Teks ini ditulis ulang terus oleh skrip halaman (biasanya hitung mundur), jadi ketikan di sini akan tertimpa. Ubah tanggalnya di kartu "Hitung mundur" di bawah.';
+    E.textScriptNote.textContent = 'Teks ini ditulis ulang terus oleh skrip halaman (biasanya hitung mundur), jadi ketikan di sini akan tertimpa. Ubah tanggalnya di kartu "Hitung mundur" — tekan tombol kembali (‹) di atas panel.';
   }, 1300);
 }
 
@@ -4150,7 +4315,7 @@ function embedVideo(url){
 }
 function pasangVideo(){
   if (!sel) return;
-  var bingkai = sel.tagName === 'IFRAME' ? sel : (sel.querySelector && sel.querySelector('iframe'));
+  var bingkai = bingkaiDari(sel);
   if (!bingkai){ toast('Pilih dulu bagian videonya.', true); return; }
   var url = embedVideo(E.pVideo.value);
   if (!url){ toast('Tempel dulu alamat videonya.', true); return; }
@@ -4341,7 +4506,7 @@ var ICONS = {
 var iconTarget = null;
 E.iconPick.addEventListener('click', function(){
   if (!sel) return;
-  iconTarget = sel.tagName.toLowerCase()==='svg' ? sel : sel.querySelector('svg');
+  iconTarget = ikonDari(sel);
   if (!iconTarget){ toast('Bagian yang dipilih tidak punya ikon. Pilih dulu ikon atau tombol yang ada ikonnya.', true); return; }
   E.iconSvg.value = ''; E.iconUrl.value = '';
   E.iconModal.hidden = false;
