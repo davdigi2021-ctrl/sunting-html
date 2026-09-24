@@ -26,7 +26,7 @@ Editor ini **tidak melakukan itu**. Halaman dirender apa adanya di dalam iframe,
 - **Ganti/tambah gambar** lewat pemilih file, seret langsung ke kanvas, atau tempel alamat gambarnya (alamat tidak membesarkan berkas, tapi gambarnya harus tetap online). Foto besar otomatis diperkecil ke 1600px dan disandikan ulang sebagai WebP sebelum ditanam, jadi berkasnya tidak membengkak — foto 1,5 MB biasanya turun ke sekitar 150 KB. SVG dan GIF tidak disentuh supaya vektor dan animasinya tetap utuh
 - Geser posisi dengan menyeret, gandakan, dan hapus elemen
 - **Tambah elemen**: section, judul, paragraf, tombol, gambar, 2 kolom, garis, jarak
-- **Ganti satu link di semua tempat sekaligus**. Masukkan link lama dan link barunya, lihat dulu berapa tempat yang akan berubah, lalu ganti semuanya dalam sekali klik. Dicari di semua atribut — termasuk `onclick`/`onsubmit` dan `action` pada form, bukan cuma `href` — dan bisa sekalian mengganti tulisan yang terlihat di halaman. Kalau elemen yang sedang dipilih memakai link yang berulang, pintasannya muncul langsung di panel Properti
+- **Ganti satu link di semua tempat sekaligus**. Masukkan link lama dan link barunya, lihat dulu berapa tempat yang akan berubah, lalu ganti semuanya dalam sekali klik. Dicari di semua atribut — termasuk `onclick`/`onsubmit` dan `action` pada form, bukan cuma `href` — dan bisa sekalian mengganti tulisan yang terlihat di halaman. Kalau elemen yang sedang dipilih memakai link yang berulang, pintasannya muncul langsung di tab Isi
 - **Kembalikan satu elemen ke asal** dalam sekali klik, tanpa perlu undo berkali-kali — teks, ukuran, warna, semuanya balik seperti di kode sumber
 - **Kunci elemen** supaya tidak tergeser atau terhapus tidak sengaja saat menyeret yang lain
 - **Ubah warna tema halaman**: warna merek yang dipakai berulang lewat variabel CSS bisa diubah sekali untuk semua tempat
@@ -38,16 +38,28 @@ Editor ini **tidak melakukan itu**. Halaman dirender apa adanya di dalam iframe,
 **Menemukan jalan**
 - **Tiga langkah bernomor** di atas panggung — tempel, ubah, unduh — dengan langkah yang sedang berjalan ditandai dan yang sudah lewat dicentang, jadi selalu jelas ini akan berakhir di mana
 - **Sambutan sekali jalan** untuk yang baru pertama membuka: tiga hal yang paling sering bikin tersendat (halamannya bisa diklik, teks diubah dengan klik dua kali, ada Ctrl+Z). Bisa dipanggil lagi lewat tombol keterangan di bar atas
-- Empat tab panel kanan memakai nama sehari-hari — **Atur, Tambah, Struktur, Periksa** — dan masing-masing menjelaskan dirinya saat kursor menyentuhnya
+- **Panel seperti Elementor**, di kiri. Tanpa pilihan, isinya daftar elemen untuk diseret ke halaman (tiga kolom ringkas, semuanya muat sekali lihat). Begitu sesuatu dipilih, kepalanya berbunyi "Ubah judul" dengan tombol kembali, dan pengaturannya dibagi tiga seperti Elementor: **Isi** (tulisan, link, gambar, video, ikon), **Gaya** (huruf dan warna), **Lanjutan** (ukuran, jarak, letak, tindakan). Kartu hanya muncul kalau memang berlaku — gambar tidak dapat kotak teks, section tidak dapat "ganti ikon"
+- Navigasi di kaki panel memakai nama sehari-hari — **Atur, Tambah, Struktur, Periksa** — dan masing-masing menjelaskan dirinya saat kursor menyentuhnya
+- **Pengaturan halaman** (warna tema, tanggal hitung mundur) ada di bawah daftar elemen, bukan di setiap elemen
 - Tombol **"Unduh hasilnya"** dibedakan dari tombol lain dan tidak pernah ikut terpotong di jendela sempit
 - Pesan salah ditulis dengan kalimat yang menyebut langkah berikutnya, bukan istilah program. Kode yang ditempel juga dikenali dulu: isi file CSS atau JavaScript yang salah kotak dikatakan apa adanya
+
+**Seret-lepas**
+- Halaman **menggulir sendiri** saat kursor dibawa ke tepi atas/bawah kanvas, dan roda mouse tetap bekerja selama menyeret — elemen bisa ditaruh jauh di bawah bagian yang sedang terlihat
+- Label kecil menempel di kursor ("Pindahkan judul", "Paragraf") dan garis biru tidak berkedip bolak-balik saat kursor ada di tengah elemen
+- Kata yang ditebalkan atau dimiringkan di tengah kalimat tidak dianggap tempat jatuh
+
+**Aman di HP**
+- Lebar yang diatur di desktop tidak pernah melebihi layar HP: ditulis sebagai `min(640px, 100%)`, jadi di desktop tepat 640 px dan di HP mengalah ke lebar layar. Tinggi kotak berisi teks ditulis sebagai tinggi minimum supaya tulisannya tidak tumpah saat membungkus lebih banyak baris
+- Pratinjau HP dan tablet tidak memakai scrollbar komputer, jadi "HP 390 px" memang 390 px
+- Setiap kali ukuran pratinjau diganti, halaman diperiksa apakah bisa digeser ke samping — termasuk tulisan yang dilarang turun baris — dengan tombol perbaikan yang tidak mengubah tampilan desktop
 
 **Melihat**
 - Pratinjau **ukuran layar asli** lewat tiga tombol ikon: Desktop 1440px, Tablet 820×1180, HP 390×844 — atau isi sendiri lebar dan tingginya di kotak sebelahnya. Tinggi yang dikosongkan mengikuti tinggi kanvas. Zoom menyesuaikan otomatis
 - Kanvas rata tepi saat lebar penuh, dan berbingkai saat pratinjau lebih sempit
 - Saat menyeret, muncul **bayangan seukuran isinya** di tempat jatuh — bukan cuma garis tipis — jadi terlihat seberapa besar section barunya nanti
 - **Rangka semua komponen** (seperti *view components* di GrapesJS), dengan label nama komponen saat kursor menyentuh elemen
-- **Panel lapisan** berisi struktur halaman. Arahkan kursor ke satu baris untuk melihat letaknya disorot di kanvas
+- **Struktur** berisi peta seluruh halaman. Arahkan kursor ke satu baris untuk melihat letaknya disorot di kanvas
 - **Pratinjau**: semua alat bantu disingkirkan dan halaman jadi bisa dipakai betulan — menu HP membuka, tombol buka-tutup bekerja, animasi masuk jalan. Link yang berpindah halaman tetap ditahan supaya pratinjau tidak melompat keluar. Tekan Esc untuk kembali menyunting
 - **Lihat kode** untuk seluruh halaman atau satu elemen saja
 
@@ -57,6 +69,10 @@ Editor ini **tidak melakukan itu**. Halaman dirender apa adanya di dalam iframe,
 ## Coba dulu tanpa menyiapkan apa-apa
 
 Tekan **"Pakai contoh halaman"**. Ketiga kotak langsung terisi — HTML, CSS, dan JS terpisah, seperti bentuk yang biasa keluar dari AI. Contohnya juga memuat header yang menempel, tombol WhatsApp melayang, gambar, dan beberapa kekeliruan khas (alamat WhatsApp tanpa `https://`, nomor diawali 0, link tab baru tanpa `rel`, gambar tanpa `alt`) supaya tab **Periksa** ada isinya untuk dicoba.
+
+## Potongan untuk widget HTML Elementor
+
+Kode yang bukan halaman utuh — misalnya isi widget HTML Elementor, yang diawali `<style>` atau `<div>` tanpa `<html>` — dibuka apa adanya dan **keluar lagi sebagai potongan**, tanpa `<html>`, `<head>`, atau `<body>` tambahan, supaya bisa langsung ditempel balik ke widgetnya. Draf yang dilanjutkan tetap ingat bentuk potongannya, dan pemeriksaan yang hanya berlaku untuk halaman utuh (judul, bahasa, pengaturan HP) dilewati.
 
 ## Kalau file kamu terpisah-pisah
 
