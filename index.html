@@ -1715,15 +1715,24 @@ function buangLokal(doc, pola, atribut){
     return '';
   });
 }
+/* Potongan — misalnya isi widget HTML Elementor — bukan halaman utuh. Untuk
+   ditampilkan ia dibungkus <html><head><body>, tapi bungkus itu milik editor:
+   hasil unduhan harus kembali berupa potongan yang sama, karena tempatnya
+   memang ditempel balik ke dalam widget, bukan dibuka sebagai halaman sendiri. */
+var potongan = false, pulihPotongan = false;
 function open(raw, css, js){
   var full = /<html[\s>]/i.test(raw) || /<!doctype/i.test(raw);
+  potongan = !full || pulihPotongan;
+  pulihPotongan = false;
   var doc = full ? raw :
     '<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body>' + raw + '</body></html>';
   css = (css||'').trim(); js = (js||'').trim();
   if (css){
     doc = buangLokal(doc, /<link\b[^>]*\brel\s*=\s*["']?stylesheet["']?[^>]*>/gi, 'href');
     var st = '<style>' + css + '</style>';
-    doc = /<\/head>/i.test(doc) ? doc.replace(/<\/head>/i, st + '</head>') : st + doc;
+    // untuk potongan, CSS-nya harus ikut di dalam <body> supaya ikut terunduh
+    if (potongan && /<body[^>]*>/i.test(doc)) doc = doc.replace(/(<body[^>]*>)/i, function(b){ return b + st; });
+    else doc = /<\/head>/i.test(doc) ? doc.replace(/<\/head>/i, st + '</head>') : st + doc;
   }
   if (js){
     doc = buangLokal(doc, /<script\b[^>]*\bsrc\s*=[^>]*>\s*<\/script>/gi, 'src');
@@ -1780,6 +1789,7 @@ E.frame.addEventListener('load', function(){
      keadaannya dikenali dan halaman dikembalikan. */
   if (!fd){ frameLost(); return; }
   stamp();
+  gayaAlat();
   bind();
   ready = true;
   E.dlBtn.disabled = E.copyBtn.disabled = E.codeBtn.disabled = E.swapBtn.disabled = false;
@@ -1823,6 +1833,31 @@ function attrs(el){
    Keduanya selalu dibuang saat ekspor dan saat melihat kode, sama seperti
    `contenteditable`. */
 var P_ASAL = 'data-sunting-asal', P_UBAH = 'data-sunting-ubah', P_KUNCI = 'data-sunting-kunci';
+
+/* Satu blok gaya milik editor, ditaruh di dalam halaman dan selalu dibuang saat
+   ekspor. Isinya dua hal yang tidak mungkin dikerjakan dari luar iframe:
+
+   - Scrollbar disembunyikan saat pratinjau di bawah 1024 px. HP dan tablet
+     memakai scrollbar melayang yang tidak memakan tempat; scrollbar komputer
+     memakan 15 px, jadi "HP 390 px" diam-diam jadi 375 px dan halaman yang
+     pas di HP asli terlihat bisa digeser ke samping di sini.
+   - Isi bingkai (video YouTube, peta) tidak menerima klik selama menyunting.
+     Klik yang jatuh ke dalam bingkai milik situs lain tidak pernah sampai ke
+     editor, jadi video yang sudah dipasang tidak bisa dipilih lagi. Di mode
+     pratinjau bingkainya dilepas supaya videonya bisa diputar.
+
+   Dipasang SESUDAH stamp(): penanda asal dipasangkan berdasarkan urutan
+   elemen, jadi elemen tambahan sebelum itu akan menggeser semua nomornya. */
+var P_ALAT = 'data-sunting-alat';
+function gayaAlat(){
+  if (!fd || !fd.head) return;
+  var st = fd.head.querySelector('style[' + P_ALAT + ']');
+  if (!st){ st = fd.createElement('style'); st.setAttribute(P_ALAT, ''); fd.head.appendChild(st); }
+  var aturan = '';
+  if (!previewOn) aturan += 'iframe,video,embed,object{pointer-events:none !important}';
+  if (devW < 1024) aturan += 'html{scrollbar-width:none}html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}';
+  if (st.textContent !== aturan) st.textContent = aturan;
+}
 var pristineAttrs = [], pristineList = [];   // daftar elemen asli, disimpan sekali
 function stamp(){
   pristineAttrs = []; pristineList = [];
@@ -1847,7 +1882,9 @@ E.devSeg.addEventListener('click', function(e){
   var b = e.target.closest('.seg-btn'); if (!b) return;
   var d = DEV[b.dataset.dev] || DEV.desktop;
   setDevSize(d[0], d[1]);
-  toast('Pratinjau ' + (b.getAttribute('aria-label') || '') + ', ' + devW + (devH ? ' × ' + devH : '') + 'px');
+  if (issues.length && /digeser ke samping/.test(issues[0].title))
+    toast('Di layar ' + (b.getAttribute('aria-label') || 'ini') + ' halaman bisa digeser ke samping. Lihat tab Periksa untuk memperbaikinya.', true);
+  else toast('Pratinjau ' + (b.getAttribute('aria-label') || '') + ', ' + devW + (devH ? ' × ' + devH : '') + 'px');
 });
 function markDev(){
   Array.prototype.forEach.call(E.devSeg.querySelectorAll('.seg-btn'), function(x){
@@ -1862,7 +1899,10 @@ function setDevSize(w, h){
   E.devHeight.value = devH ? devH : '';
   markDev();
   zoomMode = 'fit';
+  gayaAlat();
   layout(); outlineRebuild();
+  // tata letak HP baru ada sekarang, jadi baru sekarang meluber-tidaknya bisa diukur
+  if (ready) runScan(true);
 }
 E.devWidth.addEventListener('change', function(){
   setDevSize(parseInt(E.devWidth.value, 10), devH);
@@ -1892,6 +1932,7 @@ var previewOn = false, outlineSebelumPreview = false;
 function setPreview(on){
   if (!fd && on){ toast('Buka dulu halamanmu — tempel kodenya di layar awal.', true); return; }
   previewOn = on;
+  gayaAlat();
   document.body.classList.toggle('preview', on);
   document.querySelector('.app').classList.toggle('preview', on);
   E.previewBtn.classList.toggle('on', on);
@@ -2393,8 +2434,8 @@ function fillProps(){
   E.pLh.value = sel.style.lineHeight || ''; E.pLh.placeholder = css(sel,'lineHeight');
   E.pAlign.value = sel.style.textAlign || '';
   var r = sel.getBoundingClientRect();
-  E.pW.value = sel.style.width || ''; E.pW.placeholder = Math.round(r.width)+'px';
-  E.pH.value = sel.style.height || ''; E.pH.placeholder = Math.round(r.height)+'px';
+  E.pW.value = lebarPx(sel.style.width); E.pW.placeholder = Math.round(r.width)+'px';
+  E.pH.value = (MEDIA[sel.tagName] ? sel.style.height : (sel.style.minHeight || sel.style.height)) || ''; E.pH.placeholder = Math.round(r.height)+'px';
   E.pPad.value = sel.style.padding || ''; E.pPad.placeholder = css(sel,'padding');
   E.pMar.value = sel.style.margin || ''; E.pMar.placeholder = css(sel,'margin');
   setSwatch(E.pColorChip, E.pColorVal, hex(css(sel,'color')) || '#000000');
@@ -2533,9 +2574,25 @@ E.fileInput.addEventListener('change', function(){
     toast(kabarGambar(sebelum, sesudah));
   });
 });
+/* Mengganti `src` saja tidak cukup kalau gambarnya punya versi lain. `srcset`
+   dan <source> di dalam <picture> selalu didahulukan peramban — di halaman
+   Green Madani, foto video di HP diambil dari <source media="(max-width:720px)">,
+   jadi gambar baru hanya muncul di desktop dan di HP tetap foto lama. Pemuat
+   lambat (lazy-load) juga menimpa `src` dari `data-src` begitu gambarnya
+   terlihat. Semuanya diarahkan ke gambar yang sama. */
 function putImage(target, url, mode){
   if (mode==='replace' && target.tagName==='IMG'){
-    markEdited(target); target.setAttribute('src', url); return target;
+    markEdited(target); target.setAttribute('src', url);
+    ['srcset','sizes','data-srcset','data-lazy-srcset'].forEach(function(a){ target.removeAttribute(a); });
+    ['data-src','data-lazy-src','data-original'].forEach(function(a){ if (target.hasAttribute(a)) target.setAttribute(a, url); });
+    var bingkai = target.parentElement;
+    if (bingkai && bingkai.tagName === 'PICTURE'){
+      Array.prototype.forEach.call(bingkai.querySelectorAll('source'), function(s){
+        markEdited(s); s.setAttribute('srcset', url);
+        s.removeAttribute('sizes'); s.removeAttribute('type');
+      });
+    }
+    return target;
   }
   var img = fd.createElement('img');
   img.setAttribute('src', url); img.setAttribute('alt','');
@@ -2567,8 +2624,70 @@ function loadFont(fam){
 [['pSize','fontSize'],['pLh','lineHeight'],['pW','width'],['pH','height'],['pPad','padding'],['pMar','margin']].forEach(function(p){
   var el = E[p[0]];
   el.addEventListener('focus', snap);
-  el.addEventListener('input', function(){ setStyle(p[1], p[1]==='lineHeight' ? el.value.trim() : unit(el.value)); });
+  el.addEventListener('input', function(){
+    if (!sel) return;
+    if (p[1] === 'width'){ markEdited(sel); aturLebar(sel, unit(el.value)); redraw(); return; }
+    if (p[1] === 'height'){ markEdited(sel); aturTinggi(sel, unit(el.value)); redraw(); return; }
+    setStyle(p[1], p[1]==='lineHeight' ? el.value.trim() : unit(el.value));
+  });
 });
+
+/* ---------------- ukuran yang tetap aman di HP ----------------
+   Lebar yang diatur di desktop berlaku juga di HP. Judul yang dibuat 640 px
+   membuat halaman di HP melebar jadi 660 px di layar 375 px — seluruh halaman
+   bisa digeser ke samping. Jadi setiap lebar yang ditulis editor ditemani
+   max-width:100%: di layar lebar ukurannya persis seperti yang diatur, di
+   layar sempit ia mengalah ke lebar wadahnya.
+
+   Tinggi punya masalah kebalikannya. Di HP teks membungkus jadi lebih banyak
+   baris; kotak bertinggi tetap tidak ikut memanjang dan teksnya tumpah menimpa
+   bagian di bawahnya. Untuk kotak berisi teks, yang ditulis min-height —
+   "setidaknya setinggi ini", seperti Elementor. Gambar dan video tetap memakai
+   height karena ukurannya memang harus pasti. */
+var MEDIA = { IMG:1, VIDEO:1, IFRAME:1, CANVAS:1, PICTURE:1, OBJECT:1, EMBED:1, svg:1, SVG:1 };
+function asliPunya(el, prop){
+  var i = el.getAttribute(P_ASAL), a = i === null ? null : pristineAttrs[+i];
+  return !!(a && a.style && new RegExp('(^|;)\\s*' + prop + '\\s*:', 'i').test(a.style));
+}
+/* Lebar piksel ditulis sebagai min(640px, 100%), bukan 640px + max-width:100%.
+   Pasangan yang kedua sudah dicoba dan tetap meluber: saat grid atau flex
+   menghitung selebar apa kolomnya perlu, persentase belum bisa dihitung dan
+   max-width diabaikan — kolomnya ikut melebar jadi 640 px, lalu 100% dari
+   kolom selebar itu tetap 640 px. Di dalam min(), seluruh nilai dianggap
+   "otomatis" saat menghitung itu, jadi kolomnya tidak ikut terdorong. */
+function lebarPx(v){
+  var m = /^min\(\s*([\d.]+px)\s*,\s*100%\s*\)$/.exec(v || '');
+  return m ? m[1] : (v || '');
+}
+function aturLebar(el, nilai){
+  if (!nilai){
+    el.style.removeProperty('width');
+    if (el.style.boxSizing === 'border-box' && !asliPunya(el, 'box-sizing')) el.style.removeProperty('box-sizing');
+    if (!el.getAttribute('style')) el.removeAttribute('style');
+    return;
+  }
+  el.style.width = /^[\d.]+px$/.test(nilai) ? 'min(' + nilai + ', 100%)' : nilai;
+  /* Tanpa ini padding ikut ditambahkan di luar lebar, jadi kotak yang diatur
+     "100%" tetap lebih lebar dari wadahnya. */
+  if (fd.defaultView.getComputedStyle(el).boxSizing === 'content-box') el.style.boxSizing = 'border-box';
+}
+function aturTinggi(el, nilai){
+  var media = !!MEDIA[el.tagName];
+  if (!nilai){
+    el.style.removeProperty(media ? 'height' : 'min-height');
+    if (!media && !asliPunya(el, 'height')) el.style.removeProperty('height');
+    if (!el.getAttribute('style')) el.removeAttribute('style');
+    return;
+  }
+  if (media){
+    el.style.height = nilai;
+    // tanpa ini foto jadi gepeng saat lebarnya mengalah di HP
+    if (el.tagName === 'IMG' && fd.defaultView.getComputedStyle(el).objectFit === 'fill') el.style.objectFit = 'cover';
+  } else {
+    el.style.minHeight = nilai;
+    el.style.removeProperty('height');
+  }
+}
 E.pWeight.addEventListener('change', function(){ snap(); setStyle('fontWeight', E.pWeight.value); });
 E.pAlign.addEventListener('change', function(){ snap(); setStyle('textAlign', E.pAlign.value); });
 function setSwatch(chip, val, hexColor){
@@ -2890,8 +3009,8 @@ function rzMoveInner(e){
 function rzMove(cx, cy){
   if (!resize || !sel) return;
   markEdited(sel);
-  if (resize.dir==='e' || resize.dir==='se') sel.style.width = Math.max(resize.minW || 16, Math.round(resize.w + (cx-resize.x)/scale)) + 'px';
-  if (resize.dir==='s' || resize.dir==='se') sel.style.height = Math.max(16, Math.round(resize.h + (cy-resize.y)/scale)) + 'px';
+  if (resize.dir==='e' || resize.dir==='se') aturLebar(sel, Math.max(resize.minW || 16, Math.round(resize.w + (cx-resize.x)/scale)) + 'px');
+  if (resize.dir==='s' || resize.dir==='se') aturTinggi(sel, Math.max(16, Math.round(resize.h + (cy-resize.y)/scale)) + 'px');
   redraw();
 }
 function rzUp(){
@@ -3132,7 +3251,12 @@ var BLOCK = {
   text:'<p style="margin:12px 0;font-size:16px;line-height:1.7;">Paragraf baru. Klik dua kali untuk mengganti tulisannya.</p>',
   button:'<a href="#" style="display:inline-block;padding:14px 28px;background:#0071e3;color:#fff;border-radius:999px;text-decoration:none;font-weight:600;">Tombol Baru</a>',
   image:'',
-  video:'<div style="position:relative;padding-top:56.25%;background:#111;border-radius:10px;overflow:hidden;margin:16px 0;"><iframe src="about:blank" title="Video" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;border:0;" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>',
+  /* Dulu memakai trik padding-top 56,25% dengan iframe melayang di atasnya.
+     Kotak seperti itu tidak punya isi yang "mengisi" lebarnya, jadi begitu
+     ditaruh di dalam baris (flex) atau wadah rata tengah, lebarnya menyusut ke
+     0 px — tingginya ada, tapi tidak terlihat sama sekali. Sekarang lebarnya
+     penuh dengan batas bawah 320 px, dan tingginya mengikuti lewat aspect-ratio. */
+  video:'<div style="width:100%;min-width:min(100%,320px);aspect-ratio:16/9;margin:16px 0;background:#111;border-radius:10px;overflow:hidden;"><iframe src="about:blank" title="Video" loading="lazy" style="display:block;width:100%;height:100%;border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>',
   columns:'<div style="display:flex;gap:24px;flex-wrap:wrap;margin:18px 0;"><div style="flex:1;min-width:220px;"><h3 style="margin:0 0 8px;">Kolom 1</h3><p style="margin:0;line-height:1.7;">Isi kolom pertama.</p></div><div style="flex:1;min-width:220px;"><h3 style="margin:0 0 8px;">Kolom 2</h3><p style="margin:0;line-height:1.7;">Isi kolom kedua.</p></div></div>',
   columns3:'<div style="display:flex;gap:20px;flex-wrap:wrap;margin:18px 0;"><div style="flex:1;min-width:160px;"><h3 style="margin:0 0 8px;">Kolom 1</h3><p style="margin:0;line-height:1.7;">Isi kolom pertama.</p></div><div style="flex:1;min-width:160px;"><h3 style="margin:0 0 8px;">Kolom 2</h3><p style="margin:0;line-height:1.7;">Isi kolom kedua.</p></div><div style="flex:1;min-width:160px;"><h3 style="margin:0 0 8px;">Kolom 3</h3><p style="margin:0;line-height:1.7;">Isi kolom ketiga.</p></div></div>',
   divider:'<hr style="border:0;border-top:1px solid #e0e0e0;margin:28px 0;">',
@@ -3140,6 +3264,9 @@ var BLOCK = {
 };
 var PLACEHOLDER = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'640'%20height%3D'360'%3E%3Crect%20width%3D'640'%20height%3D'360'%20fill%3D'%23eeeeef'%2F%3E%3Ctext%20x%3D'320'%20y%3D'190'%20text-anchor%3D'middle'%20font-family%3D'sans-serif'%20font-size%3D'24'%20fill%3D'%23999'%3EGambar%3C%2Ftext%3E%3C%2Fsvg%3E";
 BLOCK.image = '<img src="' + PLACEHOLDER + '" alt="Gambar" style="max-width:100%;display:block;">';
+var VIDEO_KOSONG = '<body style="margin:0;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#111;color:#c9c9cf;font:15px/1.4 system-ui,sans-serif;text-align:center;padding:0 16px;box-sizing:border-box">' +
+  '<div style="width:56px;height:56px;border-radius:50%;background:#e33;display:grid;place-items:center"><div style="width:0;height:0;border-left:18px solid #fff;border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px"></div></div>' +
+  '<div>Pilih kotak ini, lalu tempel link YouTube atau Vimeo<br>di bagian <b>Isi</b> panel pengaturan.</div></body>';
 
 /* dropInfo: {el, before} untuk menaruh tepat di sana (dari drag), atau null untuk
    menaruh di bawah elemen yang sedang dipilih (dari klik). */
@@ -3149,6 +3276,13 @@ function insertBlock(kind, dropInfo){
   box.innerHTML = BLOCK[kind] || '';
   var node = box.firstElementChild;
   if (!node) return;
+  /* Kotak video kosong dulu cuma hitam polos, dan orang mengira videonya gagal
+     dimuat. Sekarang kotaknya sendiri yang bilang harus diapakan. Isian ini
+     dibuang begitu alamat videonya dipasang. */
+  if (kind === 'video'){
+    var fr = node.querySelector('iframe');
+    if (fr) fr.setAttribute('srcdoc', VIDEO_KOSONG);
+  }
   snap();
   if (dropInfo && dropInfo.el && dropInfo.el.parentNode){
     if (dropInfo.before) dropInfo.el.parentNode.insertBefore(node, dropInfo.el);
@@ -3271,6 +3405,81 @@ function palEnd(cancel){
 /* ---------------- pemeriksa masalah ---------------- */
 var SINGLE = ['font-size','color','opacity','z-index','width','height','background-color'];
 
+/* Halaman yang bisa digeser ke samping di HP. Hanya bisa diukur saat pratinjau
+   memang sedang sempit — tata letak HP baru ada kalau lebarnya HP — jadi di
+   tampilan desktop pemeriksaan ini dilewati, dan dijalankan ulang setiap kali
+   ukuran pratinjau diganti.
+
+   Yang dicari adalah bagian PERTAMA yang keluar dari tepi kanan: induknya
+   masih muat, dia tidak. Anak-anaknya ikut keluar hanya karena dia keluar,
+   jadi mereka bukan penyebabnya. Isi wadah yang memotong atau menggulir
+   isinya sendiri (overflow hidden/auto) tidak menggeser halaman, dan elemen
+   fixed tidak ikut dihitung dalam lebar halaman. */
+function cariMeluber(){
+  if (!fd || !fd.body || !fd.documentElement || devW >= 1024) return null;
+  var root = fd.documentElement, win = fd.defaultView, w = root.clientWidth;
+  if (root.scrollWidth <= w + 1) return null;
+  var ox = win.getComputedStyle(root).overflowX, bx = win.getComputedStyle(fd.body).overflowX;
+  if (/hidden|clip/.test(ox) || (/hidden|clip/.test(bx) && ox === 'visible')) return null;
+  function terkurung(el){
+    for (var n = el.parentElement; n && n !== fd.body && n !== root; n = n.parentElement){
+      if (/hidden|clip|auto|scroll/.test(win.getComputedStyle(n).overflowX)) return true;
+    }
+    return false;
+  }
+  /* Tulisan bisa keluar walau kotaknya muat — teks bergaya nowrap tetap satu
+     baris panjang meski kotaknya sudah menyempit. Jadi selain kotak, teks yang
+     menjadi isi langsung sebuah elemen juga diukur. */
+  var rentang = fd.createRange();
+  function teksKeluar(el){
+    for (var n = el.firstChild; n; n = n.nextSibling){
+      if (n.nodeType !== 3 || !n.nodeValue.trim()) continue;
+      rentang.selectNodeContents(n);
+      if (rentang.getBoundingClientRect().right + sx > w + 1) return true;
+    }
+    return false;
+  }
+  var sx = win.scrollX || 0, hasil = [];
+  var semua = fd.body.querySelectorAll('*');
+  for (var i = 0; i < semua.length; i++){
+    var el = semua[i];
+    if (skip(el)) continue;
+    var r = el.getBoundingClientRect();
+    if (r.width <= 0) continue;
+    var kotakKeluar = r.right + sx > w + 1;
+    if (!kotakKeluar && !teksKeluar(el)) continue;
+    if (win.getComputedStyle(el).position === 'fixed') continue;
+    var p = el.parentElement;
+    if (kotakKeluar && p && p !== fd.body && !skip(p) && p.getBoundingClientRect().right + sx > w + 1) continue;
+    // teks di dalam kotak yang sudah tercatat ikut keluar karena kotaknya
+    if (!kotakKeluar && hasil.some(function(h){ return h.contains(el); })) continue;
+    if (terkurung(el)) continue;
+    hasil.push(el);
+  }
+  return hasil.length ? { el: hasil, lebih: root.scrollWidth - w } : null;
+}
+/* Bagian yang ikut arus halaman dibuat boleh menyempit (min-width:0 — tanpa ini
+   kolom grid dan flex menolak lebih sempit dari isinya), tidak melebihi
+   wadahnya, dan kata yang terlalu panjang boleh dipatah. Hiasan yang melayang
+   (position:absolute) tidak diubah bentuknya: kelebihannya dipotong di wadah
+   teratasnya, cara yang sama dipakai halaman Serongga sendiri. */
+function rapikanMeluber(el){
+  if (!el || !fd.contains(el)) return;
+  var win = fd.defaultView;
+  if (win.getComputedStyle(el).position === 'absolute'){
+    var atas = el;
+    while (atas.parentElement && atas.parentElement !== fd.body) atas = atas.parentElement;
+    if (atas === el) atas = fd.body;
+    markEdited(atas); atas.style.overflowX = 'clip';
+    return;
+  }
+  markEdited(el);
+  el.style.minWidth = '0';
+  el.style.maxWidth = '100%';
+  el.style.overflowWrap = 'anywhere';
+  // teks yang dilarang turun baris tidak akan pernah muat di layar sempit
+  if (win.getComputedStyle(el).whiteSpace === 'nowrap') el.style.whiteSpace = 'normal';
+}
 function runScan(quiet){
   if (!fd){ return; }
   issues = [];
@@ -3379,7 +3588,7 @@ function runScan(quiet){
   }
 
   // 8. CSS: kurung kurawal tidak seimbang
-  Array.prototype.forEach.call(fd.querySelectorAll('style'), function(st, n){
+  Array.prototype.forEach.call(fd.querySelectorAll('style:not([data-sunting-alat])'), function(st, n){
     var txt = st.textContent || '';
     var opens = (txt.match(/\{/g)||[]).length, closes = (txt.match(/\}/g)||[]).length;
     if (opens !== closes){
@@ -3394,7 +3603,7 @@ function runScan(quiet){
 
   // 9. CSS: var() digabung nilai lain pada properti yang cuma menerima satu nilai.
   //    Sengaja sempit: lebih baik melewatkan satu masalah daripada memberi alarm palsu.
-  Array.prototype.forEach.call(fd.querySelectorAll('style'), function(st){
+  Array.prototype.forEach.call(fd.querySelectorAll('style:not([data-sunting-alat])'), function(st){
     var txt = st.textContent || '';
     var re = /([-a-z]+)\s*:\s*([^;{}]+)[;}]/gi, m, seen = {};
     while ((m = re.exec(txt))){
@@ -3447,6 +3656,27 @@ function runScan(quiet){
   if (h1.length > 1){
     issues.push({ el:h1[1], sev:'info', title:'Judul utama lebih dari satu',
       desc:'Ada ' + h1.length + ' judul utama. Sebaiknya satu saja per halaman supaya Google tahu mana judul yang sebenarnya.' });
+  }
+
+  // 12. halaman bisa digeser ke samping di layar sempit
+  var luber = cariMeluber();
+  if (luber){
+    issues.unshift({ el:luber.el[0], sev:'bad', title:'Di layar ini halaman bisa digeser ke samping',
+      desc:'Ada ' + (luber.el.length > 1 ? luber.el.length + ' bagian' : 'bagian') + ' yang ' + luber.lebih +
+        ' px lebih lebar dari layar ' + fd.documentElement.clientWidth + ' px, jadi pengunjung bisa menggeser halaman ke kiri-kanan. ' +
+        'Perbaikannya membuat bagian itu mengalah ke lebar layar; tampilan desktop tidak berubah.',
+      code:luber.el.slice(0, 3).map(label).join(', '),
+      fixLabel:'Paskan ke lebar layar',
+      /* Memperbaiki satu lapis sering membuka lapis di bawahnya: kolom grid
+         yang sudah boleh menyempit memperlihatkan tulisan nowrap di dalamnya.
+         Jadi diukur-perbaiki berulang sampai muat, dengan batas putaran. */
+      fix:function(){
+        for (var putaran = 0; putaran < 6; putaran++){
+          var sisa = cariMeluber();
+          if (!sisa) break;
+          sisa.el.forEach(rapikanMeluber);
+        }
+      } });
   }
 
   renderIssues();
@@ -3747,7 +3977,7 @@ function simpanDraf(){
     if (!fd || !fd.body || !lastDoc || previewOn) return;
     try {
       localStorage.setItem(DRAF, JSON.stringify({
-        doc: lastDoc, body: fd.body.innerHTML, judul: fd.title || '', pada: Date.now()
+        doc: lastDoc, body: fd.body.innerHTML, judul: judulHalaman(), pada: Date.now(), potongan: potongan
       }));
     } catch(err){ try { localStorage.removeItem(DRAF); } catch(e2){} }
   }, 1200);
@@ -3773,6 +4003,7 @@ E.draftOpen.addEventListener('click', function(){
     doc = doc.replace(/(<body[^>]*>)[\s\S]*(<\/body>)/i, function(_, buka, tutup){ return buka + d.body + tutup; });
   }
   E.srcInput.value = doc;
+  pulihPotongan = !!d.potongan;
   E.cssInput.value = ''; E.jsInput.value = '';
   E.startErr.hidden = true;
   E.openBtn.click();
@@ -3827,7 +4058,12 @@ function pasangVideo(){
   if (!url){ toast('Tempel dulu alamat videonya.', true); return; }
   snap();
   markEdited(bingkai);
+  // srcdoc selalu menang atas src, jadi isian "tempel link" harus dibuang dulu
+  bingkai.removeAttribute('srcdoc');
   bingkai.setAttribute('src', url);
+  /* YouTube menolak diputar (galat 153) kalau permintaannya tidak membawa
+     alamat asal. Ini nilai yang juga dipakai kode sematan resmi YouTube. */
+  if (!bingkai.hasAttribute('referrerpolicy')) bingkai.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
   toast(url.indexOf('youtube') >= 0 || url.indexOf('vimeo') >= 0 ? 'Video dipasang.' : 'Alamat dipasang apa adanya.');
 }
 E.pVideoApply.addEventListener('click', pasangVideo);
@@ -4048,6 +4284,20 @@ E.iconApply.addEventListener('click', function(){
   if (!raw){ toast('Tempel dulu kode SVG-nya.', true); return; }
   applyIcon(raw, false);
 });
+/* Warna yang benar-benar terlihat pada sebuah ikon: isi bentuknya kalau berisi,
+   garisnya kalau ikon garis. `color` milik <svg> belum tentu itu — banyak ikon
+   diwarnai langsung lewat fill pada path-nya. */
+function warnaIkon(svg, win){
+  function kosong(v){ return !v || v === 'none' || /^url\(/.test(v) || /rgba\([^)]*,\s*0\)$/.test(v); }
+  var bentuk = svg.querySelectorAll('path,circle,rect,ellipse,line,polyline,polygon,use,text');
+  for (var i = 0; i < bentuk.length; i++){
+    var cs = win.getComputedStyle(bentuk[i]);
+    if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+    if (!kosong(cs.fill) && cs.fillOpacity !== '0') return cs.fill;
+    if (!kosong(cs.stroke) && cs.strokeOpacity !== '0') return cs.stroke;
+  }
+  return win.getComputedStyle(svg).color;
+}
 function applyIcon(src, isPath){
   if (!iconTarget) return;
   snap();
@@ -4066,14 +4316,45 @@ function applyIcon(src, isPath){
       if (/^on/i.test(a.name)) n.removeAttribute(a.name);
     });
   });
-  // pertahankan penampilan lamanya
+  /* Pertahankan penampilan lamanya — warna dan ukuran, bukan cuma atributnya.
+
+     Dua hal yang dulu merusak ikon:
+     - Warna. Ikon WhatsApp di halaman Serongga berwarna hijau lewat `fill`
+       pada path-nya, di atas lingkaran putih; `color` tombolnya putih. Ikon
+       pengganti memakai currentColor, jadi jadi putih di atas putih — hilang.
+       Sekarang warna yang benar-benar TERLIHAT pada ikon lama diukur dan
+       dipakai sebagai warna ikon baru.
+     - SVG yang disalin dari internet hampir selalu membawa warna tertanam
+       (fill="#000000") dan ukuran raksasa (width="800px"). Warnanya diubah
+       jadi currentColor supaya ikut warna di atas, ukurannya dibuang supaya
+       ikut ukuran ikon lama. */
+  var lama = iconTarget, jendela = fd.defaultView;
+  var kotakLama = lama.getBoundingClientRect();
+  var catLama = warnaIkon(lama, jendela);
+  svg.removeAttribute('width'); svg.removeAttribute('height');
+  [svg].concat(Array.prototype.slice.call(svg.querySelectorAll('*'))).forEach(function(n){
+    ['fill','stroke'].forEach(function(a){
+      var v = n.getAttribute(a);
+      if (v && !/^(none|currentColor|inherit|transparent|url\()/i.test(v.trim())) n.setAttribute(a, 'currentColor');
+    });
+    var gaya = n.getAttribute('style');
+    if (gaya) n.setAttribute('style', gaya.replace(/(^|;)\s*(fill|stroke)\s*:\s*([^;]+)/gi, function(m, awal, prop, nilai){
+      return /^(none|currentColor|inherit|transparent|url\()/i.test(nilai.trim()) ? m : awal + prop + ':currentColor';
+    }));
+  });
   ['class','width','height','style','aria-hidden'].forEach(function(a){
-    var v = iconTarget.getAttribute(a);
+    var v = lama.getAttribute(a);
     if (v !== null && !svg.hasAttribute(a)) svg.setAttribute(a, v);
   });
   markEdited(svg);
-  iconTarget.replaceWith(svg);
+  lama.replaceWith(svg);
   iconTarget = svg;
+  if (catLama && jendela.getComputedStyle(svg).color !== catLama) svg.style.color = catLama;
+  var kotakBaru = svg.getBoundingClientRect();
+  if (kotakLama.width > 0 && (Math.abs(kotakBaru.width - kotakLama.width) > 1 || Math.abs(kotakBaru.height - kotakLama.height) > 1)){
+    svg.setAttribute('width', Math.round(kotakLama.width));
+    svg.setAttribute('height', Math.round(kotakLama.height));
+  }
   select(svg.parentElement || svg);
   closeModals(); buildLayers(); toast('Ikon diganti.');
 }
@@ -4084,6 +4365,7 @@ function cleanClone(clone, liveRoot){
      dikerjakan pada klon itu sendiri — tidak perlu lagi mencocokkan dua pohon
      berdasarkan urutan, yang dulu gagal begitu ada elemen ditambah atau
      dipindah. */
+  Array.prototype.forEach.call(clone.querySelectorAll('[' + P_ALAT + ']'), function(n){ n.remove(); });
   var semua = [clone].concat(Array.prototype.slice.call(clone.querySelectorAll('*')));
   for (var i=0;i<semua.length;i++){
     var el = semua[i];
@@ -4111,6 +4393,10 @@ function cleanClone(clone, liveRoot){
 function exportHtml(){
   flushEdit();
   var clone = cleanClone(fd.documentElement.cloneNode(true), fd.documentElement);
+  if (potongan){
+    var badan = clone.querySelector('body');
+    return (badan ? badan.innerHTML : clone.outerHTML).replace(/^\s+/, '') + '\n';
+  }
   return '<!DOCTYPE html>\n' + clone.outerHTML + '\n';
 }
 function validate(html){
@@ -4121,8 +4407,16 @@ function validate(html){
     return null;
   }catch(err){ return 'Halaman ini gagal diperiksa sebelum diunduh. Tekan Ctrl+Z beberapa kali lalu coba lagi.'; }
 }
+/* Potongan Elementor tidak punya <title>, jadi judul utamanya yang dipakai. */
+function judulHalaman(){
+  if (!fd) return '';
+  var t = fd.title && fd.title.trim();
+  if (t) return t;
+  var h = fd.body && fd.body.querySelector('h1, h2');
+  return h ? h.textContent.replace(/\s+/g, ' ').trim().slice(0, 60) : '';
+}
 function fileName(){
-  var t = fd && fd.title && fd.title.trim();
+  var t = judulHalaman();
   if (t){
     var s = t.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
     if (s) return s + '.html';
