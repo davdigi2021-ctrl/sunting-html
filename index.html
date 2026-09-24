@@ -1272,7 +1272,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
             <p class="sec-title">Struktur halaman</p>
             <button class="ibtn" id="layersRefresh" type="button" title="Muat ulang daftar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-refresh"/></svg></button>
           </div>
-          <p class="note">Arahkan kursor ke satu baris untuk melihat letaknya di halaman, klik untuk memilihnya.</p>
+          <p class="note">Arahkan kursor ke satu baris untuk melihat letaknya di halaman. Memilih di halaman juga menyorot barisnya di sini, dan lipatannya dibuka sendiri. Klik dua kali untuk membuka pengaturannya.</p>
           <div class="layers" id="layersTree"></div>
         </div>
 
@@ -2326,7 +2326,11 @@ function select(el){
   redraw(); fillProps();
   E.propsEmpty.hidden = true; E.propsBody.hidden = false;
   E.tabAturWrap.hidden = false;
-  markLayer(el); goTab('props');
+  /* Kalau Struktur sedang dibuka, ia tetap terbuka dan ikut menyorot —
+     seperti Navigator di Elementor. Pengaturannya ada di tab Atur di bawah,
+     atau klik dua kali barisnya. */
+  if (tabAktif() === 'layers'){ aturKepala(); markLayer(el); }
+  else { markLayer(el); goTab('props'); }
   hint('Terpilih: ' + label(el) + '. Seret untuk memindahkan, tarik bulatan biru untuk mengubah ukuran.');
 }
 function deselect(){
@@ -3299,7 +3303,7 @@ function tabAktif(){
    daftar elemen, sama seperti menekan Esc. */
 var KEPALA = {
   blocks: ['Tambah elemen', 'Seret ke halaman, atau klik untuk menaruhnya di bawah yang dipilih'],
-  layers: ['Struktur halaman', 'Semua bagian halaman, dari luar ke dalam'],
+  layers: ['Struktur halaman', 'Klik untuk memilih, klik dua kali untuk mengatur'],
   scan:   ['Periksa halaman', 'Hal-hal yang bisa membuat halaman bermasalah'],
   props:  ['Pengaturan elemen', 'Klik elemen mana pun di halaman untuk mengaturnya']
 };
@@ -3474,6 +3478,7 @@ function walk(parent, host, depth, count){
         select(target); setPeek(target, true);
         setTimeout(function(){ setPeek(null); }, 900);
       });
+      rowEl.addEventListener('dblclick', function(){ select(target); goTab('props'); });
       rowEl.addEventListener('keydown', function(ev){
         if (ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); select(target); }
       });
@@ -3499,8 +3504,30 @@ function niceHint(el){
   var t = (el.textContent || '').trim().replace(/\s+/g,' ');
   return t.length > 70 ? t.slice(0,68) + '…' : t;
 }
+/* Baris elemen yang dipilih ditandai, lipatan di atasnya dibuka, dan daftarnya
+   digulir ke baris itu. Dulu hanya ditandai: lipatan dari kedalaman ketiga ke
+   bawah tertutup sejak awal, jadi tanda itu hampir selalu tersembunyi di dalam
+   lipatan dan Struktur terlihat tidak ikut memilih. */
 function markLayer(el){
-  layerMap.forEach(function(x){ x.row.classList.toggle('on', x.el === el); });
+  var baris = null;
+  layerMap.forEach(function(x){
+    var on = x.el === el;
+    x.row.classList.toggle('on', on);
+    if (on) baris = x.row;
+  });
+  if (!baris) return;
+  for (var n = baris.parentElement; n && n !== E.layersTree; n = n.parentElement){
+    if (!n.classList.contains('layer-kids') || !n.hidden) continue;
+    n.hidden = false;
+    var tw = n.previousElementSibling && n.previousElementSibling.querySelector('.layer-twist');
+    if (tw) tw.classList.remove('closed');
+  }
+  if (E.tabLayers.hidden) return;
+  // hanya menggulir kalau barisnya di luar pandangan, dan menaruhnya di tengah
+  var p = E.tabLayers, rp = p.getBoundingClientRect(), rb = baris.getBoundingClientRect();
+  if (rb.top < rp.top + 40 || rb.bottom > rp.bottom - 8){
+    p.scrollTop += (rb.top - rp.top) - (rp.height - rb.height) / 2;
+  }
 }
 
 /* ---------------- blok baru ---------------- */
