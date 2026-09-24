@@ -1670,11 +1670,53 @@ function sasaranJatuh(el){
 /* Sisipan selalu menjadi SAUDARA, bukan anak. Kalau induknya menyusun anak-anak
    secara mendatar, saudara berikutnya muncul di SAMPING — bukan di bawah. Garis
    mendatar di tepi bawah karena itu menjanjikan hal yang tidak akan terjadi. */
-function arahMendatar(el){
+/* Apakah elemen yang dibawa akan duduk BERJAJAR kalau ditaruh di sebelah
+   elemen lain di luar flex/grid. Hanya elemen sebaris (inline, inline-block)
+   atau yang mengapung (float) yang begitu; judul, paragraf, dan kotak biasa
+   selalu mulai di baris baru.
+
+   Anak flex/grid dilaporkan peramban sebagai elemen blok walau aslinya
+   sebaris (tombol <a> di deretan tombol), jadi di situ jenis tagnya yang
+   dipakai sebagai petunjuk. `dibawa` boleh berupa elemen atau langsung
+   true/false untuk blok baru dari daftar elemen. */
+var TAG_SEBARIS = { A:1, SPAN:1, BUTTON:1, IMG:1, B:1, STRONG:1, EM:1, I:1, SMALL:1, LABEL:1, INPUT:1, SELECT:1, SUP:1, SUB:1, MARK:1, CODE:1 };
+function sebaris(dibawa){
+  if (typeof dibawa === 'boolean') return dibawa;
+  if (!dibawa || !fd) return false;
+  var win = fd.defaultView, cs = win.getComputedStyle(dibawa);
+  if (cs.float && cs.float !== 'none') return true;
+  var ip = dibawa.parentElement ? win.getComputedStyle(dibawa.parentElement).display : '';
+  if (/flex|grid/.test(ip)) return !!TAG_SEBARIS[dibawa.tagName];
+  return cs.display.indexOf('inline') === 0;
+}
+function arahMendatar(el, dibawa, lebarDibawa, abaikan){
   if (!fd || !el || !el.parentElement) return false;
   var win = fd.defaultView, induk = el.parentElement;
   var ci = win.getComputedStyle(induk), d = ci.display;
-  if ((d === 'flex' || d === 'inline-flex') && ci.flexDirection.indexOf('column') !== 0) return true;
+  if ((d === 'flex' || d === 'inline-flex') && ci.flexDirection.indexOf('column') !== 0){
+    /* Baris flex yang boleh turun baris (flex-wrap): elemen yang tidak muat di
+       sisa baris sasarannya pindah ke baris baru — jadi ke bawah, bukan ke
+       samping. Sisa baris = lebar isi wadah dikurangi semua anak yang sebaris
+       dengan sasaran (kecuali elemen yang sedang dipindah) dan jaraknya. */
+    if (ci.flexWrap !== 'nowrap' && lebarDibawa){
+      var rs = el.getBoundingClientRect(), terpakai = 0, n = 0;
+      var jarak = parseFloat(ci.columnGap) || 0;
+      for (var k = induk.firstElementChild; k; k = k.nextElementSibling){
+        if (k === abaikan || skip(k)) continue;
+        var rk = k.getBoundingClientRect();
+        if (rk.width === 0 && rk.height === 0) continue;
+        if (Math.abs(rk.top - rs.top) < Math.max(4, rs.height / 2)){ terpakai += rk.width; n++; }
+      }
+      var isi = induk.clientWidth - (parseFloat(ci.paddingLeft) || 0) - (parseFloat(ci.paddingRight) || 0);
+      if (lebarDibawa > isi - terpakai - jarak * n + 1) return false;
+    }
+    return true;
+  }
+  /* Di luar flex dan grid, kotak blok selalu turun ke baris baru — walau
+     sasarannya tombol yang berjajar. Dulu garis tegak "di samping" tetap
+     ditampilkan, lalu elemennya mendarat di bawah (4 dari 82 seretan di
+     halaman Serongga, semuanya kotak yang ditaruh di sebelah tombol). */
+  if (d !== 'grid' && d !== 'inline-grid' && dibawa !== undefined && !sebaris(dibawa)) return false;
   var sib = el.nextElementSibling || el.previousElementSibling;
   if (sib){
     var a = el.getBoundingClientRect(), b = sib.getBoundingClientRect();
@@ -1733,6 +1775,11 @@ function snap(){
   histBtns();
   simpanDraf();
 }
+/* Seretan yang dibatalkan (Esc, atau dilepas di luar tempat yang sah) tidak
+   mengubah apa pun, tapi snap() di awalnya sudah mencatat satu langkah undo.
+   Tanpa ini, Ctrl+Z pertama sesudahnya "tidak melakukan apa-apa" dan orang
+   mengira undo-nya rusak. */
+function batalkanSnap(){ if (undoS.length){ undoS.pop(); histBtns(); } }
 function histBtns(){
   E.undoBtn.disabled = !undoS.length;
   E.redoBtn.disabled = !redoS.length;
@@ -3066,9 +3113,41 @@ function clearPend(){
 
 /* Selama menyeret, kursor bisa berada di dokumen induk ATAU di dalam iframe.
    Keduanya didengarkan, dan koordinatnya dinormalkan ke ruang koordinat iframe. */
+/* Elemen melayang (position absolute/fixed) — lencana di pojok foto, caption
+   di tepi bawahnya — posisinya dikunci kode halaman ke tepi wadahnya, bukan
+   ke urutan elemen. Memindahnya di urutan halaman tidak pernah menaruhnya di
+   tempat bayangan: di halaman Serongga caption yang diseret ke judul hasilnya
+   0% berada di tempat yang dijanjikan. Jadi elemen seperti ini digeser
+   BEBAS mengikuti kursor, seperti elemen berposisi absolut di Elementor.
+
+   Pergeserannya ditulis ke properti `translate`, bukan left/top: left/right/
+   bottom dan lebar aslinya tetap utuh (caption yang membentang dari tepi ke
+   tepi tetap membentang), dan `transform` milik halaman tidak tertimpa. */
+function melayang(el){
+  if (!fd || !el) return false;
+  var p = fd.defaultView.getComputedStyle(el).position;
+  return p === 'absolute' || p === 'fixed';
+}
+function bacaGeser(el){
+  var m = /^\s*(-?[\d.]+)px(?:\s+(-?[\d.]+)px)?/.exec(el.style.translate || '');
+  return m ? { x: parseFloat(m[1]), y: parseFloat(m[2] || '0') } : { x: 0, y: 0 };
+}
 function startDrag(el){
   if (!el || !el.parentNode || drag) return;
   snap();
+  if (melayang(el)){
+    drag = { el:el, bebas:true, awal:bacaGeser(el), asliTranslate: el.style.translate || '', mulai:null };
+    E.shield.hidden = false; E.shield.classList.remove('rz');
+    mulaiSeret('Geser ' + niceName(el).toLowerCase());
+    document.addEventListener('mousemove', dragMoveOuter, true);
+    document.addEventListener('mouseup', dragEndOuter, true);
+    if (fd){
+      fd.addEventListener('mousemove', dragMoveInner, true);
+      fd.addEventListener('mouseup', dragEndInner, true);
+    }
+    hint('Elemen ini melayang di atas yang lain, jadi digeser bebas. Lepaskan di tempat yang pas; Esc untuk batal.');
+    return;
+  }
   drag = { el:el, target:null, before:true };
   E.shield.hidden = false; E.shield.classList.remove('rz');
   el.style.opacity = '.4';
@@ -3086,6 +3165,8 @@ function startDrag(el){
    dibuang lagi — sekali saja di awal seretan, bukan tiap gerakan kursor.
    Tebakan angka mati membuat bayangan meleset jauh: section ditebak 150 px,
    aslinya bisa 309 px. */
+// blok baru yang memang berjajar; sisanya elemen blok yang mulai di baris baru
+var BLOK_SEBARIS = { button:1 };
 function ukurBlok(kind, dekat){
   var node = null;
   try {
@@ -3126,6 +3207,102 @@ function tampilBayangan(target, before, mendatar, tinggi, lebar, label){
   E.ghostTag.textContent = label;
 }
 function sembunyiBayangan(){ E.ghost.hidden = true; }
+
+/* ---------------- ukur tempat jatuh yang sebenarnya ----------------
+   Aturan tebakan ("tombol berjajar, jadi yang baru juga berjajar", "baris
+   flex bisa turun") tidak pernah menangkap semua tata letak buatan AI: di
+   Green Madani 12 dari 112 seretan tetap mendarat di arah lain dari yang
+   dijanjikan garis biru. Jadi hasilnya diukur, bukan ditebak.
+
+   Salinan tak terlihat dari yang dibawa ditaruh tepat di tempat jatuhnya,
+   elemen aslinya disembunyikan sesaat (di hasil akhir ia memang pindah dari
+   tempat lamanya), letak salinan dibaca relatif terhadap sasaran, lalu
+   semuanya dikembalikan. Semua terjadi dalam satu langkah JavaScript, jadi
+   layar tidak sempat digambar ulang — tidak ada kedipan. Diukur sekali per
+   sasaran dan sisi, bukan per gerakan kursor. Bayangan lalu digambar di
+   letak itu, digeser ikut sasaran yang terlihat sekarang. */
+function ukurHasil(t, before, bawa){
+  var node = null, asli = bawa.el || null, dSimpan = '', dPrio = '';
+  if (!t || !t.parentNode) return null;
+  try {
+    if (asli) node = asli.cloneNode(true);
+    else {
+      var box = fd.createElement('div');
+      box.innerHTML = BLOCK[bawa.kind] || '';
+      node = box.firstElementChild;
+    }
+    if (!node) return null;
+    /* Gambar contoh blok Gambar belum sempat terbaca saat diukur (pengukuran
+       berjalan dalam satu langkah), jadi ukurannya nol dan bayangannya jadi
+       kotak kecil. Ukuran aslinya 640×360 diberikan khusus untuk salinan ini. */
+    if (bawa.kind === 'image' && node.tagName === 'IMG'){
+      node.setAttribute('width', '640'); node.setAttribute('height', '360'); node.style.height = 'auto';
+    }
+    /* Gambar yang sudah diketahui rusak di aslinya tidak diminta ulang oleh
+       salinan — tiap sasaran baru akan memicu satu permintaan gagal lagi. */
+    if (asli){
+      var gAsli = asli.querySelectorAll('img'), gSalin = node.querySelectorAll('img');
+      for (var gi = 0; gi < gAsli.length && gi < gSalin.length; gi++){
+        if (gAsli[gi].complete && gAsli[gi].naturalWidth === 0){ gSalin[gi].removeAttribute('src'); gSalin[gi].removeAttribute('srcset'); }
+      }
+    }
+    // bingkai di dalam salinan jangan sampai memuat video/peta sungguhan
+    Array.prototype.forEach.call(node.querySelectorAll ? node.querySelectorAll('iframe') : [], function(f){
+      f.removeAttribute('src'); f.removeAttribute('srcdoc');
+    });
+    if (node.tagName === 'IFRAME'){ node.removeAttribute('src'); node.removeAttribute('srcdoc'); }
+    node.style.visibility = 'hidden';
+    node.style.transition = 'none';
+    node.style.animation = 'none';
+    if (asli){
+      dSimpan = asli.style.getPropertyValue('display'); dPrio = asli.style.getPropertyPriority('display');
+      asli.style.setProperty('display', 'none', 'important');
+    }
+    t.parentNode.insertBefore(node, before ? t : t.nextSibling);
+    var rn = node.getBoundingClientRect(), rt = t.getBoundingClientRect();
+    var tumpang = Math.min(rn.bottom, rt.bottom) - Math.max(rn.top, rt.top);
+    var samping = rn.height > 0 && tumpang > Math.min(rn.height, rt.height) * 0.3 &&
+                  (rn.left >= rt.right - 2 || rn.right <= rt.left + 2);
+    return { dx: rn.left - rt.left, dy: rn.top - rt.top, w: rn.width, h: rn.height, samping: samping };
+  } catch(err){
+    return null;
+  } finally {
+    if (node && node.parentNode) node.parentNode.removeChild(node);
+    if (asli){
+      if (dSimpan) asli.style.setProperty('display', dSimpan, dPrio);
+      else asli.style.removeProperty('display');
+    }
+  }
+}
+function hasilDi(state, t, before, bawa){
+  if (state.ukurT !== t){ state.ukurT = t; state.ukur = {}; }
+  var k = before ? 'sebelum' : 'sesudah';
+  if (!(k in state.ukur)) state.ukur[k] = ukurHasil(t, before, bawa);
+  return state.ukur[k];
+}
+/* Arah tebakan dipakai sebagai titik awal untuk memilih sisi (kiri/kanan atau
+   atas/bawah dari posisi kursor). Kalau hasil ukurnya ternyata ke arah lain,
+   sisinya dipilih ulang menurut arah yang benar dan diukur sekali lagi. */
+function arahJatuh(p, t, bawa, state, lebar){
+  var r = t.getBoundingClientRect();
+  var tebak = arahMendatar(t, bawa.el || !!BLOK_SEBARIS[bawa.kind], lebar, bawa.el);
+  var before = sisiSebelum(t, r, p, tebak, state);
+  var m = hasilDi(state, t, before, bawa);
+  if (m && m.samping !== tebak){
+    var b2 = sisiSebelum(t, r, p, m.samping, state);
+    if (b2 !== before){ before = b2; m = hasilDi(state, t, before, bawa) || m; }
+  }
+  return { r: r, before: before, mendatar: m ? m.samping : tebak, m: m };
+}
+function tampilBayanganUkur(t, m, label){
+  var r = t.getBoundingClientRect(), g = E.ghost;
+  g.hidden = false;
+  g.style.left = ((r.left + m.dx) * scale) + 'px';
+  g.style.top = ((r.top + m.dy) * scale) + 'px';
+  g.style.width = (Math.max(26, m.w) * scale) + 'px';
+  g.style.height = (Math.max(20, m.h) * scale) + 'px';
+  E.ghostTag.textContent = label;
+}
 
 /* ---------------- seret yang mulus ----------------
    Tiga hal yang dulu membuat seret terasa kaku:
@@ -3174,7 +3351,7 @@ function ulangSasaran(){
   if (drag) dragMove(p); else if (palDrag) palMove(p);
 }
 function gulirTepi(){
-  if ((!drag && !palDrag) || !penunjuk || !fd){ return; }
+  if ((!drag && !palDrag) || !penunjuk || !fd || (drag && drag.bebas)){ return; }
   var fr = E.frame.getBoundingClientRect(), cv = E.canvas.getBoundingClientRect();
   // hanya kalau kursor memang di atas kanvas, bukan masih di panel
   if (penunjuk.x < Math.max(fr.left, cv.left) || penunjuk.x > Math.min(fr.right, cv.right)) return;
@@ -3210,19 +3387,28 @@ function dragMoveOuter(e){ catatPenunjuk(e, false); dragMove(pt(e)); }
 function dragMoveInner(e){ catatPenunjuk(e, true); dragMove({ x:e.clientX, y:e.clientY }); }
 function dragEndOuter(e){ dragMove(pt(e)); dragEnd(false); }
 function dragEndInner(e){ dragMove({ x:e.clientX, y:e.clientY }); dragEnd(false); }
+function geserBebas(p){
+  if (!drag.mulai){ drag.mulai = { x:p.x, y:p.y }; return; }
+  var x = Math.round(drag.awal.x + p.x - drag.mulai.x), y = Math.round(drag.awal.y + p.y - drag.mulai.y);
+  markEdited(drag.el);
+  drag.el.style.translate = x + 'px ' + y + 'px';
+  redraw();
+}
 function dragMove(p){
   if (!drag) return;
+  if (drag.bebas){ geserBebas(p); return; }
   var t = sasaranJatuh(fd.elementFromPoint(p.x, p.y));
   if (!t || t===drag.el || drag.el.contains(t)){
     E.insLine.hidden = true; sembunyiBayangan(); drag.target = null; return;
   }
-  var r = t.getBoundingClientRect();
-  var mendatar = arahMendatar(t);
-  var before = sisiSebelum(t, r, p, mendatar, drag);
-  drag.target = t; drag.before = before;
-  garisSisip(r, before, mendatar);
-  var dr = drag.el.getBoundingClientRect();
-  tampilBayangan(t, before, mendatar, Math.max(26, dr.height), Math.max(26, dr.width), label(drag.el));
+  var j = arahJatuh(p, t, { el: drag.el }, drag, drag.lebar || (drag.lebar = drag.el.getBoundingClientRect().width));
+  drag.target = t; drag.before = j.before;
+  garisSisip(j.r, j.before, j.mendatar);
+  if (j.m) tampilBayanganUkur(t, j.m, label(drag.el));
+  else {
+    var dr = drag.el.getBoundingClientRect();
+    tampilBayangan(t, j.before, j.mendatar, Math.max(26, dr.height), Math.max(26, dr.width), label(drag.el));
+  }
 }
 function dragEnd(cancel){
   if (!drag) return;
@@ -3234,12 +3420,22 @@ function dragEnd(cancel){
     fd.removeEventListener('mouseup', dragEndInner, true);
   }
   E.shield.hidden = true; E.insLine.hidden = true; sembunyiBayangan(); selesaiSeret();
+  if (d.bebas){
+    if (cancel || !d.mulai){
+      if (d.asliTranslate) d.el.style.translate = d.asliTranslate; else d.el.style.removeProperty('translate');
+      if (!d.el.getAttribute('style')) d.el.removeAttribute('style');
+      batalkanSnap();
+    }
+    select(d.el);
+    if (cancel) toast('Pergeseran dibatalkan.');
+    return;
+  }
   d.el.style.removeProperty('opacity');
   if (!d.el.getAttribute('style')) d.el.removeAttribute('style');
   if (!cancel && d.target && d.target.parentNode){
     if (d.before) d.target.parentNode.insertBefore(d.el, d.target);
     else d.target.parentNode.insertBefore(d.el, d.target.nextSibling);
-  }
+  } else batalkanSnap();
   select(d.el); buildLayers();
   if (cancel) toast('Pemindahan dibatalkan.');
 }
@@ -3855,20 +4051,20 @@ function palMove(p){
   if (!palDrag || !fd) return;
   var t = sasaranJatuh(fd.elementFromPoint(p.x, p.y));
   if (!t){ E.insLine.hidden = true; sembunyiBayangan(); palDrag.target = null; return; }
-  var r = t.getBoundingClientRect();
-  var mendatar = arahMendatar(t);
-  var before = sisiSebelum(t, r, p, mendatar, palDrag);
   /* Lebar wadah tujuan menentukan berapa baris teksnya membungkus, jadi tinggi
      blok diukur ulang di dalam wadah itu sendiri — sekali per sasaran baru,
      bukan tiap gerakan kursor. Diukur di <body> saja hasilnya masih meleset
-     puluhan piksel karena lebarnya beda. */
+     puluhan piksel karena lebarnya beda. Diukur SEBELUM arahnya ditentukan:
+     lebar ini yang memutuskan muat-tidaknya di baris flex yang bisa turun. */
   if (palDrag.target !== t){
     var uk = ukurBlok(palDrag.kind, t);
     palDrag.tinggi = uk.tinggi; palDrag.lebar = uk.lebar;
   }
-  palDrag.target = t; palDrag.before = before;
-  garisSisip(r, before, mendatar);
-  tampilBayangan(t, before, mendatar, palDrag.tinggi || 80, palDrag.lebar || r.width, namaBlok(palDrag.kind));
+  var j = arahJatuh(p, t, { kind: palDrag.kind }, palDrag, palDrag.lebar);
+  palDrag.target = t; palDrag.before = j.before;
+  garisSisip(j.r, j.before, j.mendatar);
+  if (j.m) tampilBayanganUkur(t, j.m, namaBlok(palDrag.kind));
+  else tampilBayangan(t, j.before, j.mendatar, palDrag.tinggi || 80, palDrag.lebar || j.r.width, namaBlok(palDrag.kind));
 }
 function namaBlok(k){
   var n = { section:'Section', heading:'Judul', text:'Paragraf', button:'Tombol', image:'Gambar',

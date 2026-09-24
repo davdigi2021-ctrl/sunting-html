@@ -52,6 +52,8 @@ Editor ini **tidak melakukan itu**. Halaman dirender apa adanya di dalam iframe,
 - Halaman **menggulir sendiri** saat kursor dibawa ke tepi atas/bawah kanvas, dan roda mouse tetap bekerja selama menyeret — elemen bisa ditaruh jauh di bawah bagian yang sedang terlihat
 - Label kecil menempel di kursor ("Pindahkan judul", "Paragraf") dan garis biru tidak berkedip bolak-balik saat kursor ada di tengah elemen
 - Kata yang ditebalkan atau dimiringkan di tengah kalimat tidak dianggap tempat jatuh
+- **Bayangan jatuh diukur, bukan ditebak**: salinan tak terlihat dari yang dibawa ditaruh sesaat di tempat jatuhnya, lalu bayangan digambar di tempat salinan itu mendarat — jadi "di samping" atau "di bawah" yang terlihat saat menyeret sama dengan hasilnya, termasuk di grid, baris yang bisa turun, dan deretan tombol
+- **Elemen melayang** (lencana di pojok foto, caption di tepi gambar) digeser bebas mengikuti kursor seperti elemen absolut di Elementor. Pergeserannya ditulis sebagai `translate`, jadi posisi dan lebar aslinya dari kode halaman tetap utuh
 
 **Aman di HP**
 - Lebar yang diatur di desktop tidak pernah melebihi layar HP: ditulis sebagai `min(640px, 100%)`, jadi di desktop tepat 640 px dan di HP mengalah ke lebar layar. Tinggi kotak berisi teks ditulis sebagai tinggi minimum supaya tulisannya tidak tumpah saat membungkus lebih banyak baris
