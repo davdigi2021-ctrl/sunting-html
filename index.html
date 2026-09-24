@@ -598,6 +598,14 @@ body.preview .device{border-radius:0;box-shadow:none;}
 .shield{position:fixed;inset:0;z-index:900;cursor:grabbing;}
 .shield[hidden]{display:none;}
 .shield.rz{cursor:nwse-resize;}
+/* Label yang menempel di kursor selama menyeret: apa yang sedang dibawa. */
+.seret-chip{
+  position:fixed;left:0;top:0;z-index:950;pointer-events:none;
+  background:var(--accent);color:#fff;font-size:12px;font-weight:600;
+  padding:4px 11px;border-radius:var(--r-pill);white-space:nowrap;
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+.seret-chip[hidden]{display:none;}
 
 /* ---------- Panel properti ---------- */
 /* Kartunya ada di dalam #propsBody, jadi gap milik .tab-panel tidak sampai ke
@@ -1247,6 +1255,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
   </div>
 </div>
 <div class="shield" id="shield" hidden></div>
+<div class="seret-chip" id="seretChip" hidden></div>
 
 <!-- Modal: lihat kode -->
 <!-- Ganti satu alamat di semua tempat sekaligus. Di halaman jualan, satu link
@@ -1368,7 +1377,7 @@ var E = {};
  'imgUrl','imgUrlApply','cVideo','pVideo','pVideoApply',
  'draftBar','draftTitle','draftWhen','draftOpen','draftDrop','cTheme','themeList','lockBtn','lockLabel',
  'ghost','ghostTag','textScriptNote','partColorBtn','cCountdown','cdList','memuat',
- 'stepBar','step1','step2','step3','tour','tourT','tourD','tourDots','tourSkip','tourNext'
+ 'stepBar','step1','step2','step3','tour','tourT','tourD','tourDots','tourSkip','tourNext','seretChip'
 ].forEach(function(id){ E[id] = $(id); });
 
 /* ---------------- keadaan ---------------- */
@@ -1533,6 +1542,15 @@ function sasaranJatuh(el){
   while (p && p.nodeType === 1 && !skip(p)){
     if (ATOMIK[p.tagName]) atas = p;
     p = p.parentElement;
+  }
+  /* Potongan di dalam kalimat — <b>, <em>, <span> — bukan tempat menaruh
+     section. Kalau dianggap sasaran, garis biru melompat ke tengah paragraf
+     setiap kali kursor melintasi kata yang ditebalkan. Naik ke kotak yang
+     memuat kalimatnya. Tombol dan link tetap sasaran sendiri (ATOMIK). */
+  var win = fd && fd.defaultView;
+  while (win && !ATOMIK[atas.tagName] && atas.parentElement && !skip(atas.parentElement) &&
+         win.getComputedStyle(atas).display === 'inline' && atas.tagName !== 'IMG'){
+    atas = atas.parentElement;
   }
   return atas;
 }
@@ -2861,7 +2879,7 @@ function onDown(e){
 function pendMove(e){
   if (!pend) return;
   if (Math.abs(e.clientX-pend.x) + Math.abs(e.clientY-pend.y) > 5){
-    var el = pend.el; clearPend(); startDrag(el);
+    var el = pend.el; clearPend(); catatPenunjuk(e, true); startDrag(el);
   }
 }
 function pendUp(){ clearPend(); }
@@ -2880,6 +2898,7 @@ function startDrag(el){
   drag = { el:el, target:null, before:true };
   E.shield.hidden = false; E.shield.classList.remove('rz');
   el.style.opacity = '.4';
+  mulaiSeret('Pindahkan ' + niceName(el).toLowerCase());
   document.addEventListener('mousemove', dragMoveOuter, true);
   document.addEventListener('mouseup', dragEndOuter, true);
   if (fd){
@@ -2934,8 +2953,86 @@ function tampilBayangan(target, before, mendatar, tinggi, lebar, label){
 }
 function sembunyiBayangan(){ E.ghost.hidden = true; }
 
-function dragMoveOuter(e){ dragMove(pt(e)); }
-function dragMoveInner(e){ dragMove({ x:e.clientX, y:e.clientY }); }
+/* ---------------- seret yang mulus ----------------
+   Tiga hal yang dulu membuat seret terasa kaku:
+
+   1. Halaman tidak bisa digulir sama sekali. Selama menyeret, kanvas ditutup
+      lapisan pelindung supaya peristiwa mouse tidak hilang ke dalam iframe —
+      akibatnya roda mouse mati, dan elemen hanya bisa ditaruh di bagian yang
+      sedang terlihat. Sekarang halaman menggulir sendiri saat kursor dibawa ke
+      tepi atas/bawah kanvas (makin dekat tepi makin cepat, seperti Elementor),
+      dan roda mouse diteruskan ke halaman.
+   2. Tidak ada yang menempel di kursor, jadi begitu kursor jauh dari garis
+      biru tidak jelas apa yang sedang dibawa. Sekarang ada label kecil.
+   3. Garis sisip berkedip bolak-balik atas-bawah saat kursor ada di tengah
+      elemen. Sekarang sisi baru diganti setelah kursor melewati 35/65%.
+
+   Pengulangnya memakai setInterval, bukan requestAnimationFrame: gulir tepi
+   harus tetap jalan walau mouse diam, dan rAF tidak berjalan di tab yang
+   tidak sedang digambar ulang. */
+var penunjuk = null, gulirT = null;
+function catatPenunjuk(e, dariDalam){
+  if (dariDalam){
+    var r = E.frame.getBoundingClientRect();
+    penunjuk = { x: r.left + e.clientX * scale, y: r.top + e.clientY * scale };
+  } else penunjuk = { x: e.clientX, y: e.clientY };
+  E.seretChip.style.transform = 'translate(' + Math.round(penunjuk.x + 14) + 'px,' + Math.round(penunjuk.y + 18) + 'px)';
+}
+function titikDalam(){
+  var r = E.frame.getBoundingClientRect();
+  return { x: (penunjuk.x - r.left) / scale, y: (penunjuk.y - r.top) / scale };
+}
+function mulaiSeret(teks, e){
+  E.seretChip.textContent = teks;
+  if (e) catatPenunjuk(e, false);
+  E.seretChip.hidden = false;
+  clearInterval(gulirT);
+  gulirT = setInterval(gulirTepi, 16);
+}
+function selesaiSeret(){
+  clearInterval(gulirT); gulirT = null;
+  E.seretChip.hidden = true; penunjuk = null;
+}
+function ulangSasaran(){
+  if (!penunjuk) return;
+  var p = titikDalam();
+  if (drag) dragMove(p); else if (palDrag) palMove(p);
+}
+function gulirTepi(){
+  if ((!drag && !palDrag) || !penunjuk || !fd){ return; }
+  var fr = E.frame.getBoundingClientRect(), cv = E.canvas.getBoundingClientRect();
+  // hanya kalau kursor memang di atas kanvas, bukan masih di panel
+  if (penunjuk.x < Math.max(fr.left, cv.left) || penunjuk.x > Math.min(fr.right, cv.right)) return;
+  var atas = Math.max(fr.top, cv.top), bawah = Math.min(fr.bottom, cv.bottom), ZONA = 72, laju = 0;
+  if (penunjuk.y < atas + ZONA) laju = -Math.ceil(18 * (1 - Math.max(0, penunjuk.y - atas) / ZONA));
+  else if (penunjuk.y > bawah - ZONA) laju = Math.ceil(18 * (1 - Math.max(0, bawah - penunjuk.y) / ZONA));
+  if (!laju) return;
+  var win = fd.defaultView, y0 = win.scrollY;
+  win.scrollBy(0, laju / scale);
+  if (win.scrollY === y0){
+    // halamannya mentok; pratinjau HP yang lebih tinggi dari layar menggulir kanvas luarnya
+    var c0 = E.canvas.scrollTop;
+    E.canvas.scrollTop += laju;
+    if (E.canvas.scrollTop === c0) return;
+  }
+  ulangSasaran();
+}
+E.shield.addEventListener('wheel', function(e){
+  if ((!drag && !palDrag) || !fd) return;
+  e.preventDefault();
+  fd.defaultView.scrollBy(0, (e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY) / scale);
+  ulangSasaran();
+}, { passive:false });
+/* Sisi atas/bawah (atau kiri/kanan) baru berpindah setelah kursor melewati
+   35% atau 65%, bukan tepat di 50%. Di sasaran baru tetap dipakai 50%. */
+function sisiSebelum(t, r, p, mendatar, lama){
+  var rasio = mendatar ? (p.x - r.left) / (r.width || 1) : (p.y - r.top) / (r.height || 1);
+  if (lama && lama.target === t) return lama.before ? rasio < 0.65 : rasio < 0.35;
+  return rasio < 0.5;
+}
+
+function dragMoveOuter(e){ catatPenunjuk(e, false); dragMove(pt(e)); }
+function dragMoveInner(e){ catatPenunjuk(e, true); dragMove({ x:e.clientX, y:e.clientY }); }
 function dragEndOuter(e){ dragMove(pt(e)); dragEnd(false); }
 function dragEndInner(e){ dragMove({ x:e.clientX, y:e.clientY }); dragEnd(false); }
 function dragMove(p){
@@ -2946,7 +3043,7 @@ function dragMove(p){
   }
   var r = t.getBoundingClientRect();
   var mendatar = arahMendatar(t);
-  var before = mendatar ? (p.x - r.left) < r.width/2 : (p.y - r.top) < r.height/2;
+  var before = sisiSebelum(t, r, p, mendatar, drag);
   drag.target = t; drag.before = before;
   garisSisip(r, before, mendatar);
   var dr = drag.el.getBoundingClientRect();
@@ -2961,7 +3058,7 @@ function dragEnd(cancel){
     fd.removeEventListener('mousemove', dragMoveInner, true);
     fd.removeEventListener('mouseup', dragEndInner, true);
   }
-  E.shield.hidden = true; E.insLine.hidden = true; sembunyiBayangan();
+  E.shield.hidden = true; E.insLine.hidden = true; sembunyiBayangan(); selesaiSeret();
   d.el.style.removeProperty('opacity');
   if (!d.el.getAttribute('style')) d.el.removeAttribute('style');
   if (!cancel && d.target && d.target.parentNode){
@@ -3348,6 +3445,7 @@ function palStart(kind, btn){
   palDrag = { kind:kind, btn:btn, target:null, before:true, tinggi:uk.tinggi, lebar:uk.lebar };
   btn.classList.add('dragging');
   E.shield.hidden = false; E.shield.classList.remove('rz');
+  mulaiSeret(namaBlok(kind).replace(' baru di sini', ''));
   document.addEventListener('mousemove', palMoveOuter, true);
   document.addEventListener('mouseup', palEndOuter, true);
   if (fd){
@@ -3356,15 +3454,15 @@ function palStart(kind, btn){
   }
   hint('Lepaskan di garis biru untuk menaruh elemen baru di sana.');
 }
-function palMoveOuter(e){ palMove(pt(e)); }
-function palMoveInner(e){ palMove({ x:e.clientX, y:e.clientY }); }
+function palMoveOuter(e){ catatPenunjuk(e, false); palMove(pt(e)); }
+function palMoveInner(e){ catatPenunjuk(e, true); palMove({ x:e.clientX, y:e.clientY }); }
 function palMove(p){
   if (!palDrag || !fd) return;
   var t = sasaranJatuh(fd.elementFromPoint(p.x, p.y));
   if (!t){ E.insLine.hidden = true; sembunyiBayangan(); palDrag.target = null; return; }
   var r = t.getBoundingClientRect();
   var mendatar = arahMendatar(t);
-  var before = mendatar ? (p.x - r.left) < r.width/2 : (p.y - r.top) < r.height/2;
+  var before = sisiSebelum(t, r, p, mendatar, palDrag);
   /* Lebar wadah tujuan menentukan berapa baris teksnya membungkus, jadi tinggi
      blok diukur ulang di dalam wadah itu sendiri — sekali per sasaran baru,
      bukan tiap gerakan kursor. Diukur di <body> saja hasilnya masih meleset
@@ -3394,7 +3492,7 @@ function palEnd(cancel){
     fd.removeEventListener('mouseup', palEndInner, true);
   }
   d.btn.classList.remove('dragging');
-  E.shield.hidden = true; E.insLine.hidden = true; sembunyiBayangan();
+  E.shield.hidden = true; E.insLine.hidden = true; sembunyiBayangan(); selesaiSeret();
   palJustDragged = true;
   setTimeout(function(){ palJustDragged = false; }, 80);
   if (cancel) toast('Dibatalkan.');
