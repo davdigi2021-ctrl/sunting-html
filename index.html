@@ -249,12 +249,14 @@ button,input,select,textarea{font:inherit;color:inherit;}
 #propsBody[data-grup="lanjut"] [data-grup]:not([data-grup="lanjut"]){display:none;}
 .isi-kosong{padding:6px 2px;}
 /* Navigasi panel di bawah, seperti kaki panel Elementor. */
-.pane-tabs{order:5;display:flex;padding:6px 8px;gap:4px;border-top:1px solid var(--line);flex:0 0 auto;}
-.tab-wrap{position:relative;flex:1;display:flex;}
+.pane-tabs{order:5;display:flex;padding:6px 6px;gap:2px;border-top:1px solid var(--line);flex:0 0 auto;}
+/* Lima tab dibagi rata (flex-basis 0), jadi lebarnya tidak ditentukan panjang
+   namanya — dulu "Atur" hanya kebagian 30 px sementara yang lain 48 px. */
+.tab-wrap{position:relative;flex:1 1 0;min-width:0;display:flex;}
 .tab-wrap[hidden]{display:none;}
 .tab{
-  flex:1;border:0;background:transparent;color:var(--ink-2);cursor:pointer;
-  padding:8px 4px;font-size:11px;font-weight:500;letter-spacing:.01em;
+  flex:1;min-width:0;border:0;background:transparent;color:var(--ink-2);cursor:pointer;
+  padding:8px 2px;font-size:11px;font-weight:500;letter-spacing:0;white-space:nowrap;
   border-radius:var(--r-sm);transition:color var(--t),background var(--t);
   display:flex;flex-direction:column;align-items:center;gap:5px;
 }
@@ -639,6 +641,42 @@ body.preview .device{border-radius:0;box-shadow:none;}
   box-shadow:0 6px 18px rgba(0,0,0,.22);
 }
 .seret-chip[hidden]{display:none;}
+/* Tombol "Ganti gambar" di pojok kanan atas gambar yang disentuh kursor. */
+.img-ganti{
+  position:absolute;z-index:3;pointer-events:auto;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+  background:var(--float);color:var(--float-ink);border:1px solid var(--float-line);
+  border-radius:var(--r-pill);padding:6px 12px 6px 10px;font-size:12.5px;font-weight:600;
+  box-shadow:var(--sh-2);transition:background var(--t),border-color var(--t);
+}
+.img-ganti svg{width:15px;height:15px;}
+.img-ganti:hover{background:var(--accent);border-color:var(--accent);color:#fff;}
+.img-ganti[hidden]{display:none;}
+/* Tab Gambar: semua gambar halaman sebagai kartu kecil. */
+.galeri{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.galeri-item{
+  border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden;
+  background:var(--surface-2);display:flex;flex-direction:column;min-width:0;
+  transition:border-color var(--t),box-shadow var(--t);
+}
+.galeri-item:hover{border-color:var(--line-2);}
+.galeri-item.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
+.galeri-thumb{
+  position:relative;display:block;width:100%;aspect-ratio:4/3;border:0;padding:0;cursor:pointer;
+  background:repeating-conic-gradient(var(--surface-3) 0 25%, var(--surface) 0 50%) 50%/12px 12px;
+}
+.galeri-thumb img{width:100%;height:100%;object-fit:contain;display:block;}
+.galeri-thumb:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;}
+.galeri-cap{
+  position:absolute;left:5px;top:5px;font-size:10.5px;font-weight:600;
+  padding:2px 6px;border-radius:5px;color:#fff;background:rgba(0,0,0,.62);
+}
+.galeri-cap.rusak{background:var(--bad);}
+.galeri-cap.berat{background:var(--warn);}
+.galeri-info{padding:6px 7px 7px;display:flex;flex-direction:column;gap:5px;min-width:0;}
+.galeri-nama{font-size:11.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.galeri-meta{font-size:10.5px;color:var(--ink-3);font-family:var(--mono);}
+.galeri-item .btn{width:100%;justify-content:center;padding:4px 6px;font-size:12px;}
 
 /* ---------- Panel properti ---------- */
 /* Kartunya ada di dalam #propsBody, jadi gap milik .tab-panel tidak sampai ke
@@ -1064,6 +1102,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
            menjelaskan dirinya sendiri saat kursor menyentuhnya. Tab Atur hanya
            muncul selama ada elemen yang dipilih — tanpa pilihan, isinya kosong. -->
       <div class="tab-wrap" id="tabAturWrap" hidden><button class="tab" data-tab="props" type="button" role="tab" title="Atur elemen yang sedang dipilih — teks, link, ukuran, huruf, dan warnanya"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-sliders"/></svg> Atur</button></div>
+      <div class="tab-wrap"><button class="tab" data-tab="gambar" type="button" role="tab" title="Semua gambar di halaman — lihat dan ganti dari satu tempat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-image"/></svg> Gambar</button></div>
       <div class="tab-wrap"><button class="tab on" data-tab="blocks" type="button" role="tab" title="Tambah bagian baru ke halaman — judul, tombol, gambar, video, kolom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-blocks"/></svg> Tambah</button></div>
       <div class="tab-wrap"><button class="tab" data-tab="layers" type="button" role="tab" title="Peta seluruh isi halaman dari luar ke dalam — untuk memilih bagian yang susah diklik"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><use href="#i-layers"/></svg> Struktur</button></div>
       <div class="tab-wrap">
@@ -1267,6 +1306,10 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
           </div>
         </div>
 
+    <div class="tab-panel" id="tabGambar" hidden>
+          <div class="galeri" id="galeri"></div>
+        </div>
+
     <div class="tab-panel" id="tabLayers" hidden>
           <div class="scan-head">
             <p class="sec-title">Struktur halaman</p>
@@ -1311,6 +1354,9 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
   </div>
   <div class="ins" id="insLine" hidden></div>
   <div class="ghost" id="ghost" hidden><span class="ghost-tag" id="ghostTag"></span></div>
+  <!-- Muncul di pojok gambar yang disentuh kursor, termasuk gambar yang tertutup
+       tombol play atau lapisan tembus pandang: sekali klik, langsung pilih berkas. -->
+  <button class="img-ganti" id="imgGanti" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-image"/></svg>Ganti gambar</button>
   <div class="qbar" id="qbar" hidden>
     <button class="qb" data-act="parent" type="button" title="Pilih elemen induk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-up"/></svg></button>
     <button class="qb" id="qbMove" type="button" title="Seret untuk memindahkan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-move"/></svg></button>
@@ -1443,7 +1489,7 @@ var E = {};
  'draftBar','draftTitle','draftWhen','draftOpen','draftDrop','cTheme','themeList','lockBtn','lockLabel',
  'ghost','ghostTag','textScriptNote','partColorBtn','cCountdown','cdList','memuat',
  'stepBar','step1','step2','step3','tour','tourT','tourD','tourDots','tourSkip','tourNext','seretChip',
- 'paneBack','paneTitle','paneSub','subTabs','isiKosong','isiKosongTeks','isiKetikBtn','tabAturWrap','aturHalamanJudul'
+ 'paneBack','paneTitle','paneSub','subTabs','isiKosong','isiKosongTeks','isiKetikBtn','tabAturWrap','aturHalamanJudul','imgGanti','tabGambar','galeri'
 ].forEach(function(id){ E[id] = $(id); });
 
 /* ---------------- keadaan ---------------- */
@@ -2213,6 +2259,7 @@ function redraw(){
   } else if (sel){ deselect(); }
   if (hoverEl && fd.contains(hoverEl)) put(E.boxHover, hoverEl);
   if (dropEl && fd.contains(dropEl)) put(E.boxDrop, dropEl);
+  letakTombolGambar();
   outlineDraw();
 }
 
@@ -2260,7 +2307,7 @@ requestAnimationFrame(watchScroll);
 function bind(){
   lastSX = -1; lastSY = -1;
   fd.addEventListener('mousemove', onMove, true);
-  fd.addEventListener('mouseleave', function(){ setHover(null); }, true);
+  fd.addEventListener('mouseleave', function(){ setHover(null); sembunyikanTombolGambarNanti(); }, true);
   fd.addEventListener('click', onClick, true);
   fd.addEventListener('dblclick', onDbl, true);
   fd.addEventListener('mousedown', onDown, true);
@@ -2275,6 +2322,8 @@ function bind(){
   fd.addEventListener('transitionend', outlineRebuild, true);
   fd.addEventListener('animationend', outlineRebuild, true);
   fd.addEventListener('load', outlineRebuild, true);
+  fd.addEventListener('load', segarkanGaleri, true);
+  fd.addEventListener('error', segarkanGaleri, true);
   fd.addEventListener('keydown', onKey);
   fd.addEventListener('blur', function(e){ if (editing(e.target)) stopEdit(e.target); }, true);
   fd.addEventListener('dragenter', onFileOver);
@@ -2285,9 +2334,11 @@ function bind(){
   fd.addEventListener('drop', onFileDrop);
 }
 function onMove(e){
-  if (drag || resize || previewOn) return;
+  if (drag || resize || previewOn){ E.imgGanti.hidden = true; return; }
   var t = komponen(e.target);
   setHover(!t || t===sel ? null : t);
+  var im = cariGambarDiTitik(e.clientX, e.clientY);
+  if (im) tampilTombolGambar(im); else if (gambarDiKursor) sembunyikanTombolGambarNanti();
 }
 function onClick(e){
   /* Saat pratinjau, halaman dibiarkan bekerja sendiri. Yang ditahan hanya link
@@ -2329,7 +2380,8 @@ function select(el){
   /* Kalau Struktur sedang dibuka, ia tetap terbuka dan ikut menyorot —
      seperti Navigator di Elementor. Pengaturannya ada di tab Atur di bawah,
      atau klik dua kali barisnya. */
-  if (tabAktif() === 'layers'){ aturKepala(); markLayer(el); }
+  tandaiGaleri(el);
+  if (tabAktif() === 'layers' || tabAktif() === 'gambar'){ aturKepala(); markLayer(el); }
   else { markLayer(el); goTab('props'); }
   hint('Terpilih: ' + label(el) + '. Seret untuk memindahkan, tarik bulatan biru untuk mengubah ukuran.');
 }
@@ -2339,7 +2391,7 @@ function deselect(){
   E.boxSel.hidden = true; E.qbar.hidden = true; E.insLine.hidden = true; sembunyiBayangan();
   setHover(null); setDrop(null); setPeek(null);
   E.propsEmpty.hidden = false; E.propsBody.hidden = true;
-  markLayer(null);
+  markLayer(null); tandaiGaleri(null);
   if (tabAktif() === 'props') goTab('blocks'); else aturKepala();
   if (ready) hint('Klik elemen untuk memilih. Klik dua kali untuk mengubah teksnya.');
 }
@@ -2461,6 +2513,15 @@ function bingkaiDari(el){
   var fr = el.querySelectorAll ? el.querySelectorAll('iframe') : [];
   return (fr.length === 1 && el.children.length <= 2) ? fr[0] : null;
 }
+/* Kotak yang isinya satu gambar dianggap "gambar" juga. Siteplan di halaman
+   Serongga ditutup lapisan tembus pandang milik kotak pembungkusnya, jadi klik
+   selalu memilih kotaknya — dan kartu Gambar tidak pernah muncul. */
+function gambarDari(el){
+  if (!el) return null;
+  if (el.tagName === 'IMG') return el;
+  var im = el.querySelectorAll ? el.querySelectorAll('img') : [];
+  return (im.length === 1 && (el.textContent || '').trim().length <= 80) ? im[0] : null;
+}
 function ikonDari(el){
   if (el.tagName.toLowerCase() === 'svg') return el;
   var sv = el.querySelectorAll ? el.querySelectorAll('svg') : [];
@@ -2524,9 +2585,9 @@ function fillProps(){
     E.linkSwapAll.dataset.href = alamat;
   } else { E.linkErr.hidden = true; E.linkFix.hidden = true; E.linkSwapAll.hidden = true; }
 
-  var img = sel.tagName==='IMG';
+  var img = gambarDari(sel);
   E.cImg.hidden = !img;
-  if (img) E.pAlt.value = sel.getAttribute('alt') || '';
+  if (img) E.pAlt.value = img.getAttribute('alt') || '';
 
   var bingkai = bingkaiDari(sel);
   E.cVideo.hidden = !bingkai;
@@ -2635,7 +2696,8 @@ E.pBlank.addEventListener('change', function(){
 /* gambar */
 E.pAlt.addEventListener('focus', snap);
 E.pAlt.addEventListener('input', function(){
-  if (sel && sel.tagName==='IMG'){ markEdited(sel); sel.setAttribute('alt', E.pAlt.value); }
+  var im = gambarDari(sel);
+  if (im){ markEdited(im); im.setAttribute('alt', E.pAlt.value); }
 });
 /* Gambar ditanam sebagai base64 supaya hasilnya tetap satu berkas yang bisa
    dibuka di mana saja tanpa folder pendamping. Ongkosnya: base64 membuat data
@@ -2689,11 +2751,12 @@ function kabarGambar(sebelum, sesudah){
   return 'Gambar dipasang, diringkas ' + kb(sebelum) + ' → ' + kb(sesudah) + '.';
 }
 var imgTarget = null, imgMode = 'replace';
-E.imgPick.addEventListener('click', function(){
-  if (!sel) return;
-  imgTarget = sel; imgMode = sel.tagName==='IMG' ? 'replace' : 'add';
+function pilihBerkasGambar(target){
+  var im = gambarDari(target);
+  imgTarget = im || target; imgMode = im ? 'replace' : 'add';
   E.fileInput.value = ''; E.fileInput.click();
-});
+}
+E.imgPick.addEventListener('click', function(){ if (sel) pilihBerkasGambar(sel); });
 E.fileInput.addEventListener('change', function(){
   var f = E.fileInput.files && E.fileInput.files[0];
   if (!f || !imgTarget) return;
@@ -3094,6 +3157,7 @@ function titikDalam(){
   return { x: (penunjuk.x - r.left) / scale, y: (penunjuk.y - r.top) / scale };
 }
 function mulaiSeret(teks, e){
+  E.imgGanti.hidden = true;
   E.seretChip.textContent = teks;
   if (e) catatPenunjuk(e, false);
   E.seretChip.hidden = false;
@@ -3280,12 +3344,13 @@ function onKey(e){
 document.addEventListener('keydown', onKey);
 
 /* ---------------- tab panel kiri ---------------- */
-var TABS = { props:E.tabProps, blocks:E.tabBlocks, layers:E.tabLayers, scan:E.tabScan };
+var TABS = { props:E.tabProps, blocks:E.tabBlocks, gambar:E.tabGambar, layers:E.tabLayers, scan:E.tabScan };
 document.querySelectorAll('.tab[data-tab]').forEach(function(t){
   t.addEventListener('click', function(){
     document.querySelectorAll('.tab[data-tab]').forEach(function(x){ x.classList.toggle('on', x===t); });
     Object.keys(TABS).forEach(function(k){ TABS[k].hidden = k !== t.dataset.tab; });
     if (t.dataset.tab === 'layers') buildLayers();
+    if (t.dataset.tab === 'gambar') buildGaleri();
     aturKepala();
   });
 });
@@ -3304,6 +3369,7 @@ function tabAktif(){
 var KEPALA = {
   blocks: ['Tambah elemen', 'Seret ke halaman, atau klik untuk menaruhnya di bawah yang dipilih'],
   layers: ['Struktur halaman', 'Klik untuk memilih, klik dua kali untuk mengatur'],
+  gambar: ['Gambar di halaman', 'Klik gambar untuk melihat letaknya, tekan Ganti untuk menggantinya'],
   scan:   ['Periksa halaman', 'Hal-hal yang bisa membuat halaman bermasalah'],
   props:  ['Pengaturan elemen', 'Klik elemen mana pun di halaman untuk mengaturnya']
 };
@@ -3348,6 +3414,145 @@ function aturJudulHalaman(){
   E.aturHalamanJudul.hidden = E.cTheme.hidden && E.cCountdown.hidden;
 }
 
+/* ---------------- tombol "Ganti gambar" di atas gambar ----------------
+   Dari 20 gambar di dua halaman pemilik, 2 tidak bisa dipilih dengan klik:
+   foto video Green Madani tertutup tombol play, siteplan Serongga tertutup
+   lapisan tembus pandang. Klik selalu mengenai yang paling atas. Tombol ini
+   mencari gambar di SELURUH tumpukan di bawah kursor (elementsFromPoint),
+   jadi gambar yang tertutup pun tetap bisa diganti — tanpa memilih dulu. */
+var gambarDiKursor = null, gambarSembunyiT = null, tombolGambarDisentuh = false;
+function cariGambarDiTitik(x, y){
+  if (!fd || !fd.elementsFromPoint) return null;
+  var tumpuk = fd.elementsFromPoint(x, y);
+  for (var i = 0; i < tumpuk.length; i++){
+    if (tumpuk[i].tagName !== 'IMG') continue;
+    var r = tumpuk[i].getBoundingClientRect();
+    // ikon dan logo kecil tidak diberi tombol; tombolnya akan menutupi seluruh gambar
+    return (r.width >= 64 && r.height >= 40) ? tumpuk[i] : null;
+  }
+  return null;
+}
+function tampilTombolGambar(im){
+  clearTimeout(gambarSembunyiT);
+  gambarDiKursor = im;
+  E.imgGanti.hidden = false;
+  letakTombolGambar();
+}
+function letakTombolGambar(){
+  if (!gambarDiKursor || E.imgGanti.hidden) return;
+  if (!fd || !fd.contains(gambarDiKursor)){ E.imgGanti.hidden = true; gambarDiKursor = null; return; }
+  var r = gambarDiKursor.getBoundingClientRect(), b = E.imgGanti;
+  var kanan = Math.min(r.right * scale, E.ovl.clientWidth) - 8;
+  b.style.left = Math.max(4, kanan - b.offsetWidth) + 'px';
+  b.style.top = (Math.max(r.top * scale, 0) + 8) + 'px';
+}
+function sembunyikanTombolGambarNanti(){
+  clearTimeout(gambarSembunyiT);
+  gambarSembunyiT = setTimeout(function(){
+    if (tombolGambarDisentuh) return;
+    E.imgGanti.hidden = true; gambarDiKursor = null;
+  }, 300);
+}
+E.imgGanti.addEventListener('mouseenter', function(){ tombolGambarDisentuh = true; clearTimeout(gambarSembunyiT); });
+E.imgGanti.addEventListener('mouseleave', function(){ tombolGambarDisentuh = false; sembunyikanTombolGambarNanti(); });
+E.imgGanti.addEventListener('click', function(){
+  var im = gambarDiKursor;
+  if (!im || !fd || !fd.contains(im)) return;
+  select(im);
+  pilihBerkasGambar(im);
+});
+
+/* ---------------- tab Gambar ----------------
+   Semua gambar halaman dalam satu tempat. Gambar kecil, yang tertutup, atau
+   yang jauh di bawah tidak perlu dicari di kanvas. Sekalian terlihat mana
+   yang tidak tampil dan mana yang membuat berkasnya berat. */
+function namaBerkas(src){
+  if (!src) return '';
+  if (/^data:/i.test(src)) return 'gambar tertanam';
+  var bagian = src.split(/[?#]/)[0].split('/');
+  var n = bagian[bagian.length - 1] || src;
+  try { n = decodeURIComponent(n); } catch(err){}
+  return n;
+}
+function ukuranTeks(b){ return b >= 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' MB' : Math.round(b / 1024) + ' KB'; }
+var galeriMap = [];
+function buildGaleri(){
+  E.galeri.innerHTML = ''; galeriMap = [];
+  if (!fd || !fd.body) return;
+  var imgs = Array.prototype.slice.call(fd.body.querySelectorAll('img'));
+  if (!imgs.length){
+    var kosong = document.createElement('p');
+    kosong.className = 'note';
+    kosong.textContent = 'Halaman ini belum punya gambar. Seret "Gambar" dari tab Tambah untuk menambahkannya.';
+    E.galeri.appendChild(kosong);
+    E.galeri.style.display = 'block';
+    return;
+  }
+  E.galeri.style.display = '';
+  imgs.forEach(function(im, i){
+    /* currentSrc = gambar yang sedang tampil (penting untuk <picture>), tapi
+       baru berganti setelah gambar baru selesai dimuat. Selama masih memuat,
+       alamat barunya yang dipakai; galeri disegarkan lagi begitu selesai. */
+    var src = (im.complete && im.currentSrc) || im.src || im.getAttribute('src') || '';
+    var kartu = document.createElement('div');
+    kartu.className = 'galeri-item';
+
+    var tb = document.createElement('button');
+    tb.type = 'button'; tb.className = 'galeri-thumb'; tb.title = 'Tunjukkan di halaman';
+    var gm = document.createElement('img');
+    gm.alt = ''; gm.decoding = 'async';
+    if (src) gm.src = src;
+    tb.appendChild(gm);
+    var rusak = !src || (im.complete && im.naturalWidth === 0);
+    var besar = /^data:/i.test(src) ? Math.round(src.length * 0.75) : 0;
+    if (rusak || besar > 300 * 1024){
+      var cap = document.createElement('span');
+      cap.className = 'galeri-cap ' + (rusak ? 'rusak' : 'berat');
+      cap.textContent = rusak ? 'Tidak tampil' : 'Berat ' + ukuranTeks(besar);
+      tb.appendChild(cap);
+    }
+
+    var info = document.createElement('div');
+    info.className = 'galeri-info';
+    var nm = document.createElement('div');
+    nm.className = 'galeri-nama';
+    nm.textContent = im.getAttribute('alt') || namaBerkas(src) || ('Gambar ' + (i + 1));
+    nm.title = nm.textContent;
+    var meta = document.createElement('div');
+    meta.className = 'galeri-meta';
+    meta.textContent = im.naturalWidth ? (im.naturalWidth + ' × ' + im.naturalHeight + ' px') : (rusak ? 'tidak termuat' : 'belum termuat');
+    var ganti = document.createElement('button');
+    ganti.type = 'button'; ganti.className = 'btn btn-plain btn-sm';
+    ganti.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-image"/></svg>Ganti';
+    info.appendChild(nm); info.appendChild(meta); info.appendChild(ganti);
+    kartu.appendChild(tb); kartu.appendChild(info);
+    E.galeri.appendChild(kartu);
+    galeriMap.push({ el: im, kartu: kartu });
+
+    tb.addEventListener('mouseenter', function(){ setPeek(im); });
+    tb.addEventListener('mouseleave', function(){ setPeek(null); });
+    tb.addEventListener('click', function(){
+      select(im); setPeek(im, true);
+      setTimeout(function(){ setPeek(null); }, 1200);
+    });
+    ganti.addEventListener('click', function(){ select(im); pilihBerkasGambar(im); });
+  });
+  tandaiGaleri(sel);
+}
+/* Gambar yang baru selesai dimuat (atau gagal) memperbarui galeri: ukuran asli
+   dan tanda "tidak tampil" baru bisa diketahui setelah itu. Dikumpulkan dulu
+   supaya dua puluh gambar yang selesai berurutan hanya menggambar ulang sekali. */
+var galeriT = null;
+function segarkanGaleri(e){
+  if (E.tabGambar.hidden || (e && e.target && e.target.tagName !== 'IMG')) return;
+  clearTimeout(galeriT);
+  galeriT = setTimeout(buildGaleri, 250);
+}
+function tandaiGaleri(el){
+  var im = el ? gambarDari(el) : null;
+  galeriMap.forEach(function(x){ x.kartu.classList.toggle('on', x.el === im); });
+}
+
 /* ---------------- lapisan ---------------- */
 var layerMap = [];
 function buildLayers(){
@@ -3386,6 +3591,7 @@ function buildLayers(){
   walk(fd.body, rootBox, 1, count);
   markLayer(sel);
   outlineRebuild();
+  if (!E.tabGambar.hidden) buildGaleri();
 }
 E.layersRefresh.addEventListener('click', function(){ buildLayers(); toast('Daftar lapisan dimuat ulang.'); });
 
@@ -4317,8 +4523,8 @@ function pasangGambarUrl(){
     toast('Alamatnya harus diawali https:// supaya bisa dimuat.', true); return;
   }
   snap();
-  var target = sel;
-  select(putImage(target, url, target.tagName === 'IMG' ? 'replace' : 'add'));
+  var im = gambarDari(sel);
+  select(im ? putImage(im, url, 'replace') : putImage(sel, url, 'add'));
   buildLayers(); E.imgUrl.value = '';
   toast('Gambar dipasang dari alamat.');
 }

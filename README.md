@@ -41,6 +41,10 @@ Editor ini **tidak melakukan itu**. Halaman dirender apa adanya di dalam iframe,
 - **Panel seperti Elementor**, di kiri. Tanpa pilihan, isinya daftar elemen untuk diseret ke halaman (tiga kolom ringkas, semuanya muat sekali lihat). Begitu sesuatu dipilih, kepalanya berbunyi "Ubah judul" dengan tombol kembali, dan pengaturannya dibagi tiga seperti Elementor: **Isi** (tulisan, link, gambar, video, ikon), **Gaya** (huruf dan warna), **Lanjutan** (ukuran, jarak, letak, tindakan). Kartu hanya muncul kalau memang berlaku — gambar tidak dapat kotak teks, section tidak dapat "ganti ikon"
 - Navigasi di kaki panel memakai nama sehari-hari — **Atur, Tambah, Struktur, Periksa** — dan masing-masing menjelaskan dirinya saat kursor menyentuhnya
 - **Pengaturan halaman** (warna tema, tanggal hitung mundur) ada di bawah daftar elemen, bukan di setiap elemen
+- **Tombol "Ganti gambar" langsung di atas gambar** saat kursor menyentuhnya — sekali klik, pilih berkas. Tetap muncul walau gambarnya tertutup tombol play atau lapisan lain, karena yang dicari seluruh tumpukan di bawah kursor, bukan cuma yang paling atas
+- **Tab Gambar**: semua gambar di halaman sebagai kartu kecil dengan nama, ukuran, dan tombol Ganti. Klik kartunya untuk loncat ke gambar itu. Gambar yang tidak tampil dan gambar tertanam yang berat ditandai
+- Memilih kotak yang isinya satu gambar (bingkai foto, kartu siteplan) langsung menampilkan kartu Gambar
+- **Struktur ikut menyorot**: memilih di halaman menyalakan barisnya, membuka lipatan di atasnya, dan menggulir ke sana
 - Tombol **"Unduh hasilnya"** dibedakan dari tombol lain dan tidak pernah ikut terpotong di jendela sempit
 - Pesan salah ditulis dengan kalimat yang menyebut langkah berikutnya, bukan istilah program. Kode yang ditempel juga dikenali dulu: isi file CSS atau JavaScript yang salah kotak dikatakan apa adanya
 
