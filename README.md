@@ -42,7 +42,7 @@ Editor ini **tidak melakukan itu**. Halaman dirender apa adanya di dalam iframe,
 - Navigasi di kaki panel memakai nama sehari-hari — **Atur, Tambah, Struktur, Periksa** — dan masing-masing menjelaskan dirinya saat kursor menyentuhnya
 - **Pengaturan halaman** (warna tema, tanggal hitung mundur) ada di bawah daftar elemen, bukan di setiap elemen
 - **Tombol "Ganti gambar" langsung di atas gambar** saat kursor menyentuhnya — sekali klik, pilih berkas. Tetap muncul walau gambarnya tertutup tombol play atau lapisan lain, karena yang dicari seluruh tumpukan di bawah kursor, bukan cuma yang paling atas
-- **Tab Gambar**: semua gambar di halaman sebagai kartu kecil dengan nama, ukuran, dan tombol Ganti. Klik kartunya untuk loncat ke gambar itu. Gambar yang tidak tampil dan gambar tertanam yang berat ditandai
+- **Tab Gambar**: semua gambar di halaman sebagai kartu kecil dengan nama, ukuran, dan tombol Ganti. Klik kartunya untuk loncat ke gambar itu. Gambar yang tidak tampil dan gambar tertanam yang berat ditandai. **Gambar latar dari CSS** (`background-image`, termasuk yang ada di `<style>`, berlapis dengan gradien, atau dari `::before`/`::after`) ikut terdaftar dengan label *Latar* dan bisa diganti, disembunyikan, atau ditambah dari kartu **Gambar latar** di tab Gaya. Penggantian ditulis sebagai aturan di dalam `<body>` supaya ikut undo/redo; lembar gaya dari domain lain yang tidak bisa dibaca dikatakan terus terang
 - Memilih kotak yang isinya satu gambar (bingkai foto, kartu siteplan) langsung menampilkan kartu Gambar
 - **Struktur ikut menyorot**: memilih di halaman menyalakan barisnya, membuka lipatan di atasnya, dan menggulir ke sana
 - Tombol **"Unduh hasilnya"** dibedakan dari tombol lain dan tidak pernah ikut terpotong di jendela sempit
@@ -54,6 +54,14 @@ Editor ini **tidak melakukan itu**. Halaman dirender apa adanya di dalam iframe,
 - Kata yang ditebalkan atau dimiringkan di tengah kalimat tidak dianggap tempat jatuh
 - **Bayangan jatuh diukur, bukan ditebak**: salinan tak terlihat dari yang dibawa ditaruh sesaat di tempat jatuhnya, lalu bayangan digambar di tempat salinan itu mendarat — jadi "di samping" atau "di bawah" yang terlihat saat menyeret sama dengan hasilnya, termasuk di grid, baris yang bisa turun, dan deretan tombol
 - **Elemen melayang** (lencana di pojok foto, caption di tepi gambar) digeser bebas mengikuti kursor seperti elemen absolut di Elementor. Pergeserannya ditulis sebagai `translate`, jadi posisi dan lebar aslinya dari kode halaman tetap utuh
+
+**Letak bebas**
+- **Tahan Alt lalu seret** elemen apa pun untuk menggesernya bebas, tanpa mengubah tempatnya di alur halaman (ditulis sebagai `translate`). Garis pandu biru muncul saat sejajar dengan tepi/tengah elemen lain; **Shift** mengunci ke satu arah, **Ctrl** mematikan garis pandu. Panah di keyboard menggeser 1 px (Shift: 10 px) untuk elemen yang sudah bebas
+- Kartu **Posisi** di tab Lanjutan: angka geser kanan/bawah, urutan tumpukan, tombol kembalikan ke tempat asal; di dalam kanvas bebas ditambah enam tombol perataan dan "Keluarkan dari kanvas"
+- **Section Bebas** (kanvas bebas): tarik dari palet atau pilih mode *Bebas*, lalu taruh blok di titik mana pun di dalamnya. Isinya diletakkan dengan persen kiri dan px atas, kanvas membesar sendiri, dan di HP (≤768 px) isinya otomatis ditumpuk ke bawah supaya tidak tumpang tindih
+- **Mode taruh Rapi / Bebas** di palet: *Rapi* menyisipkan blok di antara elemen seperti biasa; *Bebas* membungkusnya jadi section kanvas bebas bila dijatuhkan di antara section, atau menaruhnya tepat di titik jatuh bila dijatuhkan di dalam kanvas bebas
+- Tombol **"Jadikan kanvas bebas"** di kartu Posisi mengubah section yang sudah ada (posisi anak-anaknya dipertahankan), dan tiap isinya bisa dikeluarkan lagi ke alur biasa
+- Nama kelas yang ditulis netral (`kanvas-bebas`, `kb-item`), jadi hasil unduhan berdiri sendiri tanpa editor
 
 **Aman di HP**
 - Lebar yang diatur di desktop tidak pernah melebihi layar HP: ditulis sebagai `min(640px, 100%)`, jadi di desktop tepat 640 px dan di HP mengalah ke lebar layar. Tinggi kotak berisi teks ditulis sebagai tinggi minimum supaya tulisannya tidak tumpah saat membungkus lebih banyak baris

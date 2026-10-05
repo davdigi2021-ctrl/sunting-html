@@ -641,6 +641,36 @@ body.preview .device{border-radius:0;box-shadow:none;}
   box-shadow:0 6px 18px rgba(0,0,0,.22);
 }
 .seret-chip[hidden]{display:none;}
+/* Garis bantu saat menggeser bebas — merah muda, supaya beda dari biru seleksi. */
+.garis-lapis{position:absolute;inset:0;pointer-events:none;z-index:1;}
+.garis{position:absolute;background:#ff2d8a;pointer-events:none;}
+.garis[hidden]{display:none;}
+/* Cara menaruh: Rapi / Bebas */
+.mode-wadah{display:flex;flex-direction:column;gap:7px;}
+.mode-judul{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);}
+.mode-taruh{display:flex;background:var(--surface-3);border-radius:var(--r-sm);padding:2px;gap:2px;}
+.mode-btn{
+  flex:1;border:0;background:transparent;color:var(--ink-2);cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:6px 8px;border-radius:8px;font-size:12.5px;font-weight:500;
+  transition:background var(--t),color var(--t);
+}
+.mode-btn svg{width:15px;height:15px;}
+.mode-btn:hover{color:var(--ink);}
+.mode-btn.on{background:var(--surface);color:var(--ink);box-shadow:var(--sh-1);font-weight:600;}
+.mode-btn:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.mode-catatan{font-size:12px;line-height:1.5;}
+/* Perataan di dalam kanvas */
+.alin-baris{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;}
+.alin-btn{
+  height:30px;border:1px solid var(--line);border-radius:var(--r-xs);background:var(--surface);
+  color:var(--ink-2);cursor:pointer;display:grid;place-items:center;
+  transition:background var(--t),color var(--t),border-color var(--t);
+}
+.alin-btn svg{width:16px;height:16px;}
+.alin-btn:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-soft);}
+.alin-btn:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.alin-baris[hidden]{display:none;}
 /* Tombol "Ganti gambar" di pojok kanan atas gambar yang disentuh kursor. */
 .img-ganti{
   position:absolute;z-index:3;pointer-events:auto;cursor:pointer;
@@ -1342,6 +1372,21 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
               <p class="note" id="bgBagi" hidden></p>
             </div>
 
+            <div class="card" id="cPosisi" data-grup="lanjut">
+              <div class="card-h"><span class="card-t">Posisi</span></div>
+              <p class="note" id="posKet"></p>
+              <div class="row">
+                <label><span id="posXLabel">Geser kanan (px)</span><input id="posX" class="inp mono" type="number" step="1"></label>
+                <label><span id="posYLabel">Geser bawah (px)</span><input id="posY" class="inp mono" type="number" step="1"></label>
+              </div>
+              <label class="lbl" for="posZ">Tumpukan (z-index) — makin besar makin di depan</label>
+              <input id="posZ" class="inp mono" type="number" step="1" placeholder="otomatis">
+              <div class="alin-baris" id="posAlin" hidden><button class="alin-btn" data-alin="kiri" type="button" title="Rata kiri kanvas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-al-kiri"/></svg></button><button class="alin-btn" data-alin="th" type="button" title="Tengah mendatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-al-th"/></svg></button><button class="alin-btn" data-alin="kanan" type="button" title="Rata kanan kanvas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-al-kanan"/></svg></button><button class="alin-btn" data-alin="atas" type="button" title="Rata atas kanvas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-al-atas"/></svg></button><button class="alin-btn" data-alin="tv" type="button" title="Tengah tegak"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-al-tv"/></svg></button><button class="alin-btn" data-alin="bawah" type="button" title="Rata bawah kanvas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-al-bawah"/></svg></button></div>
+              <button class="btn btn-plain btn-sm btn-full" id="posReset" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-refresh"/></svg>Kembalikan ke tempat asal</button>
+              <button class="btn btn-plain btn-sm btn-full" id="posKeluar" type="button" hidden>Keluarkan dari kanvas</button>
+              <button class="btn btn-plain btn-sm btn-full" id="posKanvas" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-kanvas"/></svg>Jadikan kanvas bebas</button>
+            </div>
+
             <div class="card" data-grup="lanjut">
               <div class="card-h"><span class="card-t">Tindakan</span></div>
               <div class="grid2">
@@ -1359,6 +1404,14 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
         </div>
 
     <div class="tab-panel" id="tabBlocks">
+          <div class="mode-wadah">
+            <span class="mode-judul">Cara menaruh elemen baru</span>
+            <div class="mode-taruh" id="modeTaruh" role="group" aria-label="Cara menaruh elemen baru">
+              <button class="mode-btn on" data-mode="rapi" type="button" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-layers"/></svg>Rapi</button>
+              <button class="mode-btn" data-mode="bebas" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-grab"/></svg>Bebas</button>
+            </div>
+            <p class="note mode-catatan" id="modeCatatan"></p>
+          </div>
           <p class="block-cat">Dasar</p>
           <div class="blocks">
             <button class="block" data-block="section" type="button"><span class="block-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-section"/></svg></span>Section</button>
@@ -1374,6 +1427,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
             <button class="block" data-block="columns3" type="button"><span class="block-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-cols3"/></svg></span>3 Kolom</button>
             <button class="block" data-block="divider" type="button"><span class="block-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-line"/></svg></span>Garis</button>
             <button class="block" data-block="spacer" type="button"><span class="block-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-space"/></svg></span>Jarak</button>
+            <button class="block" data-block="free" type="button" title="Section kosong tempat elemen boleh ditaruh di titik mana saja"><span class="block-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-kanvas"/></svg></span>Section Bebas</button>
           </div>
           <p class="note">Seret kartu ke kanvas untuk menaruhnya di posisi tertentu, atau klik saja untuk menambahkannya tepat di bawah elemen yang sedang dipilih.</p>
 
@@ -1442,12 +1496,14 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
   </div>
   <div class="ins" id="insLine" hidden></div>
   <div class="ghost" id="ghost" hidden><span class="ghost-tag" id="ghostTag"></span></div>
+  <div class="garis-lapis" id="garisLapis"></div>
   <!-- Muncul di pojok gambar yang disentuh kursor, termasuk gambar yang tertutup
        tombol play atau lapisan tembus pandang: sekali klik, langsung pilih berkas. -->
   <button class="img-ganti" id="imgGanti" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-image"/></svg><span id="imgGantiTeks">Ganti gambar</span></button>
   <div class="qbar" id="qbar" hidden>
     <button class="qb" data-act="parent" type="button" title="Pilih elemen induk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-up"/></svg></button>
     <button class="qb" id="qbMove" type="button" title="Seret untuk memindahkan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-move"/></svg></button>
+    <button class="qb" id="qbFree" type="button" title="Geser bebas — seret ke mana saja (atau tahan Alt lalu seret elemennya)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-grab"/></svg></button>
     <button class="qb" data-act="text" type="button" title="Ubah teks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-pen"/></svg>Teks</button>
     <button class="qb" data-act="dup" type="button" title="Gandakan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-dup"/></svg></button>
     <button class="qb qb-bad" data-act="del" type="button" title="Hapus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-trash"/></svg></button>
@@ -1577,7 +1633,7 @@ var E = {};
  'draftBar','draftTitle','draftWhen','draftOpen','draftDrop','cTheme','themeList','lockBtn','lockLabel',
  'ghost','ghostTag','textScriptNote','partColorBtn','cCountdown','cdList','memuat',
  'stepBar','step1','step2','step3','tour','tourT','tourD','tourDots','tourSkip','tourNext','seretChip',
- 'paneBack','paneTitle','paneSub','subTabs','isiKosong','isiKosongTeks','isiKetikBtn','tabAturWrap','aturHalamanJudul','imgGanti','imgGantiTeks','tabGambar','galeri','cBg','bgThumb','bgNama','bgKet','bgPick','bgLinkBtn','bgLinkRow','bgUrl','bgUrlApply','bgOpsi','bgUkuran','bgUlang','bgPosisi','bgHapus','bgBagi'
+ 'paneBack','paneTitle','paneSub','subTabs','isiKosong','isiKosongTeks','isiKetikBtn','tabAturWrap','aturHalamanJudul','imgGanti','imgGantiTeks','tabGambar','galeri','garisLapis','qbFree','modeTaruh','modeCatatan','posKet','posX','posY','posXLabel','posYLabel','posZ','posReset','posKeluar','posKanvas','posAlin','cBg','bgThumb','bgNama','bgKet','bgPick','bgLinkBtn','bgLinkRow','bgUrl','bgUrlApply','bgOpsi','bgUkuran','bgUlang','bgPosisi','bgHapus','bgBagi'
 ].forEach(function(id){ E[id] = $(id); });
 
 /* ---------------- keadaan ---------------- */
@@ -2518,7 +2574,7 @@ function select(el){
   tandaiGaleri(el);
   if (tabAktif() === 'layers' || tabAktif() === 'gambar'){ aturKepala(); markLayer(el); }
   else { markLayer(el); goTab('props'); }
-  hint('Terpilih: ' + label(el) + '. Seret untuk memindahkan, tarik bulatan biru untuk mengubah ukuran.');
+  hint('Terpilih: ' + label(el) + '. Seret untuk memindahkan, tarik bulatan biru untuk mengubah ukuran. Tahan Alt lalu seret untuk menggesernya bebas.');
 }
 function deselect(){
   flushEdit();
@@ -2581,7 +2637,13 @@ function actDup(){
   if (!sel || !sel.parentNode) return;
   snap();
   var c = sel.cloneNode(true);
+  // salinan di kanvas bebas bergeser sedikit supaya terlihat bahwa ada dua
+  if (dalamKanvas(sel)){
+    var kv = sel.parentElement, W = kv.clientWidth || 1;
+    c.style.left = persen((sel.offsetLeft + 24) / W * 100); c.style.top = (sel.offsetTop + 24) + 'px';
+  }
   sel.parentNode.insertBefore(c, sel.nextSibling);
+  if (dalamKanvas(c)) perbesarKanvas(c.parentElement);
   select(c); buildLayers(); toast('Elemen digandakan.');
 }
 function actDel(){
@@ -2605,6 +2667,11 @@ function act(a){
   else if (a==='lock') toggleKunci();
 }
 E.qbar.addEventListener('click', function(e){ var b = e.target.closest('[data-act]'); if (b) act(b.dataset.act); });
+E.qbFree.addEventListener('mousedown', function(e){
+  if (!sel) return;
+  e.preventDefault(); e.stopPropagation();
+  startDrag(sel, { bebas:true });
+});
 E.qbMove.addEventListener('mousedown', function(e){
   if (!sel) return;
   e.preventDefault(); e.stopPropagation();
@@ -2765,6 +2832,7 @@ function fillProps(){
   setSwatch(E.pColorChip, E.pColorVal, hex(css(sel,'color')) || '#000000');
   setSwatch(E.pBgChip, E.pBgVal, hex(css(sel,'backgroundColor')) || '#ffffff');
   isiKartuLatar();
+  isiPosisi();
   aturSubtab(false);
 }
 
@@ -3461,7 +3529,7 @@ function asliPunya(el, prop){
    kolom selebar itu tetap 640 px. Di dalam min(), seluruh nilai dianggap
    "otomatis" saat menghitung itu, jadi kolomnya tidak ikut terdorong. */
 function lebarPx(v){
-  var m = /^min\(\s*([\d.]+px)\s*,\s*100%\s*\)$/.exec(v || '');
+  var m = /^min\(\s*([\d.]+px)\s*,\s*100%\s*\)$/.exec(v || '') || /^min\(\s*100%\s*,\s*([\d.]+px)\s*\)$/.exec(v || '');
   return m ? m[1] : (v || '');
 }
 function aturLebar(el, nilai){
@@ -3659,14 +3727,20 @@ function onDown(e){
   // Elemen apa pun bisa langsung diseret. Kalau target ada di dalam elemen yang
   // sedang dipilih, seret elemen terpilih itu (bukan anak yang tersentuh kursor).
   var el = (sel && (t===sel || sel.contains(t))) ? sel : t;
-  pend = { x:e.clientX, y:e.clientY, el: el };
+  /* Di dalam kanvas bebas yang diseret adalah anak kanvas yang tersentuh —
+     kartu atau tulisannya — bukan kanvasnya, juga bukan tulisan kecil di dalam
+     kartu itu. Kalau pengguna sudah masuk lebih dalam (elemen terpilih ada di
+     dalam anak itu), aturan biasa berlaku. */
+  var anakKv = t.closest ? t.closest('.' + KB) : null;
+  if (anakKv && dalamKanvas(anakKv) && !(sel && sel !== anakKv && anakKv.contains(sel) && sel.contains(t))) el = anakKv;
+  pend = { x:e.clientX, y:e.clientY, el: el, bebas: e.altKey };
   fd.addEventListener('mousemove', pendMove, true);
   fd.addEventListener('mouseup', pendUp, true);
 }
 function pendMove(e){
   if (!pend) return;
   if (Math.abs(e.clientX-pend.x) + Math.abs(e.clientY-pend.y) > 5){
-    var el = pend.el; clearPend(); catatPenunjuk(e, true); startDrag(el);
+    var el = pend.el, bb = pend.bebas, ox = pend.x, oy = pend.y; clearPend(); catatPenunjuk(e, true); startDrag(el, { bebas:bb, mulaiX:ox, mulaiY:oy });
   }
 }
 function pendUp(){ clearPend(); }
@@ -3698,23 +3772,28 @@ function bacaGeser(el){
   var m = /^\s*(-?[\d.]+)px(?:\s+(-?[\d.]+)px)?/.exec(el.style.translate || '');
   return m ? { x: parseFloat(m[1]), y: parseFloat(m[2] || '0') } : { x: 0, y: 0 };
 }
-function startDrag(el){
+function startDrag(el, opsi){
   if (!el || !el.parentNode || drag) return;
+  opsi = opsi || {};
   snap();
-  if (melayang(el)){
-    drag = { el:el, bebas:true, awal:bacaGeser(el), asliTranslate: el.style.translate || '', mulai:null };
+  if (opsi.bebas || melayang(el) || dalamKanvas(el)){
+    drag = mulaiGeserBebas(el, opsi);
+    drag.label = dalamKanvas(el) ? 'Geser di kanvas' : 'Geser bebas';
     E.shield.hidden = false; E.shield.classList.remove('rz');
-    mulaiSeret('Geser ' + niceName(el).toLowerCase());
+    mulaiSeret(drag.label);
     document.addEventListener('mousemove', dragMoveOuter, true);
     document.addEventListener('mouseup', dragEndOuter, true);
     if (fd){
       fd.addEventListener('mousemove', dragMoveInner, true);
       fd.addEventListener('mouseup', dragEndInner, true);
     }
-    hint('Elemen ini melayang di atas yang lain, jadi digeser bebas. Lepaskan di tempat yang pas; Esc untuk batal.');
+    hint('Geser bebas: lepaskan di tempat yang pas. Garis merah muda = sejajar. Ctrl matikan tarikan garis, Shift kunci satu arah, Esc batal.');
     return;
   }
-  drag = { el:el, target:null, before:true };
+  var r0 = el.getBoundingClientRect();
+  drag = { el:el, target:null, before:true,
+    grab:{ dx: opsi.mulaiX !== undefined ? Math.max(0, Math.min(r0.width, opsi.mulaiX - r0.left)) : Math.min(r0.width / 2, 80),
+           dy: opsi.mulaiY !== undefined ? Math.max(0, Math.min(r0.height, opsi.mulaiY - r0.top)) : 14 } };
   E.shield.hidden = false; E.shield.classList.remove('rz');
   el.style.opacity = '.4';
   mulaiSeret('Pindahkan ' + niceName(el).toLowerCase());
@@ -3724,7 +3803,7 @@ function startDrag(el){
     fd.addEventListener('mousemove', dragMoveInner, true);
     fd.addEventListener('mouseup', dragEndInner, true);
   }
-  hint('Lepaskan di garis biru untuk menaruh elemen di sana. Tekan Esc untuk batal.');
+  hint('Lepaskan di garis biru untuk menaruh elemen di sana. Di dalam kanvas bebas ia jatuh tepat di titik itu. Tekan Esc untuk batal.');
 }
 /* Ukuran blok baru diukur betulan, bukan ditebak. Blok dipasang sebentar dalam
    keadaan tak terlihat di tempat yang sama dengan tujuan jatuhnya, diukur, lalu
@@ -3792,17 +3871,14 @@ function ukurHasil(t, before, bawa){
   if (!t || !t.parentNode) return null;
   try {
     if (asli) node = asli.cloneNode(true);
-    else {
-      var box = fd.createElement('div');
-      box.innerHTML = BLOCK[bawa.kind] || '';
-      node = box.firstElementChild;
-    }
+    else node = bangunNodeBlok(bawa.kind, bawa.bungkus || '');
     if (!node) return null;
     /* Gambar contoh blok Gambar belum sempat terbaca saat diukur (pengukuran
        berjalan dalam satu langkah), jadi ukurannya nol dan bayangannya jadi
        kotak kecil. Ukuran aslinya 640×360 diberikan khusus untuk salinan ini. */
-    if (bawa.kind === 'image' && node.tagName === 'IMG'){
-      node.setAttribute('width', '640'); node.setAttribute('height', '360'); node.style.height = 'auto';
+    var fotoUji = node.tagName === 'IMG' ? node : (node.querySelector ? node.querySelector('img') : null);
+    if (bawa.kind === 'image' && fotoUji){
+      fotoUji.setAttribute('width', '640'); fotoUji.setAttribute('height', '360'); fotoUji.style.height = 'auto';
     }
     /* Gambar yang sudah diketahui rusak di aslinya tidak diminta ulang oleh
        salinan — tiap sasaran baru akan memicu satu permintaan gagal lagi. */
@@ -3825,6 +3901,7 @@ function ukurHasil(t, before, bawa){
       asli.style.setProperty('display', 'none', 'important');
     }
     t.parentNode.insertBefore(node, before ? t : t.nextSibling);
+    if (jadiKanvas(node)) perbesarKanvas(node);
     var rn = node.getBoundingClientRect(), rt = t.getBoundingClientRect();
     var tumpang = Math.min(rn.bottom, rt.bottom) - Math.max(rn.top, rt.top);
     var samping = rn.height > 0 && tumpang > Math.min(rn.height, rt.height) * 0.3 &&
@@ -3917,7 +3994,7 @@ function ulangSasaran(){
   if (drag) dragMove(p); else if (palDrag) palMove(p);
 }
 function gulirTepi(){
-  if ((!drag && !palDrag) || !penunjuk || !fd || (drag && drag.bebas)){ return; }
+  if ((!drag && !palDrag) || !penunjuk || !fd){ return; }
   var fr = E.frame.getBoundingClientRect(), cv = E.canvas.getBoundingClientRect();
   // hanya kalau kursor memang di atas kanvas, bukan masih di panel
   if (penunjuk.x < Math.max(fr.left, cv.left) || penunjuk.x > Math.min(fr.right, cv.right)) return;
@@ -3949,20 +4026,26 @@ function sisiSebelum(t, r, p, mendatar, lama){
   return rasio < 0.5;
 }
 
-function dragMoveOuter(e){ catatPenunjuk(e, false); dragMove(pt(e)); }
-function dragMoveInner(e){ catatPenunjuk(e, true); dragMove({ x:e.clientX, y:e.clientY }); }
+function modDrag(e){
+  var d = drag || palDrag;
+  if (d){ d.shift = e.shiftKey; d.nonaktif = e.ctrlKey || e.metaKey; }
+}
+function dragMoveOuter(e){ catatPenunjuk(e, false); modDrag(e); dragMove(pt(e)); }
+function dragMoveInner(e){ catatPenunjuk(e, true); modDrag(e); dragMove({ x:e.clientX, y:e.clientY }); }
 function dragEndOuter(e){ dragMove(pt(e)); dragEnd(false); }
 function dragEndInner(e){ dragMove({ x:e.clientX, y:e.clientY }); dragEnd(false); }
-function geserBebas(p){
-  if (!drag.mulai){ drag.mulai = { x:p.x, y:p.y }; return; }
-  var x = Math.round(drag.awal.x + p.x - drag.mulai.x), y = Math.round(drag.awal.y + p.y - drag.mulai.y);
-  markEdited(drag.el);
-  drag.el.style.translate = x + 'px ' + y + 'px';
-  redraw();
-}
 function dragMove(p){
   if (!drag) return;
   if (drag.bebas){ geserBebas(p); return; }
+  var kv = kanvasDiTitik(p.x, p.y, drag.el);
+  if (kv){
+    var dr0 = drag.el.getBoundingClientRect();
+    if (!drag.lebar) drag.lebar = dr0.width;
+    drag.target = null; drag.kanvasTujuan = kv;
+    drag.kanvasXY = bayanganKanvas(kv, p, dr0.width, dr0.height, drag.grab, label(drag.el), drag.el, drag);
+    return;
+  }
+  if (drag.kanvasTujuan){ drag.kanvasTujuan = null; drag.kanvasXY = null; sembunyiGaris(); }
   var t = sasaranJatuh(fd.elementFromPoint(p.x, p.y));
   if (!t || t===drag.el || drag.el.contains(t)){
     E.insLine.hidden = true; sembunyiBayangan(); drag.target = null; return;
@@ -3985,20 +4068,13 @@ function dragEnd(cancel){
     fd.removeEventListener('mousemove', dragMoveInner, true);
     fd.removeEventListener('mouseup', dragEndInner, true);
   }
-  E.shield.hidden = true; E.insLine.hidden = true; sembunyiBayangan(); selesaiSeret();
-  if (d.bebas){
-    if (cancel || !d.mulai){
-      if (d.asliTranslate) d.el.style.translate = d.asliTranslate; else d.el.style.removeProperty('translate');
-      if (!d.el.getAttribute('style')) d.el.removeAttribute('style');
-      batalkanSnap();
-    }
-    select(d.el);
-    if (cancel) toast('Pergeseran dibatalkan.');
-    return;
-  }
+  E.shield.hidden = true; E.insLine.hidden = true; sembunyiBayangan(); selesaiSeret(); sembunyiGaris();
+  if (d.bebas){ akhiriGeserBebas(d, cancel); return; }
   d.el.style.removeProperty('opacity');
   if (!d.el.getAttribute('style')) d.el.removeAttribute('style');
-  if (!cancel && d.target && d.target.parentNode){
+  if (!cancel && d.kanvasTujuan && d.kanvasXY){
+    letakDiKanvas(d.el, d.kanvasTujuan, d.kanvasXY.x, d.kanvasXY.y, d.lebar);
+  } else if (!cancel && d.target && d.target.parentNode){
     if (d.before) d.target.parentNode.insertBefore(d.el, d.target);
     else d.target.parentNode.insertBefore(d.el, d.target.nextSibling);
   } else batalkanSnap();
@@ -4101,7 +4177,17 @@ function onKey(e){
   if (mod && String(e.key).toLowerCase()==='y'){ if (!typing){ e.preventDefault(); redo(); } return; }
   if (typing) return;
   if (e.key==='Escape'){ if (drag){ dragEnd(true); return; } if (palDrag){ palEnd(true); return; } if (closeColorPop()) return; if (!E.tour.hidden){ turTutup(true); return; } closeModals(); deselect(); return; }
-  if ((e.key==='Delete'||e.key==='Backspace') && sel){ e.preventDefault(); actDel(); }
+  if ((e.key==='Delete'||e.key==='Backspace') && sel){ e.preventDefault(); actDel(); return; }
+  /* Panah menggeser elemen terpilih 1 px (Shift: 10 px) — tapi hanya untuk
+     elemen yang memang sudah bebas (di dalam kanvas, atau sudah digeser).
+     Untuk elemen biasa panah tetap menggulir halaman: orang yang memilih
+     satu section lalu menekan panah bawah hanya ingin turun, bukan
+     menggeser section itu. */
+  if (sel && bebasAktif(sel) && !e.ctrlKey && !e.metaKey && !e.altKey && /^Arrow(Left|Right|Up|Down)$/.test(e.key)){
+    e.preventDefault();
+    var st = e.shiftKey ? 10 : 1;
+    nudge(e.key === 'ArrowLeft' ? -st : e.key === 'ArrowRight' ? st : 0, e.key === 'ArrowUp' ? -st : e.key === 'ArrowDown' ? st : 0);
+  }
 }
 document.addEventListener('keydown', onKey);
 
@@ -4603,6 +4689,529 @@ function markLayer(el){
   }
 }
 
+/* ---------------- penempatan bebas ----------------
+   Dua cara menaruh sesuatu di mana saja, seperti Elementor:
+
+   1. GESER BEBAS pada elemen mana pun (tahan Alt lalu seret, atau tombol
+      tangan di toolbar). Hasilnya ditulis ke properti `translate`, jadi
+      tempat asalnya di alur halaman tidak berubah dan bisa dikembalikan
+      dengan satu tombol. Garis bantu muncul saat tepi atau tengahnya sejajar
+      dengan wadah atau saudaranya; tahan Ctrl untuk mematikan tarikan garis,
+      Shift untuk mengunci satu arah.
+
+   2. KANVAS BEBAS: section yang isinya boleh ditaruh di titik mana pun. Anak
+      langsung kanvas berposisi absolut — kiri dalam persen, atas dalam
+      piksel — jadi ikut melebar-menyempit bersama kanvasnya. Di layar HP
+      (≤768px) isinya otomatis tersusun ke bawah, karena posisi absolut tidak
+      pernah muat di layar sempit. Aturan itu ikut tertulis di dalam section
+      itu sendiri, jadi tetap berlaku di halaman hasil unduhan.
+
+   Nama kelas sengaja netral (`kanvas-bebas`, `kb-item`), tanpa kata
+   "sunting": ini bagian dari halamanmu sekarang, bukan jejak editor. */
+var KV = 'kanvas-bebas', KB = 'kb-item';
+var PAGE_TAGS = { SECTION:1, HEADER:1, FOOTER:1, MAIN:1, NAV:1, ARTICLE:1, ASIDE:1 };
+var BUNGKUS_KIND = { heading:1, text:1, button:1, image:1, video:1, columns:1, columns3:1 };
+var MODE_KEY = 'sunting-html-mode-taruh';
+var modeTaruh = 'rapi';
+try { if (localStorage.getItem(MODE_KEY) === 'bebas') modeTaruh = 'bebas'; } catch(err){}
+
+function jadiKanvas(el){ return !!(el && el.classList && el.classList.contains(KV)); }
+function dalamKanvas(el){ return !!(el && el.parentElement && jadiKanvas(el.parentElement) && el.classList.contains(KB)); }
+function kanvasDiTitik(x, y, kecuali){
+  if (!fd) return null;
+  var t = fd.elementFromPoint(x, y);
+  var kv = (t && t.closest) ? t.closest('.' + KV) : null;
+  if (kv && kecuali && (kecuali === kv || kecuali.contains(kv))) return null;
+  return kv;
+}
+function persen(n){ return (Math.round(n * 100) / 100) + '%'; }
+function skrol(){ var w = fd.defaultView; return { x:w.scrollX || 0, y:w.scrollY || 0 }; }
+
+/* Aturan kanvas ikut tertulis di dalam section-nya. */
+var KANVAS_CSS =
+  '.kanvas-bebas{position:relative}\n' +
+  '.kanvas-bebas>.kb-item{margin:0 !important;box-sizing:border-box}\n' +
+  '@media (max-width:768px){\n' +
+  '.kanvas-bebas{display:flex !important;flex-direction:column !important;align-items:flex-start !important;gap:16px !important;padding:32px 20px !important;min-height:0 !important;height:auto !important}\n' +
+  '.kanvas-bebas>.kb-item{position:static !important;width:auto !important;max-width:100% !important;translate:none !important;margin:0 !important}\n' +
+  '}\n';
+function buatKanvas(tinggi){
+  var s = fd.createElement('section');
+  s.className = KV;
+  s.setAttribute('style', 'position:relative;box-sizing:border-box;padding:0;min-height:' + (tinggi || 320) + 'px;background:#f5f5f7;');
+  var st = fd.createElement('style');
+  st.textContent = KANVAS_CSS;
+  s.appendChild(st);
+  return s;
+}
+/* Lebar bawaan tiap jenis blok saat ditaruh di kanvas. Elemen sebaris (tombol)
+   dibiarkan selebar isinya. */
+/* Lebar yang DITAMBAHKAN kanvas ditulis `min(100%,Npx)`, urutannya dibalik dari
+   `min(Npx,100%)` yang ditulis panel Ukuran. Bedanya hanya bentuk, tapi
+   cukup untuk tahu mana yang bawaan kanvas (dibersihkan saat elemennya
+   dikeluarkan) dan mana yang sengaja diatur pemakai (dipertahankan). */
+var KANVAS_LEBAR = { heading:480, text:440, image:420, video:520, section:900, columns:800, columns3:900, divider:320, spacer:200, free:900 };
+function lebarKanvas(px){ return 'min(100%,' + Math.round(px) + 'px)'; }
+function siapkanDiKanvas(node, kind){
+  node.classList.add(KB);
+  node.style.position = 'absolute';
+  node.style.margin = '0';          // blok baru milik kita; margin bawaan templatnya tidak berarti di kanvas
+  if (KANVAS_LEBAR[kind]) node.style.width = lebarKanvas(KANVAS_LEBAR[kind]);
+}
+/* Satu-satunya tempat blok baru dirakit, supaya bayangan seret (yang ditiru
+   di tempat jatuh) dan hasil akhirnya pasti sama. */
+function bangunNodeBlok(kind, bungkus){
+  var box = fd.createElement('div');
+  box.innerHTML = BLOCK[kind] || '';
+  var node = box.firstElementChild;
+  if (!node) return null;
+  if (kind === 'video'){
+    var fr = node.querySelector('iframe');
+    if (fr) fr.setAttribute('srcdoc', VIDEO_KOSONG);
+  }
+  if (bungkus === 'section'){
+    var s = fd.createElement('section');
+    s.setAttribute('style', 'padding:48px 24px;');
+    s.appendChild(node);
+    return s;
+  }
+  if (bungkus === 'bebas'){
+    var kv = buatKanvas(320);
+    siapkanDiKanvas(node, kind);
+    node.style.left = '8%'; node.style.top = '56px';
+    kv.appendChild(node);
+    return kv;
+  }
+  return node;
+}
+/* Kanvas membesar ke bawah mengikuti isinya, tidak pernah mengecil sendiri. */
+function perbesarKanvas(kv){
+  var bawah = 0;
+  Array.prototype.forEach.call(kv.children, function(c){
+    if (!c.classList.contains(KB)) return;
+    bawah = Math.max(bawah, c.offsetTop + c.offsetHeight);
+  });
+  var perlu = Math.ceil(bawah + 48), sekarang = kv.clientHeight;
+  if (perlu > sekarang) kv.style.minHeight = (perlu - paddingAtasBawah(kv)) + 'px';
+}
+/* `min-height` pada kotak bergaya content-box tidak termasuk padding, sedangkan
+   tinggi yang diukur (clientHeight) termasuk. Selisihnya dipotong supaya
+   tinggi akhirnya persis seperti yang dimaksud. */
+function paddingAtasBawah(el){
+  var cs = fd.defaultView.getComputedStyle(el);
+  if (cs.boxSizing === 'border-box') return 0;
+  return (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+}
+/* Taruh `el` di kanvas pada titik (x,y) piksel dari pojok kiri atasnya. */
+function letakDiKanvas(el, kv, x, y, lebar){
+  var cs0 = fd.defaultView.getComputedStyle(el);
+  var punyaKananBawah = cs0.right !== 'auto' || cs0.bottom !== 'auto';
+  var sebaris = /^inline/.test(cs0.display) || !!TAG_SEBARIS[el.tagName];
+  var dari = el.parentElement;
+  if (el.parentNode !== kv) kv.appendChild(el);
+  el.classList.add(KB);
+  var W = kv.clientWidth || 1;
+  markEdited(el);
+  el.style.position = 'absolute';
+  el.style.removeProperty('translate');
+  if (punyaKananBawah){ el.style.right = 'auto'; el.style.bottom = 'auto'; }
+  el.style.left = persen(x / W * 100);
+  el.style.top = Math.max(0, Math.round(y)) + 'px';
+  /* Elemen blok yang sebelumnya selebar wadahnya akan menyusut ke lebar
+     isinya begitu diabsolutkan. Lebar yang tadi terlihat dipertahankan. */
+  if (lebar && !sebaris && !el.style.width) el.style.width = lebarKanvas(lebar);
+  perbesarKanvas(kv);
+  return dari;
+}
+function keluarKanvas(el){
+  var kv = el.parentElement;
+  if (!jadiKanvas(kv)) return;
+  snap(); markEdited(el);
+  ['position', 'left', 'top', 'right', 'bottom', 'translate'].forEach(function(p){ el.style.removeProperty(p); });
+  if (/^min\(100%,\s*[\d.]+px\)$/.test(el.style.width)) el.style.removeProperty('width');
+  el.classList.remove(KB);
+  if (!el.getAttribute('class')) el.removeAttribute('class');
+  if (!el.getAttribute('style')) el.removeAttribute('style');
+  kv.parentNode.insertBefore(el, kv.nextSibling);
+  select(el); buildLayers(); toast('Elemen dikeluarkan dari kanvas.');
+}
+
+/* ---- garis bantu dan penarik ke garis ---- */
+function kumpulKandidat(induk, abaikan){
+  var s = skrol(), X = [], Y = [];
+  function tambah(r, penuh){
+    var L = r.left + s.x, T = r.top + s.y, R = r.right + s.x, B = r.bottom + s.y;
+    [L, (L + R) / 2, R].forEach(function(v){ X.push({ v:v, a:T, b:B }); });
+    [T, (T + B) / 2, B].forEach(function(v){ Y.push({ v:v, a:L, b:R }); });
+  }
+  if (induk){
+    var pr = induk.getBoundingClientRect();
+    tambah({ left:pr.left, right:pr.right, top:pr.top, bottom:pr.bottom });
+    var n = 0;
+    for (var c = induk.firstElementChild; c && n < 60; c = c.nextElementSibling){
+      if (c === abaikan || skip(c)) continue;
+      var rc = c.getBoundingClientRect();
+      if (rc.width < 2 || rc.height < 2) continue;
+      tambah(rc); n++;
+    }
+  }
+  return { X:X, Y:Y };
+}
+function tariKeGaris(r, kand, nonaktif){
+  var T = 6;
+  if (nonaktif || !kand) return { dx:0, dy:0, garis:[] };
+  var ex = [r.left, (r.left + r.right) / 2, r.right], ey = [r.top, (r.top + r.bottom) / 2, r.bottom];
+  var bx = null, by = null;
+  kand.X.forEach(function(t){ ex.forEach(function(e){ var d = t.v - e; if (Math.abs(d) <= T && (bx === null || Math.abs(d) < Math.abs(bx))) bx = d; }); });
+  kand.Y.forEach(function(t){ ey.forEach(function(e){ var d = t.v - e; if (Math.abs(d) <= T && (by === null || Math.abs(d) < Math.abs(by))) by = d; }); });
+  var dx = bx || 0, dy = by || 0;
+  var rr = { left:r.left + dx, right:r.right + dx, top:r.top + dy, bottom:r.bottom + dy };
+  var ex2 = [rr.left, (rr.left + rr.right) / 2, rr.right], ey2 = [rr.top, (rr.top + rr.bottom) / 2, rr.bottom];
+  var garis = [], ada = {};
+  if (bx !== null) kand.X.forEach(function(t){ ex2.forEach(function(e){
+    var k = 'v' + Math.round(t.v);
+    if (Math.abs(t.v - e) < 0.6 && !ada[k]){ ada[k] = 1; garis.push({ o:'v', v:t.v, a:Math.min(rr.top, t.a), b:Math.max(rr.bottom, t.b) }); } }); });
+  if (by !== null) kand.Y.forEach(function(t){ ey2.forEach(function(e){
+    var k = 'h' + Math.round(t.v);
+    if (Math.abs(t.v - e) < 0.6 && !ada[k]){ ada[k] = 1; garis.push({ o:'h', v:t.v, a:Math.min(rr.left, t.a), b:Math.max(rr.right, t.b) }); } }); });
+  return { dx:dx, dy:dy, garis:garis.slice(0, 6) };
+}
+function tampilGaris(garis){
+  var pool = E.garisLapis, s = skrol();
+  while (pool.children.length < garis.length){
+    var d = document.createElement('div'); d.className = 'garis'; pool.appendChild(d);
+  }
+  Array.prototype.forEach.call(pool.children, function(d, i){
+    var g = garis[i];
+    if (!g){ d.hidden = true; return; }
+    d.hidden = false;
+    if (g.o === 'v'){
+      d.style.left = ((g.v - s.x) * scale) + 'px'; d.style.top = ((g.a - s.y) * scale) + 'px';
+      d.style.width = '1px'; d.style.height = ((g.b - g.a) * scale) + 'px';
+    } else {
+      d.style.top = ((g.v - s.y) * scale) + 'px'; d.style.left = ((g.a - s.x) * scale) + 'px';
+      d.style.height = '1px'; d.style.width = ((g.b - g.a) * scale) + 'px';
+    }
+  });
+}
+function sembunyiGaris(){ tampilGaris([]); }
+
+/* ---- geser bebas (dipanggil dari startDrag/dragMove/dragEnd) ---- */
+function mulaiGeserBebas(el, opsi){
+  var s = skrol(), r = el.getBoundingClientRect();
+  var kv = dalamKanvas(el) ? el.parentElement : null;
+  var cs = fd.defaultView.getComputedStyle(el);
+  // translate tidak berlaku pada elemen sebaris biasa
+  if (!kv && cs.display === 'inline') el.style.display = 'inline-block';
+  var d = { el:el, bebas:true, mode: kv ? 'kanvas' : 'translate', cont:kv,
+    awal:bacaGeser(el), asliTranslate: el.style.translate || '',
+    asliGaya: el.getAttribute('style'), asliUbah: el.hasAttribute(P_UBAH),
+    r0:{ left:r.left + s.x, top:r.top + s.y, right:r.right + s.x, bottom:r.bottom + s.y },
+    mulai:null, shift:false, nonaktif:false };
+  if (kv){
+    var cr = kv.getBoundingClientRect();
+    d.kx = cr.left + s.x + kv.clientLeft; d.ky = cr.top + s.y + kv.clientTop;
+  }
+  d.kand = kumpulKandidat(kv || el.parentElement, el);
+  var titik = opsi && opsi.mulaiX !== undefined ? { x:opsi.mulaiX, y:opsi.mulaiY } : (penunjuk ? titikDalam() : null);
+  if (titik) d.mulai = { x:titik.x + s.x, y:titik.y + s.y };
+  return d;
+}
+function geserBebas(p){
+  var s = skrol(), px = p.x + s.x, py = p.y + s.y;
+  if (!drag.mulai){ drag.mulai = { x:px, y:py }; return; }
+  var dx = px - drag.mulai.x, dy = py - drag.mulai.y;
+  var kunciX = false, kunciY = false;
+  if (drag.shift){ if (Math.abs(dx) >= Math.abs(dy)){ dy = 0; kunciY = true; } else { dx = 0; kunciX = true; } }
+  var r = { left:drag.r0.left + dx, right:drag.r0.right + dx, top:drag.r0.top + dy, bottom:drag.r0.bottom + dy };
+  var tarik = tariKeGaris(r, drag.kand, drag.nonaktif);
+  if (!kunciX) dx += tarik.dx;
+  if (!kunciY) dy += tarik.dy;
+  var el = drag.el;
+  markEdited(el);
+  if (drag.mode === 'kanvas'){
+    var kv = drag.cont, W = kv.clientWidth || 1, w = drag.r0.right - drag.r0.left;
+    var x = drag.r0.left + dx - drag.kx, y = drag.r0.top + dy - drag.ky;
+    x = Math.max(0, Math.min(x, Math.max(0, W - w)));
+    y = Math.max(0, y);
+    el.style.left = persen(x / W * 100);
+    el.style.top = Math.round(y) + 'px';
+    perbesarKanvas(kv);
+  } else {
+    var tx = Math.round(drag.awal.x + dx), ty = Math.round(drag.awal.y + dy);
+    el.style.translate = tx + 'px ' + ty + 'px';
+  }
+  tampilGaris(tarik.garis);
+  var rn = el.getBoundingClientRect();
+  teksPosisiSeret(drag.mode === 'kanvas' ? Math.round(el.offsetLeft) : Math.round(drag.awal.x + dx), drag.mode === 'kanvas' ? el.offsetTop : Math.round(drag.awal.y + dy));
+  redraw();
+}
+function teksPosisiSeret(x, y){
+  E.seretChip.textContent = (drag && drag.label ? drag.label + '  ·  ' : '') + 'x ' + x + '  y ' + y;
+}
+function akhiriGeserBebas(d, batal){
+  sembunyiGaris();
+  if (batal || !d.mulai){
+    /* Menghapus atribut style saat objek gayanya masih "kotor" membuat Chrome
+       menulis ulang `style=""` begitu atributnya dibaca lagi — jejak kosong
+       yang ikut ke hasil unduhan. Gayanya dikosongkan dulu, baru atributnya
+       dibuang. Penanda "diubah" juga dikembalikan seperti semula. */
+    if (d.asliGaya === null){ d.el.style.cssText = ''; d.el.removeAttribute('style'); }
+    else d.el.setAttribute('style', d.asliGaya);
+    if (!d.asliUbah) d.el.removeAttribute(P_UBAH);
+    batalkanSnap();
+  } else {
+    if (d.mode === 'translate'){
+      var g = bacaGeser(d.el);
+      if (!g.x && !g.y){
+        d.el.style.removeProperty('translate');
+        if (!d.el.style.length){ d.el.style.cssText = ''; d.el.removeAttribute('style'); }
+      }
+    }
+  }
+  select(d.el);
+  if (batal) toast('Pergeseran dibatalkan.');
+}
+
+/* ---- tombol panah: geser 1 px (Shift: 10 px) ---- */
+var nudgeT = null;
+function bebasAktif(el){
+  return !!el && (dalamKanvas(el) || !!(el.style && el.style.translate) || melayang(el));
+}
+function nudge(dx, dy){
+  if (!sel || terkunci(sel)) return;
+  if (!nudgeT) snap();
+  clearTimeout(nudgeT);
+  nudgeT = setTimeout(function(){ nudgeT = null; }, 700);
+  markEdited(sel);
+  if (dalamKanvas(sel)){
+    var kv = sel.parentElement, W = kv.clientWidth || 1;
+    var x = Math.max(0, Math.min(sel.offsetLeft + dx, Math.max(0, W - sel.offsetWidth)));
+    var y = Math.max(0, sel.offsetTop + dy);
+    sel.style.left = persen(x / W * 100); sel.style.top = Math.round(y) + 'px';
+    perbesarKanvas(kv);
+  } else {
+    if (fd.defaultView.getComputedStyle(sel).display === 'inline') sel.style.display = 'inline-block';
+    var g = bacaGeser(sel);
+    var nx = g.x + dx, ny = g.y + dy;
+    if (!nx && !ny) sel.style.removeProperty('translate'); else sel.style.translate = nx + 'px ' + ny + 'px';
+    if (!sel.getAttribute('style')) sel.removeAttribute('style');
+  }
+  redraw(); isiPosisi();
+}
+
+/* ---- kartu Posisi (tab Lanjutan) ---- */
+function jumlahAnakElemen(el){
+  var n = 0;
+  for (var c = el.firstElementChild; c; c = c.nextElementSibling) if (!skip(c)) n++;
+  return n;
+}
+function isiPosisi(){
+  if (!sel) return;
+  var el = sel, kv = dalamKanvas(el), adalahKv = jadiKanvas(el);
+  var bisaKanvas = !kv && !adalahKv && /^(SECTION|DIV|MAIN|ARTICLE|ASIDE|HEADER|FOOTER)$/.test(el.tagName) && jumlahAnakElemen(el) >= 1;
+  var xy = kv ? { x:el.offsetLeft, y:el.offsetTop } : bacaGeser(el);
+  E.posKet.textContent = kv ? 'Bebas di dalam kanvas: seret ke mana saja, atau ketik angkanya. Di HP tersusun ke bawah.'
+    : adalahKv ? 'Kanvas bebas. Seret elemen di dalamnya ke mana saja; kanvas membesar sendiri. Di HP isinya tersusun ke bawah.'
+    : (xy.x || xy.y) ? 'Sudah digeser dari tempat aslinya.'
+    : 'Ikut alur halaman. Tahan Alt lalu seret, atau pakai tombol tangan di toolbar, untuk menggesernya bebas.';
+  E.posXLabel.textContent = kv ? 'Dari kiri (px)' : 'Geser kanan (px)';
+  E.posYLabel.textContent = kv ? 'Dari atas (px)' : 'Geser bawah (px)';
+  E.posX.value = Math.round(xy.x); E.posY.value = Math.round(xy.y);
+  E.posX.disabled = E.posY.disabled = adalahKv;
+  E.posAlin.hidden = !kv;
+  E.posReset.hidden = kv || adalahKv || !(xy.x || xy.y);
+  E.posKeluar.hidden = !kv;
+  E.posKanvas.hidden = !bisaKanvas;
+  E.posZ.value = el.style.zIndex || '';
+  E.posZ.placeholder = css(el, 'zIndex');
+}
+function terapkanXY(){
+  if (!sel) return;
+  var x = parseFloat(E.posX.value), y = parseFloat(E.posY.value);
+  if (isNaN(x)) x = 0; if (isNaN(y)) y = 0;
+  markEdited(sel);
+  if (dalamKanvas(sel)){
+    var kv = sel.parentElement, W = kv.clientWidth || 1;
+    sel.style.left = persen(Math.max(0, x) / W * 100); sel.style.top = Math.max(0, Math.round(y)) + 'px';
+    perbesarKanvas(kv);
+  } else {
+    if (fd.defaultView.getComputedStyle(sel).display === 'inline') sel.style.display = 'inline-block';
+    if (!x && !y) sel.style.removeProperty('translate'); else sel.style.translate = Math.round(x) + 'px ' + Math.round(y) + 'px';
+  }
+  redraw();
+  if (!dalamKanvas(sel)){
+    E.posReset.hidden = !(Math.round(x) || Math.round(y));
+    E.posKet.textContent = (Math.round(x) || Math.round(y)) ? 'Sudah digeser dari tempat aslinya.'
+      : 'Ikut alur halaman. Tahan Alt lalu seret, atau pakai tombol tangan di toolbar, untuk menggesernya bebas.';
+  }
+}
+[E.posX, E.posY].forEach(function(i){
+  i.addEventListener('focus', snap);
+  i.addEventListener('input', terapkanXY);
+});
+E.posZ.addEventListener('focus', snap);
+E.posZ.addEventListener('input', function(){
+  if (!sel) return;
+  var v = E.posZ.value.trim();
+  markEdited(sel);
+  if (v !== '' && fd.defaultView.getComputedStyle(sel).position === 'static') sel.style.position = 'relative';
+  setStyle('zIndex', v);
+});
+E.posReset.addEventListener('click', function(){
+  if (!sel) return;
+  snap(); markEdited(sel);
+  sel.style.removeProperty('translate');
+  if (!sel.getAttribute('style')) sel.removeAttribute('style');
+  redraw(); isiPosisi(); toast('Posisi dikembalikan ke tempat asalnya.');
+});
+E.posKeluar.addEventListener('click', function(){ if (sel) keluarKanvas(sel); });
+E.posAlin.addEventListener('click', function(e){
+  var b = e.target.closest('[data-alin]'); if (!b || !sel || !dalamKanvas(sel)) return;
+  snap(); markEdited(sel);
+  var kv = sel.parentElement, W = kv.clientWidth, H = kv.clientHeight, w = sel.offsetWidth, h = sel.offsetHeight;
+  var x = sel.offsetLeft, y = sel.offsetTop, a = b.dataset.alin;
+  if (a === 'kiri') x = 0; else if (a === 'th') x = (W - w) / 2; else if (a === 'kanan') x = W - w;
+  else if (a === 'atas') y = 0; else if (a === 'tv') y = (H - h) / 2; else if (a === 'bawah') y = H - h;
+  sel.style.left = persen(Math.max(0, x) / W * 100); sel.style.top = Math.max(0, Math.round(y)) + 'px';
+  redraw(); isiPosisi();
+});
+
+/* Jadikan section yang sudah ada sebagai kanvas bebas: setiap anaknya diukur
+   lalu dipaku di tempatnya sekarang (kiri dalam persen, atas dalam piksel),
+   jadi tampilannya di layar ini sama, tapi sekarang bisa digeser ke mana saja.
+   Dibatalkan dengan Ctrl+Z. Anak yang sudah melayang (position absolut/fixed)
+   dibiarkan di tempatnya. */
+/* Satu baris teks tanpa latar atau garis tepi: aman dibiarkan selebar isinya. */
+function teksSatuBaris(e, ce, r){
+  if (!(e.textContent || '').trim()) return false;
+  if (e.querySelector('img,svg,video,iframe,canvas,div,section,ul,ol,table,form,button,input')) return false;
+  if (ce.backgroundImage !== 'none' || (ce.backgroundColor && ce.backgroundColor !== 'rgba(0, 0, 0, 0)' && ce.backgroundColor !== 'transparent')) return false;
+  if (parseFloat(ce.borderTopWidth) || parseFloat(ce.borderBottomWidth) || parseFloat(ce.borderLeftWidth) || parseFloat(ce.borderRightWidth)) return false;
+  var pad = (parseFloat(ce.paddingTop) || 0) + (parseFloat(ce.paddingBottom) || 0);
+  var lh = parseFloat(ce.lineHeight); if (isNaN(lh)) lh = (parseFloat(ce.fontSize) || 16) * 1.3;
+  return (r.height - pad) <= lh * 1.5;
+}
+function jadikanKanvas(c){
+  if (!c || jadiKanvas(c) || dalamKanvas(c)) return;
+  snap(); markEdited(c);
+  // tulisan yang langsung ada di kanvas (tanpa pembungkus) dibungkus supaya bisa digeser
+  Array.prototype.slice.call(c.childNodes).forEach(function(n){
+    if (n.nodeType === 3 && n.nodeValue.trim()){
+      var sp = fd.createElement('span'); c.insertBefore(sp, n); sp.appendChild(n);
+    }
+  });
+  var win = fd.defaultView, cs = win.getComputedStyle(c);
+  var rc = c.getBoundingClientRect(), W = c.clientWidth || 1;
+  var ox = rc.left + c.clientLeft, oy = rc.top + c.clientTop;
+  var anak = Array.prototype.filter.call(c.children, function(e){ return !skip(e) && e.tagName !== 'STYLE'; });
+  var atas0 = rc.top;
+  var ukur = anak.map(function(e){
+    var r = e.getBoundingClientRect(), ce = win.getComputedStyle(e);
+    var u = { el:e, x:r.left - ox, y:r.top - oy, w:r.width, h:r.height,
+      melayang: ce.position === 'absolute' || ce.position === 'fixed',
+      sebaris: /^inline/.test(ce.display) || !!TAG_SEBARIS[e.tagName] };
+    /* Judul dan teks satu baris yang tadinya selebar wadah (blok biasa) tidak
+       dipaku selebar itu: kotak selebar wadah tidak bisa digeser ke samping
+       sama sekali, dan teksnya yang berada di tengah/kanan akan melompat ke
+       kiri kalau kotaknya menyusut. Jadi kotaknya dibiarkan selebar teks dan
+       diletakkan tepat di bawah teks yang terlihat sekarang. */
+    if (!u.sebaris && !u.melayang && teksSatuBaris(e, ce, r)){
+      var rg = fd.createRange(); rg.selectNodeContents(e);
+      var rt = rg.getBoundingClientRect();
+      if (rt.width > 0){
+        u.satuBaris = true;
+        u.x = rt.left - ox - (parseFloat(ce.paddingLeft) || 0) - (parseFloat(ce.borderLeftWidth) || 0);
+      }
+    }
+    return u;
+  });
+  var tinggi = Math.ceil(rc.height - (cs.boxSizing === 'border-box' ? 0 : (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0) +
+    (parseFloat(cs.borderTopWidth) || 0) + (parseFloat(cs.borderBottomWidth) || 0)));
+  c.classList.add(KV);
+  if (cs.position === 'static') c.style.position = 'relative';
+  c.style.minHeight = tinggi + 'px';
+  var st = fd.createElement('style'); st.textContent = KANVAS_CSS;
+  c.insertBefore(st, c.firstChild);
+  ukur.forEach(function(u){
+    if (u.melayang) return;
+    var e = u.el;
+    e.classList.add(KB);
+    e.style.position = 'absolute';
+    e.style.left = persen(u.x / W * 100); e.style.top = Math.round(u.y) + 'px';
+    if (!u.sebaris && !u.satuBaris && !e.style.width) e.style.width = lebarKanvas(u.w);
+  });
+  /* Margin atas anak pertama tadinya "menyatu" dengan wadahnya dan ikut
+     mendorong wadah ke bawah. Begitu anaknya absolut, dorongan itu hilang dan
+     seluruh isi terlihat naik. Selisihnya ditambahkan sebagai margin wadah. */
+  for (var kk = 0; kk < 3; kk++){
+    var delta = atas0 - c.getBoundingClientRect().top;
+    if (Math.abs(delta) < 0.5) break;
+    var mt = parseFloat(win.getComputedStyle(c).marginTop) || 0;
+    c.style.marginTop = (Math.round((mt + delta) * 10) / 10) + 'px';
+  }
+  select(c); buildLayers();
+  toast('Section ini sekarang kanvas bebas — seret isinya ke mana saja.');
+}
+E.posKanvas.addEventListener('click', function(){ if (sel) jadikanKanvas(sel); });
+
+/* ---- cara menaruh elemen baru: Rapi / Bebas ---- */
+function aturModeTaruh(m, simpan){
+  modeTaruh = m === 'bebas' ? 'bebas' : 'rapi';
+  Array.prototype.forEach.call(E.modeTaruh.querySelectorAll('.mode-btn'), function(b){
+    b.classList.toggle('on', b.dataset.mode === modeTaruh);
+    b.setAttribute('aria-pressed', b.dataset.mode === modeTaruh ? 'true' : 'false');
+  });
+  E.modeCatatan.textContent = modeTaruh === 'bebas'
+    ? 'Elemen baru yang dilepas di antara section otomatis dibuatkan section bebas sendiri. Dilepas di dalam kanvas bebas, ia jatuh tepat di titik itu.'
+    : 'Elemen baru yang dilepas di antara section otomatis dibungkus section supaya rapi. Di dalam kanvas bebas, ia jatuh tepat di titik itu.';
+  if (simpan){ try { localStorage.setItem(MODE_KEY, modeTaruh); } catch(err){} }
+}
+E.modeTaruh.addEventListener('click', function(e){
+  var b = e.target.closest('.mode-btn'); if (!b) return;
+  aturModeTaruh(b.dataset.mode, true);
+});
+aturModeTaruh(modeTaruh, false);
+
+/* Section yang sebaya dengan sasaran: elemen setingkat halaman, bukan isi
+   di dalam section. Di halaman yang dibungkus satu div (seperti widget
+   Elementor) sasarannya tetap section di dalamnya. */
+function anakHalaman(p){
+  var n = 0;
+  for (var c = p.firstElementChild; c; c = c.nextElementSibling) if (PAGE_TAGS[c.tagName]) n++;
+  return n;
+}
+function levelHalaman(t){
+  var n = t;
+  while (n && n.parentElement && n.parentElement !== fd.body){
+    if (PAGE_TAGS[n.tagName] && anakHalaman(n.parentElement) >= 2) return n;
+    n = n.parentElement;
+  }
+  return n;
+}
+
+/* Bayangan di dalam kanvas: kotak seukuran blok, menempel di pointer, dengan
+   garis bantu. Mengembalikan titik jatuhnya dalam piksel dari pojok kiri atas
+   kanvas. */
+function bayanganKanvas(kv, p, w, h, grab, label, abaikan, state){
+  var s = skrol(), cr = kv.getBoundingClientRect(), W = kv.clientWidth || 1;
+  var ox = cr.left + kv.clientLeft, oy = cr.top + kv.clientTop;
+  if (state.kvKand !== kv){ state.kvKand = kv; state.kand = kumpulKandidat(kv, abaikan); }
+  var left = p.x - grab.dx, top = p.y - grab.dy;
+  var r = { left:left + s.x, top:top + s.y, right:left + s.x + w, bottom:top + s.y + h };
+  var tarik = tariKeGaris(r, state.kand, state.nonaktif);
+  var x = left - ox + tarik.dx, y = top - oy + tarik.dy;
+  x = Math.max(0, Math.min(x, Math.max(0, W - w)));
+  y = Math.max(0, y);
+  var g = E.ghost; g.hidden = false;
+  g.style.left = ((ox + x) * scale) + 'px'; g.style.top = ((oy + y) * scale) + 'px';
+  g.style.width = (w * scale) + 'px'; g.style.height = (Math.max(20, h) * scale) + 'px';
+  E.ghostTag.textContent = label;
+  E.insLine.hidden = true;
+  tampilGaris(tarik.garis);
+  return { x:x, y:y };
+}
+
 /* ---------------- blok baru ---------------- */
 var BLOCK = {
   section:'<section style="padding:64px 24px;text-align:center;"><h2 style="margin:0 0 14px;font-size:32px;">Judul Section</h2><p style="margin:0 0 24px;font-size:16px;line-height:1.7;">Tulis penjelasan singkat di sini.</p><a href="#" style="display:inline-block;padding:14px 28px;background:#0071e3;color:#fff;border-radius:999px;text-decoration:none;font-weight:600;">Tombol Aksi</a></section>',
@@ -4623,37 +5232,76 @@ var BLOCK = {
 };
 var PLACEHOLDER = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'640'%20height%3D'360'%3E%3Crect%20width%3D'640'%20height%3D'360'%20fill%3D'%23eeeeef'%2F%3E%3Ctext%20x%3D'320'%20y%3D'190'%20text-anchor%3D'middle'%20font-family%3D'sans-serif'%20font-size%3D'24'%20fill%3D'%23999'%3EGambar%3C%2Ftext%3E%3C%2Fsvg%3E";
 BLOCK.image = '<img src="' + PLACEHOLDER + '" alt="Gambar" style="max-width:100%;display:block;">';
+BLOCK.free = '<section class="kanvas-bebas" style="position:relative;box-sizing:border-box;padding:0;min-height:480px;background:#f5f5f7;"><style>' + KANVAS_CSS + '</style>' +
+  '<h2 class="kb-item" style="position:absolute;left:8%;top:56px;width:min(100%,480px);font-size:40px;line-height:1.15;">Judul bebas</h2>' +
+  '<p class="kb-item" style="position:absolute;left:8%;top:150px;width:min(100%,440px);font-size:16px;line-height:1.7;">Seret elemen ini ke mana saja. Tambah elemen lain dengan menyeretnya dari daftar ke dalam kotak ini.</p>' +
+  '<a class="kb-item" href="#" style="position:absolute;left:8%;top:290px;display:inline-block;padding:14px 28px;background:#0071e3;color:#fff;border-radius:999px;text-decoration:none;font-weight:600;">Tombol</a></section>';
 var VIDEO_KOSONG = '<body style="margin:0;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#111;color:#c9c9cf;font:15px/1.4 system-ui,sans-serif;text-align:center;padding:0 16px;box-sizing:border-box">' +
   '<div style="width:56px;height:56px;border-radius:50%;background:#e33;display:grid;place-items:center"><div style="width:0;height:0;border-left:18px solid #fff;border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px"></div></div>' +
   '<div>Pilih kotak ini, lalu tempel link YouTube atau Vimeo<br>di bagian <b>Isi</b> panel pengaturan.</div></body>';
 
-/* dropInfo: {el, before} untuk menaruh tepat di sana (dari drag), atau null untuk
-   menaruh di bawah elemen yang sedang dipilih (dari klik). */
+/* dropInfo: {el, before, bungkus} untuk menaruh tepat di sana (dari seret),
+   {kanvas, x, y} untuk menjatuhkan di titik tertentu di kanvas bebas, atau null
+   untuk menaruh di bawah elemen yang sedang dipilih (dari klik). */
+function bawahTerendah(kv){
+  var b = 0;
+  Array.prototype.forEach.call(kv.children, function(c){
+    if (c.classList.contains(KB)) b = Math.max(b, c.offsetTop + c.offsetHeight);
+  });
+  return b;
+}
+function perluBungkus(kind, ref){
+  if (!BUNGKUS_KIND[kind] || !ref) return '';
+  if (!(PAGE_TAGS[ref.tagName] || ref.parentElement === fd.body)) return '';
+  return modeTaruh === 'bebas' ? 'bebas' : 'section';
+}
 function insertBlock(kind, dropInfo){
   if (!fd){ toast('Buka dulu halamanmu — tempel kodenya di layar awal.', true); return; }
-  var box = fd.createElement('div');
-  box.innerHTML = BLOCK[kind] || '';
-  var node = box.firstElementChild;
+  var kv = null;
+  if (dropInfo && dropInfo.kanvas) kv = dropInfo.kanvas;
+  else if (!dropInfo && sel) kv = jadiKanvas(sel) ? sel : (dalamKanvas(sel) ? sel.parentElement : null);
+  var bungkus = '';
+  if (!kv){
+    if (dropInfo && dropInfo.bungkus !== undefined) bungkus = dropInfo.bungkus;
+    else if (!dropInfo) bungkus = perluBungkus(kind, (sel && sel.tagName !== 'BODY') ? sel : fd.body.lastElementChild);
+  }
+  var node = bangunNodeBlok(kind, kv ? '' : bungkus);
   if (!node) return;
-  /* Kotak video kosong dulu cuma hitam polos, dan orang mengira videonya gagal
-     dimuat. Sekarang kotaknya sendiri yang bilang harus diapakan. Isian ini
-     dibuang begitu alamat videonya dipasang. */
-  if (kind === 'video'){
-    var fr = node.querySelector('iframe');
-    if (fr) fr.setAttribute('srcdoc', VIDEO_KOSONG);
-  }
   snap();
-  if (dropInfo && dropInfo.el && dropInfo.el.parentNode){
-    if (dropInfo.before) dropInfo.el.parentNode.insertBefore(node, dropInfo.el);
-    else dropInfo.el.parentNode.insertBefore(node, dropInfo.el.nextSibling);
-  } else if (sel && sel.parentNode && sel.tagName!=='BODY'){
-    sel.parentNode.insertBefore(node, sel.nextSibling);
+  var pilih = node;
+  if (kv){
+    siapkanDiKanvas(node, kind);
+    kv.appendChild(node);
+    var W = kv.clientWidth || 1, w = node.offsetWidth;
+    var x, y;
+    if (dropInfo && dropInfo.kanvas){ x = dropInfo.x; y = dropInfo.y; }
+    else { x = W * 0.08; y = bawahTerendah(kv) + 24; }
+    x = Math.max(0, Math.min(x, Math.max(0, W - w)));
+    node.style.left = persen(x / W * 100); node.style.top = Math.max(0, Math.round(y)) + 'px';
+    perbesarKanvas(kv);
   } else {
-    fd.body.appendChild(node);
+    if (dropInfo && dropInfo.el && dropInfo.el.parentNode){
+      if (dropInfo.before) dropInfo.el.parentNode.insertBefore(node, dropInfo.el);
+      else dropInfo.el.parentNode.insertBefore(node, dropInfo.el.nextSibling);
+    } else if (sel && sel.parentNode && sel.tagName!=='BODY'){
+      /* Section baru yang ditambah lewat klik masuk SESUDAH section yang
+         memuat pilihan, bukan di dalam kolom isinya (di bawah satu paragraf). */
+      var acuan = (kind === 'section' || kind === 'free') ? levelHalaman(sel) : sel;
+      acuan.parentNode.insertBefore(node, acuan.nextSibling);
+    } else {
+      fd.body.appendChild(node);
+    }
+    if (jadiKanvas(node)) perbesarKanvas(node);
+    // yang dipilih adalah isinya, bukan pembungkus yang dibuat otomatis
+    if (bungkus === 'section') pilih = node.firstElementChild;
+    else if (bungkus === 'bebas') pilih = node.querySelector('.' + KB);
   }
-  select(node); setPeek(node, true);
+  select(pilih); setPeek(node, true);
   setTimeout(function(){ setPeek(null); }, 900);
-  buildLayers(); toast('Elemen ditambahkan.');
+  buildLayers();
+  toast(bungkus === 'bebas' ? 'Section bebas dibuat. Seret elemennya ke mana saja.' :
+        bungkus === 'section' ? 'Elemen ditambahkan dan dibungkus section.' :
+        kv ? 'Elemen ditaruh di kanvas.' : 'Elemen ditambahkan.');
 }
 
 /* Seret blok dari palet memakai peristiwa mouse biasa, bukan drag-and-drop bawaan
@@ -4704,7 +5352,7 @@ function palPendClear(){
 function palStart(kind, btn){
   if (palDrag) return;
   var uk = ukurBlok(kind, null);
-  palDrag = { kind:kind, btn:btn, target:null, before:true, tinggi:uk.tinggi, lebar:uk.lebar };
+  palDrag = { kind:kind, btn:btn, target:null, before:true, tinggi:uk.tinggi, lebar:uk.lebar, bungkus:'', kanvas:null };
   btn.classList.add('dragging');
   E.shield.hidden = false; E.shield.classList.remove('rz');
   mulaiSeret(namaBlok(kind).replace(' baru di sini', ''));
@@ -4716,12 +5364,41 @@ function palStart(kind, btn){
   }
   hint('Lepaskan di garis biru untuk menaruh elemen baru di sana.');
 }
-function palMoveOuter(e){ catatPenunjuk(e, false); palMove(pt(e)); }
-function palMoveInner(e){ catatPenunjuk(e, true); palMove({ x:e.clientX, y:e.clientY }); }
+function palMoveOuter(e){ catatPenunjuk(e, false); modDrag(e); palMove(pt(e)); }
+function palMoveInner(e){ catatPenunjuk(e, true); modDrag(e); palMove({ x:e.clientX, y:e.clientY }); }
+/* Ukuran blok yang ditaruh di dalam kanvas, diukur betulan di kanvas itu
+   (sekali per kanvas), karena lebar bawaannya berbeda dari di alur halaman. */
+function ukurDiKanvas(kind, kv){
+  var node = null;
+  try {
+    node = bangunNodeBlok(kind, '');
+    if (!node) return { w:200, h:60 };
+    siapkanDiKanvas(node, kind);
+    node.style.visibility = 'hidden';
+    node.style.left = '0'; node.style.top = '0';
+    var img = node.tagName === 'IMG' ? node : (node.querySelector ? node.querySelector('img') : null);
+    if (kind === 'image' && img){ img.setAttribute('width', '640'); img.setAttribute('height', '360'); img.style.height = 'auto'; }
+    Array.prototype.forEach.call(node.querySelectorAll ? node.querySelectorAll('iframe') : [], function(f){ f.removeAttribute('src'); f.removeAttribute('srcdoc'); });
+    kv.appendChild(node);
+    var r = node.getBoundingClientRect();
+    return { w:Math.max(26, r.width), h:Math.max(20, r.height) };
+  } catch(err){ return { w:200, h:60 }; }
+  finally { if (node && node.parentNode) node.parentNode.removeChild(node); }
+}
 function palMove(p){
   if (!palDrag || !fd) return;
+  var kv = kanvasDiTitik(p.x, p.y, null);
+  if (kv){
+    if (palDrag.kvUkur !== kv){ palDrag.kvUkur = kv; palDrag.kvUk = ukurDiKanvas(palDrag.kind, kv); }
+    var uk0 = palDrag.kvUk;
+    palDrag.target = null; palDrag.kanvas = kv;
+    palDrag.kanvasXY = bayanganKanvas(kv, p, uk0.w, uk0.h, { dx:uk0.w / 2, dy:14 }, namaBlok(palDrag.kind), null, palDrag);
+    return;
+  }
+  if (palDrag.kanvas){ palDrag.kanvas = null; palDrag.kanvasXY = null; sembunyiGaris(); }
   var t = sasaranJatuh(fd.elementFromPoint(p.x, p.y));
   if (!t){ E.insLine.hidden = true; sembunyiBayangan(); palDrag.target = null; return; }
+  palDrag.bungkus = perluBungkus(palDrag.kind, t);
   /* Lebar wadah tujuan menentukan berapa baris teksnya membungkus, jadi tinggi
      blok diukur ulang di dalam wadah itu sendiri — sekali per sasaran baru,
      bukan tiap gerakan kursor. Diukur di <body> saja hasilnya masih meleset
@@ -4731,15 +5408,16 @@ function palMove(p){
     var uk = ukurBlok(palDrag.kind, t);
     palDrag.tinggi = uk.tinggi; palDrag.lebar = uk.lebar;
   }
-  var j = arahJatuh(p, t, { kind: palDrag.kind }, palDrag, palDrag.lebar);
+  var j = arahJatuh(p, t, { kind: palDrag.kind, bungkus: palDrag.bungkus }, palDrag, palDrag.lebar);
   palDrag.target = t; palDrag.before = j.before;
   garisSisip(j.r, j.before, j.mendatar);
-  if (j.m) tampilBayanganUkur(t, j.m, namaBlok(palDrag.kind));
-  else tampilBayangan(t, j.before, j.mendatar, palDrag.tinggi || 80, palDrag.lebar || j.r.width, namaBlok(palDrag.kind));
+  var teksBayangan = palDrag.bungkus === 'bebas' ? 'Section bebas baru di sini' : namaBlok(palDrag.kind);
+  if (j.m) tampilBayanganUkur(t, j.m, teksBayangan);
+  else tampilBayangan(t, j.before, j.mendatar, palDrag.tinggi || 80, palDrag.lebar || j.r.width, teksBayangan);
 }
 function namaBlok(k){
   var n = { section:'Section', heading:'Judul', text:'Paragraf', button:'Tombol', image:'Gambar',
-            video:'Video', columns:'2 Kolom', columns3:'3 Kolom', divider:'Garis', spacer:'Jarak' };
+            video:'Video', columns:'2 Kolom', columns3:'3 Kolom', divider:'Garis', spacer:'Jarak', free:'Section Bebas' };
   return (n[k] || 'Elemen') + ' baru di sini';
 }
 function palEndOuter(e){ palMove(pt(e)); palEnd(false); }
@@ -4754,11 +5432,12 @@ function palEnd(cancel){
     fd.removeEventListener('mouseup', palEndInner, true);
   }
   d.btn.classList.remove('dragging');
-  E.shield.hidden = true; E.insLine.hidden = true; sembunyiBayangan(); selesaiSeret();
+  E.shield.hidden = true; E.insLine.hidden = true; sembunyiBayangan(); selesaiSeret(); sembunyiGaris();
   palJustDragged = true;
   setTimeout(function(){ palJustDragged = false; }, 80);
   if (cancel) toast('Dibatalkan.');
-  else if (d.target) insertBlock(d.kind, { el:d.target, before:d.before });
+  else if (d.kanvas && d.kanvasXY) insertBlock(d.kind, { kanvas:d.kanvas, x:d.kanvasXY.x, y:d.kanvasXY.y });
+  else if (d.target) insertBlock(d.kind, { el:d.target, before:d.before, bungkus:d.bungkus });
   else toast('Lepaskan di atas kanvas untuk menaruh elemen.', true);
 }
 
@@ -4823,9 +5502,23 @@ function cariMeluber(){
    wadahnya, dan kata yang terlalu panjang boleh dipatah. Hiasan yang melayang
    (position:absolute) tidak diubah bentuknya: kelebihannya dipotong di wadah
    teratasnya, cara yang sama dipakai halaman Serongga sendiri. */
+/* Elemen yang digeser bebas (translate) ikut bergeser di SEMUA ukuran layar,
+   termasuk HP, dan di sana geseran 80 px ke kanan berarti halaman melebar.
+   Perbaikannya satu aturan @media di akhir <body>: di layar ≤768px geseran
+   itu diabaikan dan elemennya kembali ke tempat aslinya di alur halaman.
+   Desktop tidak berubah. */
+var GESER_TANDA = '/* Sunting HTML: geser bebas hanya berlaku di layar lebar; di HP elemen kembali ke tempat aslinya. */';
+function pastikanAturanGeserHp(){
+  var ada = Array.prototype.filter.call(fd.body.querySelectorAll('style'), function(st){ return st.textContent.indexOf(GESER_TANDA) >= 0; })[0];
+  if (ada) return;
+  var st = fd.createElement('style');
+  st.textContent = GESER_TANDA + '\n@media (max-width:768px){[style*="translate"]{translate:none !important}}\n';
+  fd.body.appendChild(st);
+}
 function rapikanMeluber(el){
   if (!el || !fd.contains(el)) return;
   var win = fd.defaultView;
+  if (el.style && el.style.translate){ pastikanAturanGeserHp(); return; }
   if (win.getComputedStyle(el).position === 'absolute'){
     var atas = el;
     while (atas.parentElement && atas.parentElement !== fd.body) atas = atas.parentElement;
@@ -5027,7 +5720,8 @@ function runScan(quiet){
     issues.unshift({ el:luber.el[0], sev:'bad', title:'Di layar ini halaman bisa digeser ke samping',
       desc:'Ada ' + (luber.el.length > 1 ? luber.el.length + ' bagian' : 'bagian') + ' yang ' + luber.lebih +
         ' px lebih lebar dari layar ' + fd.documentElement.clientWidth + ' px, jadi pengunjung bisa menggeser halaman ke kiri-kanan. ' +
-        'Perbaikannya membuat bagian itu mengalah ke lebar layar; tampilan desktop tidak berubah.',
+        'Perbaikannya membuat bagian itu mengalah ke lebar layar; tampilan desktop tidak berubah.' +
+        (luber.el.some(function(e){ return !!(e.style && e.style.translate); }) ? ' Elemen yang digeser bebas dikembalikan ke tempat aslinya di layar HP.' : ''),
       code:luber.el.slice(0, 3).map(label).join(', '),
       fixLabel:'Paskan ke lebar layar',
       /* Memperbaiki satu lapis sering membuka lapis di bawahnya: kolom grid
@@ -5744,6 +6438,13 @@ function cleanClone(clone, liveRoot){
       for (k in orig){
         if (Object.prototype.hasOwnProperty.call(orig,k) && el.getAttribute(k) !== orig[k]) el.setAttribute(k, orig[k]);
       }
+    }
+    /* Chrome menulis `style=""` untuk elemen yang gayanya pernah diubah lalu
+       dikosongkan lagi (diseret lalu kembali ke tempat asal, misalnya). Itu
+       jejak tanpa isi di hasil unduhan, jadi dibuang — kecuali halaman aslinya
+       memang menulisnya begitu. */
+    if (el.hasAttribute('style') && !el.getAttribute('style').trim() && !(orig && Object.prototype.hasOwnProperty.call(orig, 'style'))){
+      el.removeAttribute('style');
     }
     // selalu dibuang, termasuk dari elemen yang disunting dan yang baru ditambah
     el.removeAttribute(P_ASAL);
