@@ -677,6 +677,29 @@ body.preview .device{border-radius:0;box-shadow:none;}
 .galeri-nama{font-size:11.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .galeri-meta{font-size:10.5px;color:var(--ink-3);font-family:var(--mono);}
 .galeri-item .btn{width:100%;justify-content:center;padding:4px 6px;font-size:12px;}
+.galeri-judul{grid-column:1/-1;margin:6px 0 -2px;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);}
+.galeri-judul:first-child{margin-top:0;}
+.galeri-cap.latar{top:auto;bottom:5px;background:var(--accent);}
+.galeri-aksi{display:flex;gap:4px;}
+.galeri-aksi .btn{flex:1 1 0;min-width:0;}
+.galeri-link{display:flex;gap:4px;}
+.galeri-link .inp{flex:1;min-width:0;padding:4px 6px;font-size:11.5px;}
+.galeri-link .btn{flex:0 0 auto;width:auto;padding:4px 8px;}
+.galeri-link[hidden]{display:none;}
+/* Kartu Gambar latar di tab Gaya */
+.bg-baris{display:flex;gap:10px;align-items:center;min-width:0;}
+.bg-thumb{
+  flex:0 0 auto;width:54px;height:42px;border-radius:var(--r-xs);border:1px solid var(--line);
+  background:var(--surface-3) center/cover no-repeat;
+}
+.bg-thumb.kosong{background-image:none;position:relative;}
+.bg-thumb.kosong::after{content:"";position:absolute;inset:11px 15px;border:1.5px dashed var(--ink-3);border-radius:3px;}
+.bg-info{display:flex;flex-direction:column;gap:1px;min-width:0;}
+.bg-info strong{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bg-info span{font-size:11.5px;color:var(--ink-2);line-height:1.4;}
+#cBg .btn span{min-width:0;}
+#bgOpsi{display:flex;flex-direction:column;gap:8px;}
+#bgOpsi[hidden]{display:none;}
 
 /* ---------- Panel properti ---------- */
 /* Kartunya ada di dalam #propsBody, jadi gap milik .tab-panel tidak sampai ke
@@ -960,6 +983,17 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
     <g id="i-star"><path d="M13.7276 3.44418L15.4874 6.99288C15.7274 7.48687 16.3673 7.9607 16.9073 8.05143L20.0969 8.58575C22.1367 8.92853 22.6167 10.4206 21.1468 11.8925L18.6671 14.3927C18.2471 14.8161 18.0172 15.6327 18.1471 16.2175L18.8571 19.3125C19.417 21.7623 18.1271 22.71 15.9774 21.4296L12.9877 19.6452C12.4478 19.3226 11.5579 19.3226 11.0079 19.6452L8.01827 21.4296C5.8785 22.71 4.57865 21.7522 5.13859 19.3125L5.84851 16.2175C5.97849 15.6327 5.74852 14.8161 5.32856 14.3927L2.84884 11.8925C1.389 10.4206 1.85895 8.92853 3.89872 8.58575L7.08837 8.05143C7.61831 7.9607 8.25824 7.48687 8.49821 6.99288L10.258 3.44418C11.2179 1.51861 12.7777 1.51861 13.7276 3.44418Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>
     <g id="i-eye"><path d="M2 8C2 8 6.47715 3 12 3C17.5228 3 22 8 22 8" stroke-width="1.5" stroke-linecap="round"/> <path d="M21.544 13.045C21.848 13.4713 22 13.6845 22 14C22 14.3155 21.848 14.5287 21.544 14.955C20.1779 16.8706 16.6892 21 12 21C7.31078 21 3.8221 16.8706 2.45604 14.955C2.15201 14.5287 2 14.3155 2 14C2 13.6845 2.15201 13.4713 2.45604 13.045C3.8221 11.1294 7.31078 7 12 7C16.6892 7 20.1779 11.1294 21.544 13.045Z" stroke-width="1.5"/> <path d="M15 14C15 12.3431 13.6569 11 12 11C10.3431 11 9 12.3431 9 14C9 15.6569 10.3431 17 12 17C13.6569 17 15 15.6569 15 14Z" stroke-width="1.5"/></g>
     <g id="i-drop"><path d="M13.435 7L7.15915 13.2759M7.15915 13.2759L4.82728 15.6077C3.92569 16.5093 3.47489 16.9601 3.23745 17.5334C3 18.1066 3 18.7441 3 20.0192V21H3.98082C5.25586 21 5.89338 21 6.46663 20.7626C7.03988 20.5251 7.49068 20.0743 8.39227 19.1727L14.2891 13.2759M7.15915 13.2759H14.2891M14.2891 13.2759L17 10.565" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> <path d="M19.2087 8.38869L20.82 10M19.2087 8.38869L20.0705 7.52682C20.363 7.23431 20.5093 7.08805 20.611 6.94529C21.1297 6.21676 21.1297 5.23953 20.611 4.511C20.5093 4.36824 20.363 4.22198 20.0705 3.92947C19.778 3.63697 19.6318 3.4907 19.489 3.38905C18.7605 2.87032 17.7832 2.87032 17.0547 3.38905C16.912 3.4907 16.7657 3.63695 16.4732 3.92947L15.6113 4.79133M19.2087 8.38869L15.6113 4.79133M14 3.18002L15.6113 4.79133" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-grab"><path d="M17.5 9.5V8.75C17.5 7.7835 18.2835 7 19.25 7C20.2165 7 21 7.7835 21 8.75V12.8C21 16.7765 17.7765 20 13.8 20H10.0588C6.16034 20 3 16.8397 3 12.9412V12C3 10.8954 3.89543 10 5 10C6.10457 10 7 10.8954 7 12V12.9412" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M17.5 9.5V6.75C17.5 5.7835 16.7165 5 15.75 5C14.7835 5 14 5.7835 14 6.75V8.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 8.5V5.75C14 4.7835 13.2165 4 12.25 4C11.2835 4 10.5 4.7835 10.5 5.75V8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.5 8V6.75C10.5 5.7835 9.7165 5 8.75 5C7.7835 5 7 5.7835 7 6.75V12" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-al-kiri"><path d="M8.00232 7.5C8.00232 6.65611 7.91895 5.68211 8.75232 5.20096C9.10039 5 9.5677 5 10.5023 5H11.5023C12.4369 5 12.9042 5 13.2523 5.20096C14.0857 5.68211 14.0023 6.65611 14.0023 7.5C14.0023 8.34389 14.0857 9.31789 13.2523 9.79904C12.9042 10 12.4369 10 11.5023 10H10.5023C9.5677 10 9.10039 10 8.75232 9.79904C7.91895 9.31789 8.00232 8.34389 8.00232 7.5Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.00232 16.5C8.00232 15.6561 7.91895 14.6821 8.75232 14.201C9.10039 14 9.5677 14 10.5023 14H17.5023C18.4369 14 18.9042 14 19.2523 14.201C20.0857 14.6821 20.0023 15.6561 20.0023 16.5C20.0023 17.3439 20.0857 18.3179 19.2523 18.799C18.9042 19 18.4369 19 17.5023 19H10.5023C9.5677 19 9.10039 19 8.75232 18.799C7.91895 18.3179 8.00232 17.3439 8.00232 16.5Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 2V22" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-al-th"><path d="M12 19L12 22" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 10L12 14" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 2L12 5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.00036 7.5C8.00036 6.65611 7.91699 5.68211 8.75036 5.20096C9.09844 5 9.56575 5 10.5004 5H13.5004C14.435 5 14.9023 5 15.2504 5.20096C16.0837 5.68211 16.0004 6.65611 16.0004 7.5C16.0004 8.34389 16.0837 9.31789 15.2504 9.79904C14.9023 10 14.435 10 13.5004 10H10.5004C9.56575 10 9.09844 10 8.75036 9.79904C7.91699 9.31789 8.00036 8.34389 8.00036 7.5Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.00036 16.5C4.00036 15.6561 3.91699 14.6821 4.75036 14.201C5.09844 14 5.56575 14 6.50036 14H17.5004C18.435 14 18.9023 14 19.2504 14.201C20.0837 14.6821 20.0004 15.6561 20.0004 16.5C20.0004 17.3439 20.0837 18.3179 19.2504 18.799C18.9023 19 18.435 19 17.5004 19H6.50036C5.56575 19 5.09844 19 4.75036 18.799C3.91699 18.3179 4.00036 17.3439 4.00036 16.5Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-al-kanan"><path d="M10.0004 7.5C10.0004 6.65611 9.91699 5.68211 10.7504 5.20096C11.0984 5 11.5657 5 12.5004 5H13.5004C14.435 5 14.9023 5 15.2504 5.20096C16.0837 5.68211 16.0004 6.65611 16.0004 7.5C16.0004 8.34389 16.0837 9.31789 15.2504 9.79904C14.9023 10 14.435 10 13.5004 10H12.5004C11.5657 10 11.0984 10 10.7504 9.79904C9.91699 9.31789 10.0004 8.34389 10.0004 7.5Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.00036 16.5C4.00036 15.6561 3.91699 14.6821 4.75036 14.201C5.09844 14 5.56575 14 6.50036 14H13.5004C14.435 14 14.9023 14 15.2504 14.201C16.0837 14.6821 16.0004 15.6561 16.0004 16.5C16.0004 17.3439 16.0837 18.3179 15.2504 18.799C14.9023 19 14.435 19 13.5004 19H6.50036C5.56575 19 5.09844 19 4.75036 18.799C3.91699 18.3179 4.00036 17.3439 4.00036 16.5Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 2V22" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-al-atas"><path d="M16.502 7.99988C17.3458 7.99988 18.3198 7.9165 18.801 8.74988C19.002 9.09795 19.002 9.56526 19.002 10.4999V11.4999C19.002 12.4345 19.002 12.9018 18.801 13.2499C18.3198 14.0832 17.3458 13.9999 16.502 13.9999C15.6581 13.9999 14.6841 14.0832 14.2029 13.2499C14.002 12.9018 14.002 12.4345 14.002 11.4999L14.002 10.4999C14.002 9.56526 14.002 9.09795 14.2029 8.74988C14.6841 7.9165 15.6581 7.99988 16.502 7.99988Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.50195 7.99988C8.34585 7.99988 9.31984 7.9165 9.80099 8.74988C10.002 9.09795 10.002 9.56526 10.002 10.4999L10.002 17.4999C10.002 18.4345 10.002 18.9018 9.80099 19.2499C9.31984 20.0832 8.34585 19.9999 7.50195 19.9999C6.65806 19.9999 5.68406 20.0832 5.20292 19.2499C5.00195 18.9018 5.00195 18.4345 5.00195 17.4999L5.00195 10.4999C5.00195 9.56526 5.00195 9.09795 5.20292 8.74988C5.68406 7.9165 6.65806 7.99988 7.50195 7.99988Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 4L2 4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-al-tv"><path d="M16.5 8.00232C17.3439 8.00232 18.3179 7.91895 18.799 8.75232C19 9.10039 19 9.5677 19 10.5023V13.5023C19 14.4369 19 14.9042 18.799 15.2523C18.3179 16.0857 17.3439 16.0023 16.5 16.0023C15.6561 16.0023 14.6821 16.0857 14.201 15.2523C14 14.9042 14 14.4369 14 13.5023L14 10.5023C14 9.5677 14 9.10039 14.201 8.75232C14.6821 7.91895 15.6561 8.00232 16.5 8.00232Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.5 4.00232C8.34389 4.00232 9.31789 3.91895 9.79904 4.75232C10 5.10039 10 5.5677 10 6.50232L10 17.5023C10 18.4369 10 18.9042 9.79904 19.2523C9.31789 20.0857 8.34389 20.0023 7.5 20.0023C6.65611 20.0023 5.68211 20.0857 5.20096 19.2523C5 18.9042 5 18.4369 5 17.5023L5 6.50232C5 5.5677 5 5.10039 5.20096 4.75232C5.68211 3.91895 6.65611 4.00232 7.5 4.00232Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12H2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 12L10 12" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 12L19 12" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-al-bawah"><path d="M16.502 10.0023C17.3458 10.0023 18.3198 9.91895 18.801 10.7523C19.002 11.1004 19.002 11.5677 19.002 12.5023V13.5023C19.002 14.4369 19.002 14.9042 18.801 15.2523C18.3198 16.0857 17.3458 16.0023 16.502 16.0023C15.6581 16.0023 14.6841 16.0857 14.2029 15.2523C14.002 14.9042 14.002 14.4369 14.002 13.5023L14.002 12.5023C14.002 11.5677 14.002 11.1004 14.2029 10.7523C14.6841 9.91895 15.6581 10.0023 16.502 10.0023Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.50195 4.00232C8.34585 4.00232 9.31984 3.91895 9.80099 4.75232C10.002 5.10039 10.002 5.5677 10.002 6.50232L10.002 13.5023C10.002 14.4369 10.002 14.9042 9.80099 15.2523C9.31984 16.0857 8.34585 16.0023 7.50195 16.0023C6.65806 16.0023 5.68406 16.0857 5.20292 15.2523C5.00195 14.9042 5.00195 14.4369 5.00195 13.5023L5.00195 6.50232C5.00195 5.5677 5.00195 5.10039 5.20292 4.75232C5.68406 3.91895 6.65806 4.00232 7.50195 4.00232Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 20L2 20" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-magnet"><path d="M16 12V11C16 10.0572 16 9.58579 16.2929 9.29289C16.5858 9 17.0572 9 18 9C18.9428 9 19.4142 9 19.7071 9.29289C20 9.58579 20 10.0572 20 11V12M16 12V14C16 16.2091 14.2091 18 12 18C9.79086 18 8 16.2091 8 14V12M16 12H20M20 12V14C20 18.4183 16.4183 22 12 22C7.58172 22 4 18.4183 4 14V12M8 12V11C8 10.0572 8 9.58579 7.70711 9.29289C7.41421 9 6.94281 9 6 9C5.05719 9 4.58579 9 4.29289 9.29289C4 9.58579 4 10.0572 4 11V12M8 12L4 12" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 2V6M20 4H16" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 4H4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-kanvas"><path d="M20.1088 20.1088C18.7175 21.5 16.4783 21.5 12 21.5C7.52166 21.5 5.28249 21.5 3.89124 20.1088C2.5 18.7175 2.5 16.4783 2.5 12C2.5 7.52166 2.5 5.28249 3.89124 3.89124C5.28248 2.5 7.52166 2.5 12 2.5C16.4783 2.5 18.7175 2.5 20.1088 3.89124C21.5 5.28249 21.5 7.52166 21.5 12C21.5 16.4783 21.5 18.7175 20.1088 20.1088Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 21.5L9 2.5" stroke-width="1.5"/><path d="M21.5 12L9 12" stroke-width="1.5"/></g>
+    <g id="i-depan"><path d="M16.5981 8.5C17 9.19615 17 10.1308 17 12C17 13.8692 17 14.8038 16.5981 15.5C16.3348 15.9561 15.9561 16.3348 15.5 16.5981C14.8038 17 13.8692 17 12 17C10.1308 17 9.19615 17 8.5 16.5981C8.04394 16.3348 7.66523 15.9561 7.40192 15.5C7 14.8038 7 13.8692 7 12C7 10.1308 7 9.19615 7.40192 8.5C7.66523 8.04394 8.04394 7.66523 8.5 7.40192C9.19615 7 10.1308 7 12 7C13.8692 7 14.8038 7 15.5 7.40192C15.9561 7.66523 16.3348 8.04394 16.5981 8.5Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 4.00359C7.9804 3.50152 7.92512 3.17171 7.76918 2.90161C7.61091 2.62749 7.38328 2.39985 7.10915 2.24159C6.69071 2 6.12893 2 5.00538 2C3.88183 2 3.32006 2 2.90161 2.24159C2.62749 2.39985 2.39985 2.62749 2.24159 2.90161C2 3.32006 2 3.88183 2 5.00538C2 6.12893 2 6.69071 2.24159 7.10915C2.39985 7.38328 2.62749 7.61091 2.90161 7.76918C3.17171 7.92512 3.50152 7.9804 4.00359 8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 19.9964C16.0196 20.4985 16.0749 20.8283 16.2308 21.0984C16.3891 21.3725 16.6167 21.6001 16.8908 21.7584C17.3093 22 17.8711 22 18.9946 22C20.1182 22 20.6799 22 21.0984 21.7584C21.3725 21.6001 21.6001 21.3725 21.7584 21.0984C22 20.6799 22 20.1182 22 18.9946C22 17.8711 22 17.3093 21.7584 16.8908C21.6001 16.6167 21.3725 16.3891 21.0984 16.2308C20.8283 16.0749 20.4985 16.0196 19.9964 16" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-belakang"><path d="M9.72752 3.36502C10 3.8998 10 4.59987 10 6C10 7.40013 10 8.1002 9.72752 8.63498C9.48783 9.10538 9.10538 9.48783 8.63498 9.72752C8.1002 10 7.40013 10 6 10C4.59987 10 3.8998 10 3.36502 9.72752C2.89462 9.48783 2.51217 9.10538 2.27248 8.63498C2 8.1002 2 7.40013 2 6C2 4.59987 2 3.8998 2.27248 3.36502C2.51217 2.89462 2.89462 2.51217 3.36502 2.27248C3.8998 2 4.59987 2 6 2C7.40013 2 8.1002 2 8.63498 2.27248C9.10538 2.51217 9.48783 2.89462 9.72752 3.36502Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M21.7275 15.365C22 15.8998 22 16.5999 22 18C22 19.4001 22 20.1002 21.7275 20.635C21.4878 21.1054 21.1054 21.4878 20.635 21.7275C20.1002 22 19.4001 22 18 22C16.5999 22 15.8998 22 15.365 21.7275C14.8946 21.4878 14.5122 21.1054 14.2725 20.635C14 20.1002 14 19.4001 14 18C14 16.5999 14 15.8998 14.2725 15.365C14.5122 14.8946 14.8946 14.5122 15.365 14.2725C15.8998 14 16.5999 14 18 14C19.4001 14 20.1002 14 20.635 14.2725C21.1054 14.5122 21.4878 14.8946 21.7275 15.365Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 6C14.9299 6 15.3949 6 15.7764 6.10222C16.8117 6.37962 17.6203 7.18827 17.8977 8.22354C18 8.60504 18 9.07003 18 10M5.99997 14C5.99997 14.93 5.99997 15.395 6.10219 15.7765C6.37959 16.8117 7.18824 17.6204 8.22351 17.8978C8.60501 18 9.07 18 9.99997 18" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>
   </defs>
 </svg>
 
@@ -1254,6 +1288,60 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
               </div>
             </div>
 
+            <!-- Gambar latar seperti di Elementor: foto di belakang isi kotak. Muncul
+                 untuk kotak apa pun, juga yang belum punya gambar latar. -->
+            <div class="card" id="cBg" data-grup="gaya" hidden>
+              <div class="card-h"><span class="card-t">Gambar latar</span></div>
+              <div class="bg-baris">
+                <span class="bg-thumb kosong" id="bgThumb"></span>
+                <div class="bg-info"><strong id="bgNama">Belum ada gambar latar</strong><span id="bgKet"></span></div>
+              </div>
+              <div class="grid2">
+                <button class="btn btn-plain btn-sm" id="bgPick" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-image"/></svg><span>Pilih dari komputer</span></button>
+                <button class="btn btn-plain btn-sm" id="bgLinkBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-chain"/></svg><span>Dari link</span></button>
+              </div>
+              <div class="row-2" id="bgLinkRow" hidden>
+                <input id="bgUrl" class="inp mono" type="text" placeholder="https://situs.com/foto.jpg" spellcheck="false">
+                <button class="btn btn-plain btn-sm" id="bgUrlApply" type="button">Pasang</button>
+              </div>
+              <div id="bgOpsi" hidden>
+                <div class="row">
+                  <label>Ukuran
+                    <select id="bgUkuran" class="inp">
+                      <option value="">Sesuai CSS</option>
+                      <option value="cover">Penuh (isi kotak)</option>
+                      <option value="contain">Utuh (muat semua)</option>
+                      <option value="auto">Ukuran asli</option>
+                    </select>
+                  </label>
+                  <label>Ulang
+                    <select id="bgUlang" class="inp">
+                      <option value="">Sesuai CSS</option>
+                      <option value="no-repeat">Tidak</option>
+                      <option value="repeat">Ya</option>
+                      <option value="repeat-x">Mendatar</option>
+                      <option value="repeat-y">Tegak</option>
+                    </select>
+                  </label>
+                </div>
+                <label class="lbl" for="bgPosisi">Posisi gambar</label>
+                <select id="bgPosisi" class="inp">
+                  <option value="">Sesuai CSS</option>
+                  <option value="center center">Tengah</option>
+                  <option value="center top">Atas</option>
+                  <option value="center bottom">Bawah</option>
+                  <option value="left center">Kiri</option>
+                  <option value="right center">Kanan</option>
+                  <option value="left top">Kiri atas</option>
+                  <option value="right top">Kanan atas</option>
+                  <option value="left bottom">Kiri bawah</option>
+                  <option value="right bottom">Kanan bawah</option>
+                </select>
+                <button class="btn btn-quiet btn-sm btn-full" id="bgHapus" type="button">Hapus gambar latar</button>
+              </div>
+              <p class="note" id="bgBagi" hidden></p>
+            </div>
+
             <div class="card" data-grup="lanjut">
               <div class="card-h"><span class="card-t">Tindakan</span></div>
               <div class="grid2">
@@ -1356,7 +1444,7 @@ textarea.inp{resize:vertical;line-height:1.5;font-family:var(--font);}
   <div class="ghost" id="ghost" hidden><span class="ghost-tag" id="ghostTag"></span></div>
   <!-- Muncul di pojok gambar yang disentuh kursor, termasuk gambar yang tertutup
        tombol play atau lapisan tembus pandang: sekali klik, langsung pilih berkas. -->
-  <button class="img-ganti" id="imgGanti" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-image"/></svg>Ganti gambar</button>
+  <button class="img-ganti" id="imgGanti" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-image"/></svg><span id="imgGantiTeks">Ganti gambar</span></button>
   <div class="qbar" id="qbar" hidden>
     <button class="qb" data-act="parent" type="button" title="Pilih elemen induk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-up"/></svg></button>
     <button class="qb" id="qbMove" type="button" title="Seret untuk memindahkan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-move"/></svg></button>
@@ -1489,7 +1577,7 @@ var E = {};
  'draftBar','draftTitle','draftWhen','draftOpen','draftDrop','cTheme','themeList','lockBtn','lockLabel',
  'ghost','ghostTag','textScriptNote','partColorBtn','cCountdown','cdList','memuat',
  'stepBar','step1','step2','step3','tour','tourT','tourD','tourDots','tourSkip','tourNext','seretChip',
- 'paneBack','paneTitle','paneSub','subTabs','isiKosong','isiKosongTeks','isiKetikBtn','tabAturWrap','aturHalamanJudul','imgGanti','tabGambar','galeri'
+ 'paneBack','paneTitle','paneSub','subTabs','isiKosong','isiKosongTeks','isiKetikBtn','tabAturWrap','aturHalamanJudul','imgGanti','imgGantiTeks','tabGambar','galeri','cBg','bgThumb','bgNama','bgKet','bgPick','bgLinkBtn','bgLinkRow','bgUrl','bgUrlApply','bgOpsi','bgUkuran','bgUlang','bgPosisi','bgHapus','bgBagi'
 ].forEach(function(id){ E[id] = $(id); });
 
 /* ---------------- keadaan ---------------- */
@@ -2384,8 +2472,8 @@ function onMove(e){
   if (drag || resize || previewOn){ E.imgGanti.hidden = true; return; }
   var t = komponen(e.target);
   setHover(!t || t===sel ? null : t);
-  var im = cariGambarDiTitik(e.clientX, e.clientY);
-  if (im) tampilTombolGambar(im); else if (gambarDiKursor) sembunyikanTombolGambarNanti();
+  var hit = cariGambarDiTitik(e.clientX, e.clientY);
+  if (hit) tampilTombolGambar(hit); else if (gambarDiKursor) sembunyikanTombolGambarNanti();
 }
 function onClick(e){
   /* Saat pratinjau, halaman dibiarkan bekerja sendiri. Yang ditahan hanya link
@@ -2676,6 +2764,7 @@ function fillProps(){
   E.pMar.value = sel.style.margin || ''; E.pMar.placeholder = css(sel,'margin');
   setSwatch(E.pColorChip, E.pColorVal, hex(css(sel,'color')) || '#000000');
   setSwatch(E.pBgChip, E.pBgVal, hex(css(sel,'backgroundColor')) || '#ffffff');
+  isiKartuLatar();
   aturSubtab(false);
 }
 
@@ -2809,6 +2898,20 @@ E.fileInput.addEventListener('change', function(){
   if (!f || !imgTarget) return;
   var t = imgTarget, m = imgMode;
   siapkanGambar(f, function(url, sebelum, sesudah){
+    if (m === 'latarElemen' || m === 'latarSemua' || m === 'latarEntri'){
+      snap();
+      var gagal = 0;
+      if (m === 'latarElemen'){
+        ubahLatarElemen(t.el, url);
+        if (t.pseudo) gagal = 0;
+      } else {
+        var e = m === 'latarEntri' ? t.entri : entriLatar(t.url, t.el);
+        gagal = e ? terapkanLatar(e, url) : 1;
+      }
+      select(t.el); buildLayers();
+      toast(gagal ? 'Sebagian gambar latar tidak bisa diganti — stylesheet-nya milik situs lain.' : kabarGambar(sebelum, sesudah), !!gagal);
+      return;
+    }
     snap(); select(putImage(t, url, m)); buildLayers();
     toast(kabarGambar(sebelum, sesudah));
   });
@@ -2840,6 +2943,469 @@ function putImage(target, url, mode){
   else target.insertAdjacentElement('afterend', img);
   return img;
 }
+
+/* ---------------- gambar latar (CSS) ----------------
+   Dulu tab Gambar hanya mengenal <img>. Halaman buatan AI sering memasang
+   fotonya sebagai latar CSS — `background-image` di kelas, di atribut style, di
+   ::before, lewat var(--foto), lapis di bawah gradien gelap — dan semuanya
+   tidak terlihat, jadi tidak bisa diganti. Di halaman uji ada 10 elemen
+   seperti itu, tab Gambar menampilkan 1 kartu.
+
+   Cara mengganti disesuaikan dengan di mana gambarnya ditulis:
+   - di atribut style elemen  -> teks atribut itu diubah langsung;
+   - di aturan stylesheet     -> aturan penimpa ditaruh di satu blok <style>
+     di AKHIR <body>, dengan penyeleksi dan @media yang sama persis dengan
+     aturan aslinya. Blok ini sengaja di <body>, bukan <head>: undo, draf
+     tersimpan, dan pemulihan semuanya hanya menyalin isi <body>, jadi
+     perubahan di <head> akan hilang diam-diam saat Ctrl+Z. CSS aslinya tidak
+     disentuh sama sekali;
+   - stylesheet dari situs lain (tidak bisa dibaca) -> cadangan: gaya langsung
+     pada elemennya, kecuali gambarnya ada di ::before/::after (tidak
+     mungkin; dikatakan terus terang). */
+var LATAR_TANDA = '/* Sunting HTML: gambar latar yang diganti. Aturan ini menimpa aturan CSS asli. */';
+/* Tiga bentuk url(): "…", '…', dan tanpa tanda kutip. Pola "buka-gulung"
+   ([^"\\]*(?:\\.[^"\\]*)*) dipakai supaya gambar base64 sepanjang megabita
+   tidak membuat mesin regex kehabisan tumpukan. */
+var RE_URL = /url\(\s*(?:"([^"\\]*(?:\\[\s\S][^"\\]*)*)"|'([^'\\]*(?:\\[\s\S][^'\\]*)*)'|([^'")\s][^)]*?))\s*\)/g;
+var TAG_ABAIKAN = { SCRIPT:1, STYLE:1, LINK:1, META:1, HEAD:1, TITLE:1, NOSCRIPT:1, TEMPLATE:1, BR:1 };
+
+function bukaCss(s){
+  return String(s).replace(/\\([0-9a-fA-F]{1,6}\s?|[\s\S])/g, function(m, k){
+    if (/^[0-9a-fA-F]/.test(k)){ try { return String.fromCodePoint(parseInt(k, 16)); } catch(err){ return k; } }
+    return k;
+  });
+}
+function urlMutlak(u, basis){
+  if (!u) return '';
+  if (/^data:/i.test(u)) return u;
+  try { return new URL(u, basis || (fd && fd.baseURI) || location.href).href; } catch(err){ return u; }
+}
+function cssUrl(u){
+  return 'url("' + String(u).replace(/[\\"]/g, '\\$&').replace(/\n/g, '\\a ') + '")';
+}
+function daftarUrl(teks, basis){
+  var hasil = [], m;
+  RE_URL.lastIndex = 0;
+  while ((m = RE_URL.exec(teks || ''))){
+    var mentah = m[1] !== undefined ? m[1] : (m[2] !== undefined ? m[2] : m[3]);
+    hasil.push({ token:m[0], url:urlMutlak(bukaCss(mentah), basis) });
+  }
+  return hasil;
+}
+/* Ganti setiap url() yang menunjuk ke urlLama. urlBaru kosong = hapus gambar.
+   Mengembalikan null kalau tidak ada yang cocok. */
+function gantiUrlDi(teks, urlLama, urlBaru, basis){
+  var ada = false;
+  var keluar = String(teks).replace(RE_URL, function(token, a, b, c){
+    var mentah = a !== undefined ? a : (b !== undefined ? b : c);
+    if (urlMutlak(bukaCss(mentah), basis) !== urlLama) return token;
+    ada = true;
+    return urlBaru ? cssUrl(urlBaru) : 'none';
+  });
+  if (!ada) return null;
+  // image-set(none 1x) tidak sah dan membuat seluruh aturan diabaikan
+  if (!urlBaru && /image-set\(/i.test(keluar)){
+    keluar = keluar.replace(/(?:-webkit-)?image-set\((?:[^()]|\([^()]*\))*\)/gi, function(f){ return /none/.test(f) ? 'none' : f; });
+  }
+  return keluar;
+}
+function bgUrls(cs){
+  var bi = cs && cs.backgroundImage;
+  return (bi && bi !== 'none' && bi.indexOf('url(') >= 0) ? daftarUrl(bi) : [];
+}
+function inlineMemuat(el, url){
+  var s = el && el.getAttribute && el.getAttribute('style');
+  return !!s && s.indexOf('url') >= 0 && daftarUrl(s, fd.baseURI).some(function(x){ return x.url === url; });
+}
+function gayaPseudo(el, ps){
+  var cs = fd.defaultView.getComputedStyle(el, ps || null);
+  if (ps && (cs.content === 'none' || cs.content === 'normal' || cs.display === 'none')) return null;
+  return cs;
+}
+
+/* Semua gambar latar di halaman, dikelompokkan menurut cara penggantiannya:
+   yang di atribut style per elemen; yang di stylesheet per alamat gambar
+   (satu aturan bisa dipakai banyak elemen, dan menggantinya berarti mengganti
+   semuanya). Juga poster <video> dan <image> di dalam SVG. */
+function pindaiLatar(){
+  var kelompok = {}, urut = [];
+  var semua = [fd.documentElement, fd.body].concat(Array.prototype.slice.call(fd.body.querySelectorAll('*')));
+  function tambah(kunci, awal, host){
+    var e = kelompok[kunci];
+    if (!e){ e = kelompok[kunci] = awal; e.hosts = []; urut.push(e); }
+    if (!e.hosts.some(function(h){ return h.el === host.el && h.pseudo === host.pseudo; })) e.hosts.push(host);
+    if (host.pseudo) e.pseudo = true;
+  }
+  semua.forEach(function(el, idx){
+    if (TAG_ABAIKAN[el.tagName]) return;
+    if (el.ownerSVGElement){ return; }
+    ['', '::before', '::after'].forEach(function(ps){
+      if (ps && (el === fd.documentElement)) return;
+      var cs = gayaPseudo(el, ps); if (!cs) return;
+      bgUrls(cs).forEach(function(u){
+        var inl = !ps && inlineMemuat(el, u.url);
+        tambah(inl ? ('i' + idx + '|' + u.url) : ('r|' + u.url), { jenis:'css', url:u.url, inline:inl, pseudo:false }, { el:el, pseudo:ps });
+      });
+    });
+    if (el.tagName === 'VIDEO' && el.getAttribute('poster')){
+      var pu = urlMutlak(el.getAttribute('poster'), fd.baseURI);
+      tambah('p' + idx, { jenis:'atribut', atribut:'poster', url:pu, inline:true, pseudo:false }, { el:el, pseudo:'' });
+    }
+  });
+  Array.prototype.forEach.call(fd.body.querySelectorAll('svg image'), function(im, i){
+    var a = im.getAttribute('href') !== null ? 'href' : (im.getAttribute('xlink:href') !== null ? 'xlink:href' : '');
+    if (!a) return;
+    var su = urlMutlak(im.getAttribute(a), fd.baseURI);
+    tambah('s' + i, { jenis:'atribut', atribut:a, url:su, inline:true, pseudo:false }, { el:im, pseudo:'' });
+  });
+  return urut;
+}
+
+/* ---- aturan stylesheet ---- */
+function blokLatar(buat){
+  var ada = Array.prototype.filter.call(fd.body.querySelectorAll('style'), function(s){ return s.textContent.indexOf(LATAR_TANDA) === 0; })[0];
+  if (ada || !buat) return ada || null;
+  var s = fd.createElement('style');
+  s.textContent = LATAR_TANDA + '\n';
+  fd.body.appendChild(s);
+  return s;
+}
+function syaratAturan(r){
+  var n = r.constructor && r.constructor.name;
+  if (n === 'CSSMediaRule') return '@media ' + r.conditionText;
+  if (n === 'CSSSupportsRule') return '@supports ' + r.conditionText;
+  if (n === 'CSSContainerRule') return '@container ' + r.conditionText;
+  return '';
+}
+function cariDeklarasi(urlTarget){
+  var temu = [], tidakTerbaca = 0, blok = blokLatar(false);
+  function jelajah(aturan, rantai, basis, milikKita){
+    for (var i = 0; i < aturan.length; i++){
+      var r = aturan[i];
+      if (r.type === 1){
+        var st = r.style;
+        for (var k = 0; k < st.length; k++){
+          var nm = st[k];
+          // hanya properti yang membawa gambar latar: background-image dan variabel --*
+          if (nm !== 'background-image' && nm.indexOf('--') !== 0) continue;
+          var val = st.getPropertyValue(nm);
+          if (val.indexOf('url(') < 0) continue;
+          if (daftarUrl(val, basis).some(function(x){ return x.url === urlTarget; }))
+            temu.push({ rule:r, rantai:rantai, prop:nm, nilai:val, basis:basis, milikKita:milikKita });
+        }
+      } else if (r.type === 3){
+        try { if (r.styleSheet) jelajah(r.styleSheet.cssRules, rantai, r.styleSheet.href || basis, false); }
+        catch(err){ tidakTerbaca++; }
+      } else if (r.cssRules){
+        var sy = syaratAturan(r);
+        jelajah(r.cssRules, sy ? rantai.concat([sy]) : rantai, basis, milikKita);
+      }
+    }
+  }
+  var lembar = fd.styleSheets;
+  for (var i = 0; i < lembar.length; i++){
+    var ss = lembar[i], rules;
+    try { rules = ss.cssRules; } catch(err){ tidakTerbaca++; continue; }
+    if (!rules) continue;
+    jelajah(rules, [], ss.href || fd.baseURI, !!(blok && ss.ownerNode === blok));
+  }
+  return { temu:temu, tidakTerbaca:tidakTerbaca };
+}
+/* Blok penimpa disimpan sebagai MODEL: satu catatan per (syarat @media,
+   penyeleksi, properti). Dulu tiap penggantian membuat aturan baru dari teks
+   aslinya. Gambar `.set{image-set(a 1x, b 2x)}` yang diganti dua kali jadi
+   dua aturan yang saling menimpa, dan aturan terakhir — yang dibuat dari
+   teks asli — membangkitkan lagi gambar yang sudah diganti. Sekarang catatan
+   yang sudah ada diubah di tempat, dan nilai efektifnya (bukan teks asli)
+   yang menjadi dasar. */
+function bacaModelBlok(){
+  var blok = blokLatar(false), model = [];
+  if (!blok || !blok.sheet) return model;
+  (function jelajah(aturan, rantai){
+    for (var i = 0; i < aturan.length; i++){
+      var r = aturan[i];
+      if (r.type === 1){
+        for (var k = 0; k < r.style.length; k++){
+          var nm = r.style[k];
+          model.push({ rantai:rantai, sel:r.selectorText, prop:nm, nilai:r.style.getPropertyValue(nm) });
+        }
+      } else if (r.cssRules){
+        var sy = syaratAturan(r);
+        jelajah(r.cssRules, sy ? rantai.concat([sy]) : rantai);
+      }
+    }
+  })(blok.sheet.cssRules, []);
+  return model;
+}
+function kunciModel(m){ return m.rantai.join('|') + '#' + m.sel + '#' + m.prop; }
+function tulisModel(model){
+  var teks = LATAR_TANDA + '\n' + model.map(function(m){
+    return m.rantai.map(function(x){ return x + '{'; }).join('') +
+      m.sel + '{' + m.prop + ':' + m.nilai + ' !important}' +
+      m.rantai.map(function(){ return '}'; }).join('');
+  }).join('\n') + (model.length ? '\n' : '');
+  blokLatar(true).textContent = teks;
+}
+/* Blok penimpa berada di dokumen, bukan di stylesheet aslinya, jadi alamat
+   relatif harus dijadikan mutlak lebih dulu supaya tetap menunjuk ke berkas
+   yang sama. */
+function mutlakkanNilai(nilai, basis){
+  return String(nilai).replace(RE_URL, function(token, a, b, c){
+    var mentah = a !== undefined ? a : (b !== undefined ? b : c);
+    return cssUrl(urlMutlak(bukaCss(mentah), basis));
+  });
+}
+/* Menimpa setiap deklarasi yang memuat urlLama. Mengembalikan jumlah
+   catatan yang dibuat atau diubah. */
+function timpaAturan(urlLama, urlBaru){
+  var h = cariDeklarasi(urlLama), model = bacaModelBlok(), n = 0;
+  function cari(t){
+    var k = kunciModel({ rantai:t.rantai, sel:t.rule.selectorText, prop:t.prop });
+    for (var i = 0; i < model.length; i++) if (kunciModel(model[i]) === k) return model[i];
+    return null;
+  }
+  h.temu.forEach(function(t){
+    var ada = cari(t);
+    if (t.milikKita){
+      if (ada){
+        var nv0 = gantiUrlDi(ada.nilai, urlLama, urlBaru, fd.baseURI);
+        if (nv0 !== null){ ada.nilai = nv0; n++; }
+      }
+      return;
+    }
+    var dasar = ada ? ada.nilai : mutlakkanNilai(t.nilai, t.basis);
+    var nv = gantiUrlDi(dasar, urlLama, urlBaru, ada ? fd.baseURI : t.basis);
+    if (nv === null) return;       // nilai efektifnya sudah tidak memakai gambar ini
+    if (ada) ada.nilai = nv;
+    else model.push({ rantai:t.rantai, sel:t.rule.selectorText, prop:t.prop, nilai:nv });
+    n++;
+  });
+  if (n) tulisModel(model);
+  return n;
+}
+
+/* ---- mengganti ---- */
+function masihMemuat(h, url){
+  return bgUrls(gayaPseudo(h.el, h.pseudo) || null).some(function(x){ return x.url === url; });
+}
+function gantiInlineLatar(el, urlLama, urlBaru){
+  var n = gantiUrlDi(el.getAttribute('style') || '', urlLama, urlBaru, fd.baseURI);
+  if (n === null) return false;
+  markEdited(el);
+  el.setAttribute('style', n);
+  return true;
+}
+/* Gaya langsung pada elemen berisi daftar lapisan yang sama seperti yang
+   sedang tampil, dengan satu gambar diganti. `kuat` = !important, untuk
+   aturan stylesheet yang sendirinya !important. */
+function gantiElemenCss(el, urlLama, urlBaru){
+  var nilai = gantiUrlDi(fd.defaultView.getComputedStyle(el).backgroundImage, urlLama, urlBaru, fd.baseURI);
+  if (nilai === null) return false;
+  markEdited(el);
+  el.style.setProperty('background-image', nilai);
+  if (masihMemuat({ el:el, pseudo:'' }, urlLama)) el.style.setProperty('background-image', nilai, 'important');
+  return !masihMemuat({ el:el, pseudo:'' }, urlLama);
+}
+function terapkanAtribut(entri, urlBaru){
+  entri.hosts.forEach(function(h){
+    markEdited(h.el);
+    if (urlBaru) h.el.setAttribute(entri.atribut, urlBaru); else h.el.removeAttribute(entri.atribut);
+  });
+  return 0;
+}
+/* Ganti satu gambar di SEMUA tempat yang memakainya. Mengembalikan berapa
+   tempat yang gagal diganti (0 = semua berhasil). */
+function terapkanLatar(entri, urlBaru){
+  if (entri.jenis === 'atribut') return terapkanAtribut(entri, urlBaru);
+  var gagal = 0;
+  if (entri.inline){
+    entri.hosts.forEach(function(h){ gantiInlineLatar(h.el, entri.url, urlBaru); });
+  } else {
+    timpaAturan(entri.url, urlBaru);
+  }
+  entri.hosts.forEach(function(h){
+    if (!masihMemuat(h, entri.url)) return;
+    if (!h.pseudo && gantiElemenCss(h.el, entri.url, urlBaru)) return;
+    gagal++;
+  });
+  return gagal;
+}
+function entriLatar(url, el){
+  var semua = pindaiLatar();
+  for (var i = 0; i < semua.length; i++){
+    var e = semua[i];
+    if (e.url === url && e.hosts.some(function(h){ return h.el === el; })) return e;
+  }
+  for (var j = 0; j < semua.length; j++) if (semua[j].url === url) return semua[j];
+  return null;
+}
+/* Gambar latar yang sedang tampil pada elemen ini sendiri (bukan ::before). */
+function latarUtama(el){
+  var u = bgUrls(fd.defaultView.getComputedStyle(el));
+  return u.length ? u[0].url : null;
+}
+function latarPseudo(el){
+  var ps = ['::before', '::after'];
+  for (var i = 0; i < ps.length; i++){
+    var cs = gayaPseudo(el, ps[i]);
+    var u = cs ? bgUrls(cs) : [];
+    if (u.length) return { el:el, pseudo:ps[i], url:u[0].url };
+  }
+  return null;
+}
+/* Ganti/tambah/hapus gambar latar pada SATU elemen saja. Gambar yang dipakai
+   bersama lewat satu kelas tidak ikut berubah di elemen lain. */
+function ubahLatarElemen(el, urlBaru){
+  var lama = latarUtama(el);
+  if (!lama){
+    if (!urlBaru) return true;
+    markEdited(el);
+    el.style.setProperty('background-image', cssUrl(urlBaru));
+    var cs = fd.defaultView.getComputedStyle(el);
+    // supaya gambar yang baru ditambahkan langsung terlihat wajar, bukan terpotong di pojok
+    if (cs.backgroundSize === 'auto') el.style.setProperty('background-size', 'cover');
+    if (cs.backgroundRepeat === 'repeat') el.style.setProperty('background-repeat', 'no-repeat');
+    if (cs.backgroundPositionX === '0%' && cs.backgroundPositionY === '0%') el.style.setProperty('background-position', 'center');
+    return true;
+  }
+  if (inlineMemuat(el, lama)){
+    gantiInlineLatar(el, lama, urlBaru);
+    if (!masihMemuat({ el:el, pseudo:'' }, lama)) return true;
+  }
+  return gantiElemenCss(el, lama, urlBaru);
+}
+
+/* ---- kartu "Gambar latar" di tab Gaya ---- */
+/* Latar sering berlapis: gradien gelap di atas foto. Ukuran, posisi, dan
+   ulangannya masing-masing berupa daftar sejajar dengan lapisannya, jadi yang
+   dibaca dan ditulis hanya lapisan fotonya — gradien di atasnya dibiarkan. */
+function pisahDaftar(teks){
+  var hasil = [], dalam = 0, awal = 0, kutip = '';
+  for (var i = 0; i < teks.length; i++){
+    var ch = teks.charAt(i);
+    if (kutip){ if (ch === '\\') i++; else if (ch === kutip) kutip = ''; continue; }
+    if (ch === '"' || ch === "'") kutip = ch;
+    else if (ch === '(') dalam++;
+    else if (ch === ')') dalam--;
+    else if (ch === ',' && dalam === 0){ hasil.push(teks.slice(awal, i).trim()); awal = i + 1; }
+  }
+  hasil.push(teks.slice(awal).trim());
+  return hasil;
+}
+function lapisanFoto(cs){
+  var l = pisahDaftar(cs.backgroundImage);
+  for (var i = 0; i < l.length; i++) if (l[i].indexOf('url(') >= 0) return { i:i, n:l.length };
+  return { i:0, n:l.length };
+}
+function nilaiLapisan(cs, prop, idx){
+  var arr = pisahDaftar(cs[prop] || '');
+  return arr[idx % arr.length] || '';
+}
+var POSISI_BG = {
+  'center center':'50% 50%', 'center top':'50% 0%', 'center bottom':'50% 100%',
+  'left center':'0% 50%', 'right center':'100% 50%',
+  'left top':'0% 0%', 'right top':'100% 0%', 'left bottom':'0% 100%', 'right bottom':'100% 100%'
+};
+function isiKartuLatar(){
+  if (!sel) return;
+  var media = !!MEDIA[sel.tagName] || sel.tagName === 'VIDEO';
+  E.cBg.hidden = media;
+  if (media) return;
+  var cs = fd.defaultView.getComputedStyle(sel);
+  var url = latarUtama(sel), ps = url ? null : latarPseudo(sel);
+  E.bgThumb.style.backgroundImage = url ? cssUrl(url) : (ps ? cssUrl(ps.url) : '');
+  E.bgThumb.classList.toggle('kosong', !url && !ps);
+  E.bgNama.textContent = url ? (namaBerkas(url) || 'gambar') : (ps ? namaBerkas(ps.url) : 'Belum ada gambar latar');
+  E.bgKet.textContent = url
+    ? (inlineMemuat(sel, url) ? 'ditulis di elemen ini' : 'dari CSS halaman')
+    : (ps ? 'ada di lapisan ' + ps.pseudo + ' — ganti lewat tab Gambar' : 'Kotak ini polos. Pasang foto di belakang isinya.');
+  E.bgPick.lastChild.textContent = url ? 'Ganti dari komputer' : 'Pilih dari komputer';
+  E.bgOpsi.hidden = !url;
+  E.bgPick.disabled = E.bgLinkBtn.disabled = !!ps;
+  E.bgLinkRow.hidden = true;
+  if (url){
+    var L = lapisanFoto(cs);
+    var u = nilaiLapisan(cs, 'backgroundSize', L.i), posX = nilaiLapisan(cs, 'backgroundPosition', L.i), ul = nilaiLapisan(cs, 'backgroundRepeat', L.i);
+    E.bgUkuran.value = (u === 'cover' || u === 'contain' || u === 'auto') ? u : '';
+    var pos = '';
+    for (var k in POSISI_BG) if (POSISI_BG[k] === posX) pos = k;
+    E.bgPosisi.value = pos;
+    E.bgUlang.value = (ul === 'no-repeat' || ul === 'repeat' || ul === 'repeat-x' || ul === 'repeat-y') ? ul : '';
+  }
+  E.bgBagi.hidden = true;
+  if (url && !inlineMemuat(sel, url)){
+    // berapa elemen lain yang memakai gambar ini lewat CSS yang sama? dihitung setelah panel tergambar
+    var pilihan = sel;
+    setTimeout(function(){
+      if (sel !== pilihan || !fd) return;
+      var e = entriLatar(url, pilihan);
+      if (e && e.hosts.length > 1){
+        E.bgBagi.hidden = false;
+        E.bgBagi.textContent = 'Gambar ini juga dipakai di ' + (e.hosts.length - 1) + ' tempat lain. Perubahan di sini hanya untuk kotak ini; untuk mengganti semuanya, pakai tab Gambar.';
+      }
+    }, 0);
+  }
+}
+function pasangLatarDariBerkas(f){
+  var t = sel; if (!t) return;
+  siapkanGambar(f, function(url, sebelum, sesudah){
+    snap(); ubahLatarElemen(t, url);
+    select(t); buildLayers();
+    toast(kabarGambar(sebelum, sesudah));
+  });
+}
+function pasangLatarDariLink(url){
+  url = (url || '').trim();
+  if (!url){ toast('Tempel dulu alamat gambarnya.', true); return false; }
+  if (!/^(https?:)?\/\//i.test(url) && !/^data:image\//i.test(url)){
+    toast('Alamatnya harus diawali https:// supaya bisa dimuat.', true); return false;
+  }
+  return url;
+}
+E.bgPick.addEventListener('click', function(){
+  if (!sel) return;
+  imgTarget = { el:sel, pseudo:'' }; imgMode = 'latarElemen';
+  E.fileInput.value = ''; E.fileInput.click();
+});
+E.bgLinkBtn.addEventListener('click', function(){
+  E.bgLinkRow.hidden = !E.bgLinkRow.hidden;
+  if (!E.bgLinkRow.hidden) E.bgUrl.focus();
+});
+function terapkanBgLink(){
+  var url = pasangLatarDariLink(E.bgUrl.value); if (!url || !sel) return;
+  var t = sel;
+  snap(); ubahLatarElemen(t, url);
+  E.bgUrl.value = ''; E.bgLinkRow.hidden = true;
+  select(t); buildLayers();
+  toast('Gambar latar dipasang dari alamat.');
+}
+E.bgUrlApply.addEventListener('click', terapkanBgLink);
+E.bgUrl.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); terapkanBgLink(); } });
+E.bgHapus.addEventListener('click', function(){
+  if (!sel) return;
+  var t = sel; snap(); ubahLatarElemen(t, '');
+  select(t); buildLayers(); toast('Gambar latar dihapus.');
+});
+[['bgUkuran', 'background-size'], ['bgPosisi', 'background-position'], ['bgUlang', 'background-repeat']].forEach(function(p){
+  E[p[0]].addEventListener('change', function(){
+    if (!sel || !E[p[0]].value) return;
+    snap(); markEdited(sel);
+    var v = E[p[0]].value;
+    var camel = p[1].replace(/-([a-z])/g, function(m, c){ return c.toUpperCase(); });
+    var cs0 = fd.defaultView.getComputedStyle(sel), L = lapisanFoto(cs0), nilai = v;
+    if (L.n > 1){
+      var lama = pisahDaftar(cs0[camel] || ''), baru = [];
+      for (var j = 0; j < L.n; j++) baru.push(j === L.i ? v : (lama[j % lama.length] || v));
+      nilai = baru.join(', ');
+    }
+    sel.style.setProperty(p[1], nilai);
+    var cs = fd.defaultView.getComputedStyle(sel);
+    // aturan CSS asli yang !important tidak bisa dikalahkan gaya biasa
+    var jadi = nilaiLapisan(cs, camel, L.i), harap = p[1] === 'background-position' ? POSISI_BG[v] : v;
+    if (jadi !== harap) sel.style.setProperty(p[1], nilai, 'important');
+    redraw();
+  });
+});
 
 /* tulisan / ukuran / warna */
 E.pFont.addEventListener('change', function(){
@@ -3616,21 +4182,33 @@ function aturJudulHalaman(){
    lapisan tembus pandang. Klik selalu mengenai yang paling atas. Tombol ini
    mencari gambar di SELURUH tumpukan di bawah kursor (elementsFromPoint),
    jadi gambar yang tertutup pun tetap bisa diganti — tanpa memilih dulu. */
-var gambarDiKursor = null, gambarSembunyiT = null, tombolGambarDisentuh = false;
+var gambarDiKursor = null, latarDiKursor = null, gambarSembunyiT = null, tombolGambarDisentuh = false;
+/* Yang dicari: <img> pertama di tumpukan, atau — kalau tidak ada — elemen
+   pertama yang punya gambar latar (di dirinya atau di ::before/::after). Yang
+   kecil (< 64×40) dilewati; tombolnya akan menutupi seluruh gambar. */
 function cariGambarDiTitik(x, y){
   if (!fd || !fd.elementsFromPoint) return null;
   var tumpuk = fd.elementsFromPoint(x, y);
   for (var i = 0; i < tumpuk.length; i++){
-    if (tumpuk[i].tagName !== 'IMG') continue;
-    var r = tumpuk[i].getBoundingClientRect();
-    // ikon dan logo kecil tidak diberi tombol; tombolnya akan menutupi seluruh gambar
-    return (r.width >= 64 && r.height >= 40) ? tumpuk[i] : null;
+    var el = tumpuk[i];
+    if (el.tagName === 'IMG'){
+      var r = el.getBoundingClientRect();
+      return (r.width >= 64 && r.height >= 40) ? { img:el } : null;
+    }
+    if (TAG_ABAIKAN[el.tagName] || el.ownerSVGElement || el === fd.documentElement) continue;
+    var r2 = el.getBoundingClientRect();
+    if (r2.width < 64 || r2.height < 40) continue;
+    var u = latarUtama(el);
+    var host = u ? { el:el, pseudo:'', url:u } : latarPseudo(el);
+    if (host) return { latar:host };
   }
   return null;
 }
-function tampilTombolGambar(im){
+function tampilTombolGambar(hit){
   clearTimeout(gambarSembunyiT);
-  gambarDiKursor = im;
+  latarDiKursor = hit.latar || null;
+  gambarDiKursor = hit.img || hit.latar.el;
+  E.imgGantiTeks.textContent = hit.latar ? 'Ganti gambar latar' : 'Ganti gambar';
   E.imgGanti.hidden = false;
   letakTombolGambar();
 }
@@ -3646,12 +4224,20 @@ function sembunyikanTombolGambarNanti(){
   clearTimeout(gambarSembunyiT);
   gambarSembunyiT = setTimeout(function(){
     if (tombolGambarDisentuh) return;
-    E.imgGanti.hidden = true; gambarDiKursor = null;
+    E.imgGanti.hidden = true; gambarDiKursor = null; latarDiKursor = null;
   }, 300);
 }
 E.imgGanti.addEventListener('mouseenter', function(){ tombolGambarDisentuh = true; clearTimeout(gambarSembunyiT); });
 E.imgGanti.addEventListener('mouseleave', function(){ tombolGambarDisentuh = false; sembunyikanTombolGambarNanti(); });
 E.imgGanti.addEventListener('click', function(){
+  if (latarDiKursor){
+    var h = latarDiKursor;
+    if (!fd || !fd.contains(h.el)) return;
+    select(h.el);
+    imgTarget = h; imgMode = h.pseudo ? 'latarSemua' : 'latarElemen';
+    E.fileInput.value = ''; E.fileInput.click();
+    return;
+  }
   var im = gambarDiKursor;
   if (!im || !fd || !fd.contains(im)) return;
   select(im);
@@ -3659,9 +4245,10 @@ E.imgGanti.addEventListener('click', function(){
 });
 
 /* ---------------- tab Gambar ----------------
-   Semua gambar halaman dalam satu tempat. Gambar kecil, yang tertutup, atau
-   yang jauh di bawah tidak perlu dicari di kanvas. Sekalian terlihat mana
-   yang tidak tampil dan mana yang membuat berkasnya berat. */
+   Semua gambar halaman dalam satu tempat — yang ditulis sebagai <img> maupun
+   sebagai latar CSS. Gambar kecil, yang tertutup, atau yang jauh di bawah
+   tidak perlu dicari di kanvas. Sekalian terlihat mana yang tidak tampil dan
+   mana yang membuat berkasnya berat. */
 function namaBerkas(src){
   if (!src) return '';
   if (/^data:/i.test(src)) return 'gambar tertanam';
@@ -3672,11 +4259,97 @@ function namaBerkas(src){
 }
 function ukuranTeks(b){ return b >= 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' MB' : Math.round(b / 1024) + ' KB'; }
 var galeriMap = [];
+var IKON_GAMBAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-image"/></svg>';
+
+/* Satu kartu galeri. `o` menjelaskan gambarnya dan apa yang terjadi saat
+   kartunya ditekan, supaya <img>, latar CSS, poster video, dan gambar SVG
+   memakai bentuk kartu yang sama. */
+function buatKartuGambar(o){
+  var kartu = document.createElement('div');
+  kartu.className = 'galeri-item';
+
+  var tb = document.createElement('button');
+  tb.type = 'button'; tb.className = 'galeri-thumb'; tb.title = 'Tunjukkan di halaman';
+  var gm = document.createElement('img');
+  gm.alt = ''; gm.decoding = 'async';
+  if (o.src) gm.src = o.src;
+  tb.appendChild(gm);
+  function tandai(teks, kelas){
+    var cap = document.createElement('span');
+    cap.className = 'galeri-cap ' + kelas; cap.textContent = teks;
+    tb.appendChild(cap);
+  }
+  if (o.badge) tandai(o.badge, 'latar');
+  var besar = /^data:/i.test(o.src) ? Math.round(o.src.length * 0.75) : 0;
+  if (o.rusak) tandai('Tidak tampil', 'rusak');
+  else if (besar > 300 * 1024) tandai('Berat ' + ukuranTeks(besar), 'berat');
+
+  var info = document.createElement('div');
+  info.className = 'galeri-info';
+  var nm = document.createElement('div');
+  nm.className = 'galeri-nama'; nm.textContent = o.nama; nm.title = o.judul || o.nama;
+  var meta = document.createElement('div');
+  meta.className = 'galeri-meta'; meta.textContent = o.meta;
+
+  var aksi = document.createElement('div');
+  aksi.className = 'galeri-aksi';
+  var ganti = document.createElement('button');
+  ganti.type = 'button'; ganti.className = 'btn btn-plain btn-sm';
+  ganti.innerHTML = IKON_GAMBAR + 'Ganti';
+  var linkBtn = document.createElement('button');
+  linkBtn.type = 'button'; linkBtn.className = 'btn btn-quiet btn-sm'; linkBtn.textContent = 'Link';
+  linkBtn.title = 'Ganti dengan gambar dari alamat internet';
+  aksi.appendChild(ganti); aksi.appendChild(linkBtn);
+
+  var baris = document.createElement('div');
+  baris.className = 'galeri-link'; baris.hidden = true;
+  var isian = document.createElement('input');
+  isian.type = 'text'; isian.className = 'inp mono'; isian.placeholder = 'https://…'; isian.spellcheck = false;
+  var pasang = document.createElement('button');
+  pasang.type = 'button'; pasang.className = 'btn btn-plain btn-sm'; pasang.textContent = 'Pasang';
+  baris.appendChild(isian); baris.appendChild(pasang);
+
+  info.appendChild(nm); info.appendChild(meta); info.appendChild(aksi); info.appendChild(baris);
+  kartu.appendChild(tb); kartu.appendChild(info);
+  E.galeri.appendChild(kartu);
+  galeriMap.push({ kartu:kartu, hosts:o.hosts });
+
+  tb.addEventListener('mouseenter', function(){ setPeek(o.hosts[0]); });
+  tb.addEventListener('mouseleave', function(){ setPeek(null); });
+  tb.addEventListener('click', function(){
+    o.tunjuk();
+    setPeek(o.hosts[0], true);
+    setTimeout(function(){ setPeek(null); }, 1200);
+  });
+  ganti.addEventListener('click', o.pilihBerkas);
+  linkBtn.addEventListener('click', function(){ baris.hidden = !baris.hidden; if (!baris.hidden) isian.focus(); });
+  function lakukan(){
+    var url = pasangLatarDariLink(isian.value); if (!url) return;
+    o.pasangLink(url);
+  }
+  pasang.addEventListener('click', lakukan);
+  isian.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); lakukan(); } });
+
+  // ukuran asli dan "tidak tampil" untuk gambar yang belum diketahui keadaannya
+  if (o.periksa){
+    var pr = new Image();
+    pr.onload = function(){ meta.textContent = pr.naturalWidth + ' × ' + pr.naturalHeight + ' px' + (o.sufiks || ''); };
+    pr.onerror = function(){ meta.textContent = 'tidak termuat' + (o.sufiks || ''); tandai('Tidak tampil', 'rusak'); };
+    pr.src = o.src;
+  }
+  return kartu;
+}
+function judulGaleri(teks){
+  var j = document.createElement('p');
+  j.className = 'galeri-judul'; j.textContent = teks;
+  E.galeri.appendChild(j);
+}
 function buildGaleri(){
   E.galeri.innerHTML = ''; galeriMap = [];
   if (!fd || !fd.body) return;
   var imgs = Array.prototype.slice.call(fd.body.querySelectorAll('img'));
-  if (!imgs.length){
+  var latar = pindaiLatar();
+  if (!imgs.length && !latar.length){
     var kosong = document.createElement('p');
     kosong.className = 'note';
     kosong.textContent = 'Halaman ini belum punya gambar. Seret "Gambar" dari tab Tambah untuk menambahkannya.';
@@ -3685,54 +4358,50 @@ function buildGaleri(){
     return;
   }
   E.galeri.style.display = '';
+  if (imgs.length && latar.length) judulGaleri('Gambar di halaman');
   imgs.forEach(function(im, i){
     /* currentSrc = gambar yang sedang tampil (penting untuk <picture>), tapi
        baru berganti setelah gambar baru selesai dimuat. Selama masih memuat,
        alamat barunya yang dipakai; galeri disegarkan lagi begitu selesai. */
     var src = (im.complete && im.currentSrc) || im.src || im.getAttribute('src') || '';
-    var kartu = document.createElement('div');
-    kartu.className = 'galeri-item';
-
-    var tb = document.createElement('button');
-    tb.type = 'button'; tb.className = 'galeri-thumb'; tb.title = 'Tunjukkan di halaman';
-    var gm = document.createElement('img');
-    gm.alt = ''; gm.decoding = 'async';
-    if (src) gm.src = src;
-    tb.appendChild(gm);
     var rusak = !src || (im.complete && im.naturalWidth === 0);
-    var besar = /^data:/i.test(src) ? Math.round(src.length * 0.75) : 0;
-    if (rusak || besar > 300 * 1024){
-      var cap = document.createElement('span');
-      cap.className = 'galeri-cap ' + (rusak ? 'rusak' : 'berat');
-      cap.textContent = rusak ? 'Tidak tampil' : 'Berat ' + ukuranTeks(besar);
-      tb.appendChild(cap);
-    }
-
-    var info = document.createElement('div');
-    info.className = 'galeri-info';
-    var nm = document.createElement('div');
-    nm.className = 'galeri-nama';
-    nm.textContent = im.getAttribute('alt') || namaBerkas(src) || ('Gambar ' + (i + 1));
-    nm.title = nm.textContent;
-    var meta = document.createElement('div');
-    meta.className = 'galeri-meta';
-    meta.textContent = im.naturalWidth ? (im.naturalWidth + ' × ' + im.naturalHeight + ' px') : (rusak ? 'tidak termuat' : 'belum termuat');
-    var ganti = document.createElement('button');
-    ganti.type = 'button'; ganti.className = 'btn btn-plain btn-sm';
-    ganti.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-image"/></svg>Ganti';
-    info.appendChild(nm); info.appendChild(meta); info.appendChild(ganti);
-    kartu.appendChild(tb); kartu.appendChild(info);
-    E.galeri.appendChild(kartu);
-    galeriMap.push({ el: im, kartu: kartu });
-
-    tb.addEventListener('mouseenter', function(){ setPeek(im); });
-    tb.addEventListener('mouseleave', function(){ setPeek(null); });
-    tb.addEventListener('click', function(){
-      select(im); setPeek(im, true);
-      setTimeout(function(){ setPeek(null); }, 1200);
+    buatKartuGambar({
+      src:src, rusak:rusak, hosts:[im],
+      nama: im.getAttribute('alt') || namaBerkas(src) || ('Gambar ' + (i + 1)),
+      meta: im.naturalWidth ? (im.naturalWidth + ' × ' + im.naturalHeight + ' px') : (rusak ? 'tidak termuat' : 'belum termuat'),
+      tunjuk: function(){ select(im); },
+      pilihBerkas: function(){ select(im); pilihBerkasGambar(im); },
+      pasangLink: function(url){
+        snap(); select(putImage(im, url, 'replace')); buildLayers();
+        toast('Gambar dipasang dari alamat.');
+      }
     });
-    ganti.addEventListener('click', function(){ select(im); pilihBerkasGambar(im); });
   });
+  if (latar.length){
+    if (imgs.length) judulGaleri('Gambar latar (CSS)');
+    latar.forEach(function(e){
+      var hosts = e.hosts.map(function(h){ return h.el; });
+      var sufiks = e.hosts.length > 1 ? ' · ' + e.hosts.length + ' tempat' : '';
+      var bagian = e.jenis === 'atribut' ? (e.atribut === 'poster' ? 'Poster' : 'SVG') : 'Latar';
+      buatKartuGambar({
+        src:e.url, rusak:false, periksa:true, sufiks:sufiks, hosts:hosts, badge:bagian,
+        nama: namaBerkas(e.url) || 'gambar latar', judul: /^data:/i.test(e.url) ? 'gambar tertanam' : e.url,
+        meta: 'memuat…' + sufiks,
+        tunjuk: function(){ select(hosts[0]); },
+        pilihBerkas: function(){
+          select(hosts[0]);
+          imgTarget = { entri:e, el:hosts[0] }; imgMode = 'latarEntri';
+          E.fileInput.value = ''; E.fileInput.click();
+        },
+        pasangLink: function(url){
+          snap();
+          var gagal = terapkanLatar(e, url);
+          select(hosts[0]); buildLayers();
+          toast(gagal ? 'Sebagian gambar latar tidak bisa diganti — stylesheet-nya milik situs lain.' : 'Gambar dipasang dari alamat.', !!gagal);
+        }
+      });
+    });
+  }
   tandaiGaleri(sel);
 }
 /* Gambar yang baru selesai dimuat (atau gagal) memperbarui galeri: ukuran asli
@@ -3746,7 +4415,9 @@ function segarkanGaleri(e){
 }
 function tandaiGaleri(el){
   var im = el ? gambarDari(el) : null;
-  galeriMap.forEach(function(x){ x.kartu.classList.toggle('on', x.el === im); });
+  galeriMap.forEach(function(x){
+    x.kartu.classList.toggle('on', !!el && (x.hosts.indexOf(el) >= 0 || (!!im && x.hosts.indexOf(im) >= 0)));
+  });
 }
 
 /* ---------------- lapisan ---------------- */
